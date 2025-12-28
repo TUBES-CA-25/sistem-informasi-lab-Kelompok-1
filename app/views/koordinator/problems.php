@@ -37,16 +37,16 @@
                 <div class="card-body">
                     <h3 style="margin-bottom: 1rem;">Filter Status</h3>
                     <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                        <a href="/koordinator/problems" class="btn <?= !isset($currentStatus) ? 'btn-primary' : 'btn-secondary' ?>">
+                        <a href="<?= BASE_URL ?>/koordinator/problems" class="btn <?= !isset($currentStatus) ? 'btn-primary' : 'btn-secondary' ?>">
                             Semua
                         </a>
-                        <a href="/koordinator/problems?status=reported" class="btn <?= ($currentStatus ?? '') === 'reported' ? 'btn-primary' : 'btn-secondary' ?>">
+                        <a href="<?= BASE_URL ?>/koordinator/problems?status=reported" class="btn <?= ($currentStatus ?? '') === 'reported' ? 'btn-primary' : 'btn-secondary' ?>">
                             Dilaporkan
                         </a>
-                        <a href="/koordinator/problems?status=in_progress" class="btn <?= ($currentStatus ?? '') === 'in_progress' ? 'btn-primary' : 'btn-secondary' ?>">
+                        <a href="<?= BASE_URL ?>/koordinator/problems?status=in_progress" class="btn <?= ($currentStatus ?? '') === 'in_progress' ? 'btn-primary' : 'btn-secondary' ?>">
                             Dalam Proses
                         </a>
-                        <a href="/koordinator/problems?status=resolved" class="btn <?= ($currentStatus ?? '') === 'resolved' ? 'btn-primary' : 'btn-secondary' ?>">
+                        <a href="<?= BASE_URL ?>/koordinator/problems?status=resolved" class="btn <?= ($currentStatus ?? '') === 'resolved' ? 'btn-primary' : 'btn-secondary' ?>">
                             Selesai
                         </a>
                     </div>
@@ -95,7 +95,7 @@
                                         <td><?= getStatusBadge($problem['status']) ?></td>
                                         <td><?= formatDate($problem['reported_at']) ?></td>
                                         <td>
-                                            <a href="/koordinator/problems/<?= $problem['id'] ?>" class="btn btn-sm btn-primary">
+                                            <a href="<?= BASE_URL ?>/koordinator/problems/<?= $problem['id'] ?>" class="btn btn-sm btn-primary">
                                                 Detail
                                             </a>
                                         </td>
