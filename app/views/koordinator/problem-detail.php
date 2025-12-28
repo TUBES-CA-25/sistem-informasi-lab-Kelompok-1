@@ -25,7 +25,7 @@
                 <h2>🔧 Detail Masalah #<?= $problem['id'] ?></h2>
                 <p>Informasi lengkap dan riwayat masalah</p>
             </div>
-            <a href="/koordinator/problems" class="btn btn-secondary">← Kembali</a>
+            <a href="<?= BASE_URL ?>/koordinator/problems" class="btn btn-secondary">← Kembali</a>
         </div>
         
         <div style="padding: 2rem;">
@@ -130,7 +130,7 @@
                         <div class="card-body">
                             <h3>🔄 Update Status</h3>
                             
-                            <form method="POST" action="/koordinator/problems/<?= $problem['id'] ?>/update-status">
+                            <form method="POST" action="<?= BASE_URL ?>/koordinator/problems/<?= $problem['id'] ?>/update-status">
                                 <div class="form-group">
                                     <label for="status">Status Baru:</label>
                                     <select name="status" id="status" class="form-control" required>
