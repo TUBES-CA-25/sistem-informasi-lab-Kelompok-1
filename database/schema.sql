@@ -157,11 +157,11 @@ INSERT INTO roles (role_name) VALUES
 
 -- Insert Users (password: password123)
 INSERT INTO users (name, email, password, role_id, status) VALUES 
-('Admin User', 'admin@iclabs.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1, 'active'),
-('Koordinator Lab', 'koordinator@iclabs.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 2, 'active'),
-('Asisten 1', 'asisten1@iclabs.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 3, 'active'),
-('Asisten 2', 'asisten2@iclabs.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 3, 'active'),
-('Asisten 3', 'asisten3@iclabs.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 3, 'active');
+('Admin User', 'admin@iclabs.com', '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 1, 'active'),
+('Koordinator Lab', 'koordinator@iclabs.com', '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 2, 'active'),
+('Asisten 1', 'asisten1@iclabs.com', '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 3, 'active'),
+('Asisten 2', 'asisten2@iclabs.com', '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 3, 'active'),
+('Asisten 3', 'asisten3@iclabs.com', '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 3, 'active');
 
 -- Insert Laboratories
 INSERT INTO laboratories (lab_name, description, location) VALUES 
