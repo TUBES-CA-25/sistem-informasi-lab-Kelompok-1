@@ -233,6 +233,13 @@ function setFlash($type, $message) {
 }
 
 /**
+ * Check if flash message exists
+ */
+function hasFlash() {
+    return isset($_SESSION['flash']);
+}
+
+/**
  * Get and clear flash message
  */
 function getFlash() {
