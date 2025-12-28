@@ -1,0 +1,55 @@
+# ICLABS - Git Ignore File
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Uploads folder (user-generated content)
+public/uploads/*
+!public/uploads/.gitkeep
+
+# Logs
+*.log
+logs/
+apache/logs/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# PHP cache
+*.cache
+
+# Composer (if using)
+vendor/
+composer.lock
+
+# Node modules (if using npm)
+node_modules/
+package-lock.json
+
+# Sensitive configuration (backup original)
+app/config/database.php.bak
+
+# Database backups
+*.sql.bak
+backups/
+
+# Session files
+sessions/
+tmp/
