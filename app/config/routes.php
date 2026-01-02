@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ICLABS - Routes Configuration
  */
@@ -13,10 +14,13 @@ $router->get('/home', 'LandingController@index');
 
 // Schedule
 $router->get('/schedule', 'LandingController@schedule');
+$router->get('/schedule/:id', 'LandingController@scheduleDetail');
 
-// Laboratory Management Section (on landing)
-$router->get('/head-laboran', 'LandingController@headLaboran');
-$router->get('/lab-activities', 'LandingController@labActivities');
+// Management Presence (Updated from head-laboran)
+$router->get('/presence', 'LandingController@presence');
+
+// Activities (Blog style)
+$router->get('/activities', 'LandingController@labActivities');
 
 // ==========================================
 // AUTHENTICATION ROUTES
@@ -29,11 +33,12 @@ $router->post('/auth/logout', 'AuthController@logout');
 $router->get('/logout', 'AuthController@logout');
 
 // ==========================================
-// API ROUTES (JSON responses)
+// API ROUTES (JSON responses for AJAX/Modal)
 // ==========================================
 
 // Public API
 $router->get('/api/schedules', 'ApiController@getSchedules');
+$router->get('/api/schedule/:id', 'ApiController@getScheduleDetail'); // NEW: Untuk tombol Detail
 $router->get('/api/head-laboran', 'ApiController@getHeadLaboran');
 $router->get('/api/lab-activities', 'ApiController@getLabActivities');
 
@@ -78,6 +83,7 @@ $router->get('/admin/laboratories/:id/edit', 'AdminController@editLaboratoryForm
 $router->post('/admin/laboratories/:id/edit', 'AdminController@editLaboratory');
 $router->post('/admin/laboratories/:id/delete', 'AdminController@deleteLaboratory');
 
+
 // Lab Schedules
 $router->get('/admin/schedules', 'AdminController@listSchedules');
 $router->get('/admin/schedules/create', 'AdminController@createScheduleForm');
@@ -85,6 +91,9 @@ $router->post('/admin/schedules/create', 'AdminController@createSchedule');
 $router->get('/admin/schedules/:id/edit', 'AdminController@editScheduleForm');
 $router->post('/admin/schedules/:id/edit', 'AdminController@editSchedule');
 $router->post('/admin/schedules/:id/delete', 'AdminController@deleteSchedule');
+$router->get('/admin/schedules/:id', 'AdminController@viewSchedule');
+
+
 
 // Assistant Schedules (Piket)
 $router->get('/admin/assistant-schedules', 'AdminController@listAssistantSchedules');
@@ -94,13 +103,22 @@ $router->get('/admin/assistant-schedules/:id/edit', 'AdminController@editAssista
 $router->post('/admin/assistant-schedules/:id/edit', 'AdminController@editAssistantSchedule');
 $router->post('/admin/assistant-schedules/:id/delete', 'AdminController@deleteAssistantSchedule');
 
+
+
+
 // Head Laboran Management
 $router->get('/admin/head-laboran', 'AdminController@listHeadLaboran');
 $router->get('/admin/head-laboran/create', 'AdminController@createHeadLaboranForm');
 $router->post('/admin/head-laboran/create', 'AdminController@createHeadLaboran');
+
+$router->get('/admin/head-laboran/:id', 'AdminController@viewHeadLaboran');
+
 $router->get('/admin/head-laboran/:id/edit', 'AdminController@editHeadLaboranForm');
 $router->post('/admin/head-laboran/:id/edit', 'AdminController@editHeadLaboran');
 $router->post('/admin/head-laboran/:id/delete', 'AdminController@deleteHeadLaboran');
+
+
+
 
 // Lab Activities Management
 $router->get('/admin/activities', 'AdminController@listActivities');
