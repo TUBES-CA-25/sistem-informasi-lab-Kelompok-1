@@ -245,3 +245,149 @@ CREATE INDEX idx_lab_activities_date ON lab_activities(activity_date);
 -- Koordinator: koordinator@iclabs.com / password123
 -- Asisten1: asisten1@iclabs.com / password123
 -- ==========================================
+
+--Update Rifky
+-- 1. Tambah kolom untuk Jadwal Lengkap
+ALTER TABLE lab_schedules
+ADD COLUMN program_study VARCHAR(100) AFTER course,
+ADD COLUMN semester INT AFTER program_study,
+ADD COLUMN class_code VARCHAR(20) AFTER semester,
+ADD COLUMN frequency VARCHAR(50) AFTER class_code,
+ADD COLUMN assistant_2 VARCHAR(100) AFTER assistant;
+
+-- 2. Tambah kolom untuk Detail Kehadiran Head Laboran
+ALTER TABLE head_laboran
+ADD COLUMN position VARCHAR(100) DEFAULT 'Laboran' AFTER user_id, -- Contoh: Kepala Lab 1, Laboran
+ADD COLUMN return_time DATETIME AFTER location,
+ADD COLUMN notes TEXT AFTER return_time; -- Untuk deskripsi jobdesk/alasan
+
+-- 3. Tambah kolom Gambar untuk Kegiatan (Blog)
+ALTER TABLE lab_activities
+ADD COLUMN image_cover VARCHAR(255) AFTER title;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- =============================================
+-- 1. UPDATE DATA JADWAL (LAB SCHEDULES)
+-- Mengisi kolom Prodi, Semester, Kelas, dll
+-- =============================================
+
+-- Update jadwal yang sudah ada dengan data lengkap
+UPDATE lab_schedules 
+SET 
+    program_study = 'Teknik Informatika',
+    semester = 1,
+    class_code = 'A1',
+    frequency = 'Mingguan',
+    assistant_2 = 'Asisten Magang'
+WHERE id = 1;
+
+UPDATE lab_schedules 
+SET 
+    program_study = 'Sistem Informasi',
+    semester = 3,
+    class_code = 'B2',
+    frequency = 'Mingguan',
+    assistant_2 = 'Asisten Senior'
+WHERE id = 2;
+
+UPDATE lab_schedules 
+SET 
+    program_study = 'Teknik Informatika',
+    semester = 5,
+    class_code = 'C1',
+    frequency = '2 Minggu Sekali',
+    assistant_2 = '-'
+WHERE id = 3;
+
+-- Tambah satu jadwal baru yang kompleks untuk testing
+INSERT INTO lab_schedules 
+(laboratory_id, day, start_time, end_time, course, lecturer, assistant, participant_count, program_study, semester, class_code, frequency, assistant_2)
+VALUES 
+(2, 'Wednesday', '08:00:00', '11:00:00', 'Kecerdasan Buatan', 'Prof. Dr. AI Expert', 'Asisten 1', 40, 'Teknik Informatika', 5, 'IF-5-A', 'Mingguan', 'Asisten 3');
+
+
+-- =============================================
+-- 2. SETUP DATA HEAD LABORAN & PRESENCE
+-- Membuat User Baru untuk Kepala Lab 2 & 3
+-- =============================================
+
+-- Buat User baru dulu (Password: password123)
+INSERT INTO users (name, email, password, role_id, status) VALUES 
+('Budi (KaLab Multimedia)', 'kalab2@iclabs.com', '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 2, 'active'),
+('Siti (KaLab Jaringan)', 'kalab3@iclabs.com', '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 2, 'active'),
+('Joko (Laboran Teknis)', 'laboran@iclabs.com', '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 2, 'active');
+
+-- Update Kepala Lab 1 yang sudah ada (dari seed awal)
+UPDATE head_laboran 
+SET 
+    position = 'Kepala Lab Komputer Dasar',
+    status = 'active',
+    notes = 'Standby di ruangan A201',
+    return_time = NULL
+WHERE id = 1;
+
+-- Insert Kepala Lab baru ke tabel head_laboran
+-- Menggunakan subquery untuk mengambil ID user yang baru dibuat
+INSERT INTO head_laboran (user_id, position, status, location, time_in, notes, return_time) 
+SELECT id, 'Kepala Lab Multimedia', 'inactive', 'Luar Kota', NULL, 'Sedang Dinas Luar di Jakarta', '2026-01-05 08:00:00'
+FROM users WHERE email = 'kalab2@iclabs.com';
+
+INSERT INTO head_laboran (user_id, position, status, location, time_in, notes) 
+SELECT id, 'Kepala Lab Jaringan', 'active', 'Lab Jaringan B1', '07:30:00', 'Siap melayani konsultasi'
+FROM users WHERE email = 'kalab3@iclabs.com';
+
+INSERT INTO head_laboran (user_id, position, status, location, time_in, notes) 
+SELECT id, 'Staff Laboran', 'active', 'Ruang Server', '08:00:00', 'Maintenance Server Rutin'
+FROM users WHERE email = 'laboran@iclabs.com';
+
+
+-- =============================================
+-- 3. UPDATE KEGIATAN (ACTIVITIES) DENGAN GAMBAR
+-- Menggunakan placeholder image sementara
+-- =============================================
+
+UPDATE lab_activities 
+SET image_cover = 'https://placehold.co/600x400/2563eb/FFF?text=Workshop+Python' 
+WHERE id = 1;
+
+UPDATE lab_activities 
+SET image_cover = 'https://placehold.co/600x400/10b981/FFF?text=Maintenance' 
+WHERE id = 2;
+
+UPDATE lab_activities 
+SET image_cover = 'https://placehold.co/600x400/f59e0b/FFF?text=Seminar+Security' 
+WHERE id = 3;
+
+UPDATE lab_activities 
+SET image_cover = 'https://placehold.co/600x400/ef4444/FFF?text=Database' 
+WHERE id = 4;
+
+
+
+-- Tambah kolom foto di tabel lab_schedules
+ALTER TABLE lab_schedules
+ADD COLUMN lecturer_photo VARCHAR(255) DEFAULT NULL AFTER lecturer,
+ADD COLUMN assistant_photo VARCHAR(255) DEFAULT NULL AFTER assistant,
+ADD COLUMN assistant2_photo VARCHAR(255) DEFAULT NULL AFTER assistant_2,
+ADD COLUMN description TEXT AFTER frequency;
+
+-- Update Dummy Data (Supaya langsung ada isinya saat ditest)
+UPDATE lab_schedules SET 
+lecturer_photo = 'https://ui-avatars.com/api/?name=Dosen+A&background=random&size=200',
+assistant_photo = 'https://ui-avatars.com/api/?name=Asisten+1&background=0D8ABC&color=fff&size=200',
+assistant2_photo = 'https://ui-avatars.com/api/?name=Asisten+2&background=random&size=200',
+description = 'Praktikum ini berfokus pada penerapan algoritma Machine Learning dasar menggunakan Python.'
+WHERE id > 0;

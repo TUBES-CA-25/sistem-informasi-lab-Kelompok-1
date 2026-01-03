@@ -1,10 +1,11 @@
 <?php
+
 /**
  * ICLABS - Database Configuration
  */
 
 define('DB_HOST', '127.0.0.1');
-define('DB_PORT', '3310');
+define('DB_PORT', '3306');
 define('DB_NAME', 'iclabs');
 define('DB_USER', 'root');
 define('DB_PASS', '');
@@ -14,9 +15,10 @@ define('DB_CHARSET', 'utf8mb4');
  * Get Database Connection
  * @return PDO
  */
-function getDBConnection() {
+function getDBConnection()
+{
     static $pdo = null;
-    
+
     if ($pdo === null) {
         try {
             $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
@@ -30,6 +32,6 @@ function getDBConnection() {
             die("Database connection failed: " . $e->getMessage());
         }
     }
-    
+
     return $pdo;
 }

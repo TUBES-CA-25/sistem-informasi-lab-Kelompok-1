@@ -1,57 +1,67 @@
 <?php
+
 /**
  * ICLABS - API Controller
- * Handles JSON API endpoints
+ * Handles JSON responses for AJAX requests
  */
 
-class ApiController extends Controller {
-    
+class ApiController extends Controller
+{
+
     /**
-     * Get laboratory schedules (JSON)
+     * Constructor to set JSON header
      */
-    public function getSchedules() {
+    public function __construct()
+    {
+        header('Content-Type: application/json');
+    }
+
+    /**
+     * Get all schedules
+     */
+    public function getSchedules()
+    {
         $scheduleModel = $this->model('LabScheduleModel');
-        
-        $day = $this->getQuery('day');
-        
-        if ($day) {
-            $schedules = $scheduleModel->getSchedulesByDay($day);
+        $data = $scheduleModel->getAllWithLaboratory();
+        echo json_encode(['success' => true, 'data' => $data]);
+    }
+
+    /**
+     * [NEW] Get Single Schedule Detail
+     * Digunakan untuk modal detail pada halaman Schedule
+     */
+    public function getScheduleDetail($id)
+    {
+        $scheduleModel = $this->model('LabScheduleModel');
+
+        // Mengambil detail jadwal spesifik (termasuk assistant_2, prodi, dll)
+        $data = $scheduleModel->getScheduleDetail($id);
+
+        if ($data) {
+            echo json_encode(['success' => true, 'data' => $data]);
         } else {
-            $schedules = $scheduleModel->getAllWithLaboratory();
+            http_response_code(404);
+            echo json_encode(['success' => false, 'message' => 'Schedule not found']);
         }
-        
-        $this->json([
-            'success' => true,
-            'data' => $schedules
-        ]);
     }
-    
+
     /**
-     * Get head laboran (JSON)
+     * Get head laboran list
      */
-    public function getHeadLaboran() {
+    public function getHeadLaboran()
+    {
         $headLaboranModel = $this->model('HeadLaboranModel');
-        
-        $headLaboran = $headLaboranModel->getActiveHeadLaboran();
-        
-        $this->json([
-            'success' => true,
-            'data' => $headLaboran
-        ]);
+        $data = $headLaboranModel->getActiveHeadLaboran();
+        echo json_encode(['success' => true, 'data' => $data]);
     }
-    
+
     /**
-     * Get lab activities (JSON)
+     * Get lab activities
      */
-    public function getLabActivities() {
+    public function getLabActivities()
+    {
         $activityModel = $this->model('LabActivityModel');
-        
-        $limit = $this->getQuery('limit', 10);
-        $activities = $activityModel->getPublicActivities($limit);
-        
-        $this->json([
-            'success' => true,
-            'data' => $activities
-        ]);
+        $data = $activityModel->getPublicActivities();
+        echo json_encode(['success' => true, 'data' => $data]);
     }
 }
