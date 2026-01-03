@@ -121,16 +121,16 @@ function formatTime($time) {
  */
 function getStatusBadge($status) {
     $badges = [
-        'active' => '<span class="badge badge-success">Active</span>',
-        'inactive' => '<span class="badge badge-danger">Inactive</span>',
-        'pending' => '<span class="badge badge-warning">Pending</span>',
-        'completed' => '<span class="badge badge-success">Completed</span>',
-        'in_progress' => '<span class="badge badge-info">In Progress</span>',
-        'reported' => '<span class="badge badge-warning">Reported</span>',
-        'resolved' => '<span class="badge badge-success">Resolved</span>',
+        'active' => '<span style="padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 600; background: rgba(16, 185, 129, 0.15); color: #059669; display: inline-block;">✓ Active</span>',
+        'inactive' => '<span style="padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 600; background: rgba(239, 68, 68, 0.15); color: #dc2626; display: inline-block;">✕ Inactive</span>',
+        'pending' => '<span style="padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 600; background: rgba(245, 158, 11, 0.15); color: #d97706; display: inline-block;">⏳ Pending</span>',
+        'completed' => '<span style="padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 600; background: rgba(16, 185, 129, 0.15); color: #059669; display: inline-block;">✓ Completed</span>',
+        'in_progress' => '<span style="padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 600; background: rgba(59, 130, 246, 0.15); color: #2563eb; display: inline-block;">⚙️ In Progress</span>',
+        'reported' => '<span style="padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 600; background: rgba(245, 158, 11, 0.15); color: #d97706; display: inline-block;">📋 Reported</span>',
+        'resolved' => '<span style="padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 600; background: rgba(16, 185, 129, 0.15); color: #059669; display: inline-block;">✅ Resolved</span>',
     ];
     
-    return $badges[$status] ?? '<span class="badge">' . e($status) . '</span>';
+    return $badges[$status] ?? '<span style="padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 600; background: rgba(100, 116, 139, 0.15); color: #475569; display: inline-block;">' . e($status) . '</span>';
 }
 
 /**
