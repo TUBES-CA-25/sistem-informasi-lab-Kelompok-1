@@ -820,19 +820,28 @@ class AdminController extends Controller
 
 
 
+
+
+
+
+
+
+
+
+
+
+
     // ==========================================
-    // LAB ACTIVITIES MANAGEMENT
+    // ACTIVITY / BLOG MANAGEMENT
     // ==========================================
 
     public function listActivities()
     {
         $activityModel = $this->model('LabActivityModel');
-
         $data = [
-            'activities' => $activityModel->getAllWithCreator()
+            'activities' => $activityModel->getAllActivities()
         ];
-
-        $this->view('admin/activities/list', $data);
+        $this->view('admin/activities/index', $data);
     }
 
     public function createActivityForm()
@@ -840,27 +849,50 @@ class AdminController extends Controller
         $this->view('admin/activities/create');
     }
 
+
+
     public function createActivity()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/admin/activities/create');
         }
 
+        // 1. Handle Upload Cover
+        $coverPath = $this->handleFileUpload('image_cover_file', 'uploads/activities/');
+
+        // 2. Ambil Input (Termasuk Link URL)
         $data = [
             'title' => sanitize($this->getPost('title')),
             'activity_type' => sanitize($this->getPost('activity_type')),
+            'description' => sanitize($this->getPost('description')), // Deskripsi Singkat
+            'link_url' => trim($this->getPost('link_url')),         // NEW: Link ke Berita
             'activity_date' => sanitize($this->getPost('activity_date')),
-            'location' => sanitize($this->getPost('location')),
-            'description' => sanitize($this->getPost('description')),
-            'status' => sanitize($this->getPost('status', 'draft'))
+            'image_cover' => $coverPath
         ];
 
-        $activityModel = $this->model('LabActivityModel');
-        $activityModel->createActivity($data);
+        // 3. Validasi
+        $errors = $this->validate($data, [
+            'title' => 'required',
+            'link_url' => 'required', // Link wajib diisi
+            'activity_date' => 'required'
+        ]);
 
-        setFlash('success', 'Activity created successfully');
-        $this->redirect('/admin/activities');
+        if (!empty($errors)) {
+            setFlash('danger', 'Judul, Link Berita, dan Tanggal wajib diisi.');
+            $this->redirect('/admin/activities/create');
+        }
+
+        $activityModel = $this->model('LabActivityModel');
+        if ($activityModel->createActivity($data)) {
+            setFlash('success', 'Kegiatan berhasil diterbitkan.');
+            $this->redirect('/admin/activities');
+        } else {
+            setFlash('danger', 'Gagal menerbitkan kegiatan.');
+            $this->redirect('/admin/activities/create');
+        }
     }
+
+
 
     public function editActivityForm($id)
     {
@@ -868,7 +900,7 @@ class AdminController extends Controller
         $activity = $activityModel->find($id);
 
         if (!$activity) {
-            setFlash('danger', 'Activity not found');
+            setFlash('danger', 'Kegiatan tidak ditemukan.');
             $this->redirect('/admin/activities');
         }
 
@@ -882,21 +914,29 @@ class AdminController extends Controller
             $this->redirect('/admin/activities/' . $id . '/edit');
         }
 
+        $activityModel = $this->model('LabActivityModel');
+        $oldData = $activityModel->find($id);
+
+        $coverPath = $this->handleFileUpload('image_cover_file', 'uploads/activities/') ?? $oldData['image_cover'];
+
         $data = [
             'title' => sanitize($this->getPost('title')),
             'activity_type' => sanitize($this->getPost('activity_type')),
-            'activity_date' => sanitize($this->getPost('activity_date')),
-            'location' => sanitize($this->getPost('location')),
             'description' => sanitize($this->getPost('description')),
-            'status' => sanitize($this->getPost('status'))
+            'link_url' => trim($this->getPost('link_url')), // NEW
+            'activity_date' => sanitize($this->getPost('activity_date')),
+            'image_cover' => $coverPath
         ];
 
-        $activityModel = $this->model('LabActivityModel');
-        $activityModel->updateActivity($id, $data);
-
-        setFlash('success', 'Activity updated successfully');
-        $this->redirect('/admin/activities');
+        if ($activityModel->updateActivity($id, $data)) {
+            setFlash('success', 'Kegiatan berhasil diperbarui.');
+            $this->redirect('/admin/activities');
+        } else {
+            setFlash('danger', 'Gagal memperbarui kegiatan.');
+            $this->redirect('/admin/activities/' . $id . '/edit');
+        }
     }
+
 
     public function deleteActivity($id)
     {
@@ -905,11 +945,42 @@ class AdminController extends Controller
         }
 
         $activityModel = $this->model('LabActivityModel');
-        $activityModel->deleteActivity($id);
+        if ($activityModel->deleteActivity($id)) {
+            setFlash('success', 'Kegiatan dihapus.');
+        } else {
+            setFlash('danger', 'Gagal menghapus kegiatan.');
+        }
 
-        setFlash('success', 'Activity deleted successfully');
         $this->redirect('/admin/activities');
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // ==========================================
     // PROBLEMS MANAGEMENT
