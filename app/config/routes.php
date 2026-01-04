@@ -120,13 +120,15 @@ $router->post('/admin/head-laboran/:id/delete', 'AdminController@deleteHeadLabor
 
 
 
-// Lab Activities Management
+// Lab Activities (Blog/News)
 $router->get('/admin/activities', 'AdminController@listActivities');
-$router->get('/admin/activities/create', 'AdminController@createActivityForm');
+$router->get('/admin/activities/create', 'AdminController@createActivityForm'); // Create DI ATAS ID
 $router->post('/admin/activities/create', 'AdminController@createActivity');
 $router->get('/admin/activities/:id/edit', 'AdminController@editActivityForm');
 $router->post('/admin/activities/:id/edit', 'AdminController@editActivity');
 $router->post('/admin/activities/:id/delete', 'AdminController@deleteActivity');
+
+
 
 // Problems Management
 $router->get('/admin/problems', 'AdminController@listProblems');

@@ -1,98 +1,78 @@
 <?php
-/**
- * ICLABS - Lab Activity Model
- */
 
-class LabActivityModel extends Model {
+class LabActivityModel extends Model
+{
     protected $table = 'lab_activities';
-    
+
     /**
-     * Get all activities with creator info
+     * Ambil semua kegiatan (untuk Admin List)
+     * Diurutkan dari yang terbaru
      */
-    public function getAllWithCreator() {
-        $sql = "SELECT a.*, u.name as creator_name 
-                FROM lab_activities a 
-                JOIN users u ON a.created_by = u.id 
-                ORDER BY a.activity_date DESC, a.created_at DESC";
+    public function getAllActivities()
+    {
+        $sql = "SELECT * FROM {$this->table} ORDER BY activity_date DESC, created_at DESC";
         return $this->query($sql);
     }
-    
+
     /**
-     * Get public activities (for landing page)
+     * Ambil kegiatan untuk Halaman Depan (Public Landing Page)
      */
-    public function getPublicActivities($limit = 10) {
-        $sql = "SELECT a.*, u.name as creator_name 
-                FROM lab_activities a 
-                JOIN users u ON a.created_by = u.id 
-                WHERE a.status = 'published' 
-                ORDER BY a.activity_date DESC 
-                LIMIT ?";
+    public function getPublicActivities($limit = 6)
+    {
+        $sql = "SELECT * FROM {$this->table} ORDER BY activity_date DESC LIMIT ?";
         return $this->query($sql, [$limit]);
     }
-    
+
     /**
-     * Get upcoming activities
+     * Cari satu kegiatan berdasarkan ID
      */
-    public function getUpcomingActivities() {
-        $sql = "SELECT a.*, u.name as creator_name 
-                FROM lab_activities a 
-                JOIN users u ON a.created_by = u.id 
-                WHERE a.activity_date >= CURDATE() AND a.status = 'published' 
-                ORDER BY a.activity_date ASC";
-        return $this->query($sql);
+    public function find($id)
+    {
+        $sql = "SELECT * FROM {$this->table} WHERE id = ?";
+        $result = $this->query($sql, [$id]);
+
+        // Mengembalikan baris pertama atau false jika kosong
+        return isset($result[0]) ? $result[0] : false;
     }
-    
+
     /**
-     * Get activities by type
+     * Hitung kegiatan yang akan datang
      */
-    public function getActivitiesByType($type) {
-        $sql = "SELECT a.*, u.name as creator_name 
-                FROM lab_activities a 
-                JOIN users u ON a.created_by = u.id 
-                WHERE a.activity_type = ? 
-                ORDER BY a.activity_date DESC";
-        return $this->query($sql, [$type]);
+    public function countUpcoming()
+    {
+        $sql = "SELECT COUNT(*) as total FROM {$this->table} WHERE activity_date >= CURDATE()";
+        $result = $this->query($sql);
+        return isset($result[0]['total']) ? $result[0]['total'] : 0;
     }
-    
+
     /**
-     * Create activity
+     * Tambah Kegiatan Baru
      */
-    public function createActivity($data) {
-        $data['created_by'] = getUserId();
+    public function createActivity($data)
+    {
+        // Tambahkan data sistem otomatis (Pembuat & Waktu)
+        $data['created_by'] = $_SESSION['user_id'] ?? 0;
         $data['created_at'] = date('Y-m-d H:i:s');
-        $data['status'] = $data['status'] ?? 'draft';
-        
+
+        // Menggunakan method bawaan framework Anda (insert)
         return $this->insert($data);
     }
-    
+
     /**
-     * Update activity
+     * Update Kegiatan
      */
-    public function updateActivity($id, $data) {
+    public function updateActivity($id, $data)
+    {
+        // Menggunakan method bawaan framework Anda (update)
         return $this->update($id, $data);
     }
-    
+
     /**
-     * Delete activity
+     * Hapus Kegiatan
      */
-    public function deleteActivity($id) {
+    public function deleteActivity($id)
+    {
+        // Menggunakan method bawaan framework Anda (delete)
         return $this->delete($id);
-    }
-    
-    /**
-     * Count activities
-     */
-    public function countActivities() {
-        return $this->count();
-    }
-    
-    /**
-     * Count upcoming activities
-     */
-    public function countUpcoming() {
-        $sql = "SELECT COUNT(*) as count FROM lab_activities 
-                WHERE activity_date >= CURDATE() AND status = 'published'";
-        $result = $this->queryOne($sql);
-        return (int) $result['count'];
     }
 }
