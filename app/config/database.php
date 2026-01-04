@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ICLABS - Database Configuration
  */
@@ -14,9 +15,10 @@ define('DB_CHARSET', 'utf8mb4');
  * bapak
  * @return PDO
  */
-function getDBConnection() {
+function getDBConnection()
+{
     static $pdo = null;
-    
+
     if ($pdo === null) {
         try {
             $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
@@ -30,6 +32,6 @@ function getDBConnection() {
             die("Database connection failed: " . $e->getMessage());
         }
     }
-    
+
     return $pdo;
 }
