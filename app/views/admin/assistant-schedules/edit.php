@@ -1,9 +1,11 @@
 <?php $title = 'Edit Assistant Schedule'; $adminLayout = true; ?>
 <?php include APP_PATH . '/views/layouts/header.php'; ?>
 
-<div class="admin-layout">
+<div class="admin-layout antialiased bg-slate-50 min-h-screen">
     <?php include APP_PATH . '/views/layouts/admin-sidebar.php'; ?>
     
+    <main class="p-4 sm:ml-64 pt-10">
+    <div class="max-w-3xl mx-auto">
     <div class="main-content">
         <div class="admin-navbar">
             <div class="admin-navbar-brand">Edit Assistant Schedule</div>
@@ -70,6 +72,8 @@
             </div>
         </div>
     </div>
+    </div>
+    <?php include APP_PATH . '/views/layouts/footer.php'; ?>
+    </main>
 </div>
 
-<?php include APP_PATH . '/views/layouts/footer.php'; ?>

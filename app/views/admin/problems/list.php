@@ -1,10 +1,11 @@
 <?php $title = 'Lab Problems'; $adminLayout = true; ?>
 <?php include APP_PATH . '/views/layouts/header.php'; ?>
 
-<div class="admin-layout">
+<div class="admin-layout antialiased bg-slate-50 min-h-screen">
     <?php include APP_PATH . '/views/layouts/admin-sidebar.php'; ?>
     
-    <div class="main-content">
+    <main class="p-4 sm:ml-64 pt-10">
+    <div class="p-4 border-2 border-dashed border-slate-200 rounded-lg bg-white min-h-[80vh]">
         <div class="admin-navbar">
             <div class="admin-navbar-brand">Lab Problems</div>
             <div class="admin-navbar-profile">
@@ -90,6 +91,9 @@
             </div>
         </div>
     </div>
+    </div>
+    
+<?php include APP_PATH . '/views/layouts/footer.php'; ?>
+    </main>
 </div>
 
-<?php include APP_PATH . '/views/layouts/footer.php'; ?>

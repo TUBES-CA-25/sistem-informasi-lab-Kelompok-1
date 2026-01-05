@@ -4,6 +4,9 @@
 <div class="admin-layout">
     <?php include APP_PATH . '/views/layouts/admin-sidebar.php'; ?>
     
+    <main class="p-4 sm:ml-64 pt-10">
+        <div class="max-w-4xl mx-auto">
+
     <div class="main-content">
         <div class="admin-navbar">
             <div class="admin-navbar-brand">Create User</div>
@@ -58,6 +61,9 @@
             </div>
         </div>
     </div>
-</div>
+        </div>
 
 <?php include APP_PATH . '/views/layouts/footer.php'; ?>
+    </main>
+</div>
+

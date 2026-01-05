@@ -1,10 +1,11 @@
 <?php $title = 'Problem Detail'; $adminLayout = true; ?>
 <?php include APP_PATH . '/views/layouts/header.php'; ?>
 
-<div class="admin-layout">
+<div class="admin-layout antialiased bg-slate-50 min-h-screen">
     <?php include APP_PATH . '/views/layouts/admin-sidebar.php'; ?>
     
-    <div class="main-content">
+    <main class="p-4 sm:ml-64 pt-10">
+        <div class="max-w-4xl mx-auto">
         <div class="admin-navbar">
             <div class="admin-navbar-brand">Problem Detail</div>
             <div class="admin-navbar-profile">
@@ -107,6 +108,8 @@
             </div>
         </div>
     </div>
+</div>    
+<?php include APP_PATH . '/views/layouts/footer.php'; ?>
+    </main>
 </div>
 
-<?php include APP_PATH . '/views/layouts/footer.php'; ?>

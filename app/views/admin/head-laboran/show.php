@@ -95,6 +95,7 @@
                 </div>
             </div>
         </div>
+        
+        <?php include APP_PATH . '/views/layouts/footer.php'; ?>
     </main>
 </div>
-<?php include APP_PATH . '/views/layouts/footer.php'; ?>

@@ -3,7 +3,9 @@
 
 <div class="admin-layout">
     <?php include APP_PATH . '/views/layouts/admin-sidebar.php'; ?>
-    
+    <main class="p-4 sm:ml-64 pt-10">
+        <div class="p-4 border-2 border-dashed border-slate-200 rounded-lg bg-white min-h-[80vh]">
+
     <div class="main-content">
         <div class="admin-navbar">
             <div class="admin-navbar-brand">Users Management</div>
@@ -62,6 +64,9 @@
             </div>
         </div>
     </div>
+    </div>
+    
+<?php include APP_PATH . '/views/layouts/footer.php'; ?>
+    </main>
 </div>
 
-<?php include APP_PATH . '/views/layouts/footer.php'; ?>
