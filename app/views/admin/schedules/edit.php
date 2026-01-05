@@ -169,6 +169,6 @@
             </form>
         </div>
         
-<?php include APP_PATH . '/views/layouts/footer.php'; ?>
+    <?php include APP_PATH . '/views/layouts/footer.php'; ?>
     </main>
 </div>
