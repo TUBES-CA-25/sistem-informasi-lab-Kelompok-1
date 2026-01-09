@@ -39,7 +39,7 @@
         <div style="background: white; padding: 1.8rem 2.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 10;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                    <h2 style="font-size: 1.8rem; font-weight: 800; margin: 0; background: linear-gradient(135deg, #3b82f6, #8b5cf6); -background-clip: text; -webkit-text-fill-color: transparent;">📋 All Problems</h2>
+                    <h2 style="font-size: 1.8rem; font-weight: 800; margin: 0; background: linear-gradient(135deg, #3b82f6, #8b5cf6); -webkit\-background-clip: text; -webkit-text-fill-color: transparent;">📋 All Problems</h2>
                     <p style="margin: 0.5rem 0 0 0; color: #64748b; font-size: 0.95rem;">Kelola semua laporan masalah laboratorium</p>
                 </div>
                 

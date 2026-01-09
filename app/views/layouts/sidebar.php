@@ -163,6 +163,65 @@ function isSidebarActive($uri, $path)
     </div>
 
     <?php elseif ($_SESSION['role'] == 'asisten'): ?>
+    <div class="flex-1 px-3 py-4 overflow-y-auto">
+        <ul class="space-y-1 font-medium">
+
+            <li class="mb-4">
+                <a href="<?= url('/') ?>" class="flex items-center p-3 rounded-lg text-emerald-400 bg-emerald-900/20 border border-emerald-900/50 hover:bg-emerald-900/40 transition-all group">
+                    <i class="bi bi-house-door-fill text-lg group-hover:scale-110 transition-transform"></i>
+                    <span class="ms-3 font-semibold">Ke Halaman Depan</span>
+                </a>
+            </li>
+
+            <li class="px-3 pt-2 pb-1 text-xs font-bold text-slate-500 uppercase tracking-wider">Menu Utama</li>
+
+            <li>
+                <a href="<?= url('/admin/dashboard') ?>" class="flex items-center p-2 rounded-lg group transition-all duration-200 <?= isSidebarActive($uri, '/admin/dashboard') ?>">
+                    <i class="bi bi-speedometer2 text-lg"></i>
+                    <span class="ms-3">Dashboard Asisten</span>
+                </a>
+            </li>
+
+            <li class="px-3 pt-4 pb-1 text-xs font-bold text-slate-500 uppercase tracking-wider">Akademik</li>
+
+            <li>
+                <a href="<?= url('/admin/schedules') ?>" class="flex items-center p-2 rounded-lg group transition-all duration-200 <?= isSidebarActive($uri, '/admin/schedules') ?>">
+                    <i class="bi bi-calendar-week text-lg"></i>
+                    <span class="ms-3">Jadwal Praktikum</span>
+                </a>
+            </li>
+            <li>
+                <a href="<?= url('/admin/assistant-schedules') ?>" class="flex items-center p-2 rounded-lg group transition-all duration-200 <?= isSidebarActive($uri, '/admin/assistant-schedules') ?>">
+                    <i class="bi bi-clock-history text-lg"></i>
+                    <span class="ms-3">Jadwal Piket</span>
+                </a>
+            </li>
+
+            <li class="px-3 pt-4 pb-1 text-xs font-bold text-slate-500 uppercase tracking-wider">Manajemen Lab</li>
+
+            <li>
+                <a href="<?= url('/admin/activities') ?>" class="flex items-center p-2 rounded-lg group transition-all duration-200 <?= isSidebarActive($uri, '/admin/activities') ?>">
+                    <i class="bi bi-newspaper text-lg"></i>
+                    <span class="ms-3">Kegiatan / Blog</span>
+                </a>
+            </li>
+            <li>
+                <a href="<?= url('/admin/problems') ?>" class="flex items-center p-2 rounded-lg group transition-all duration-200 <?= isSidebarActive($uri, '/admin/problems') ?>">
+                    <i class="bi bi-exclamation-triangle text-lg"></i>
+                    <span class="ms-3">Laporan Masalah</span>
+                </a>
+            </li>
+
+            <li class="px-3 pt-4 pb-1 text-xs font-bold text-slate-500 uppercase tracking-wider">System</li>
+
+            <li>
+                <a href="<?= url('/logout') ?>" class="flex items-center p-2 text-rose-400 rounded-lg hover:bg-rose-900/20 hover:text-rose-300 group transition-all duration-200">
+                    <i class="bi bi-box-arrow-right text-lg"></i>
+                    <span class="ms-3">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
 
     <?php endif; ?>
 </aside>

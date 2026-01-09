@@ -1,4 +1,4 @@
-<?php $title = 'Admin Dashboard'; $adminLayout = true; ?>
+<?php $title = 'Koordinator Dashboard'; $adminLayout = true; ?>
 <?php include APP_PATH . '/views/layouts/header.php'; ?>
 
 <div class="admin-layout antialiased bg-slate-50 min-h-screen">
