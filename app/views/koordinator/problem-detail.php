@@ -1,241 +1,113 @@
-<?php $title = 'Koordinator - Problem Detail'; ?>
+<?php $title = 'Problem Detail'; $adminLayout = true; ?>
 <?php include APP_PATH . '/views/layouts/header.php'; ?>
 
-<div style="display: flex; min-height: 100vh;">
-    <!-- Sidebar -->
-    <div style="width: 250px; background: #1e293b; color: white; padding: 1.5rem;">
-        <div style="font-size: 1.5rem; font-weight: bold; margin-bottom: 2rem;">ICLABS</div>
-        <ul style="list-style: none; padding: 0;">
-            <li style="margin-bottom: 0.5rem;">
-                <a href="<?= url('/koordinator/dashboard') ?>" style="color: #cbd5e1; text-decoration: none; display: block; padding: 0.5rem;">Dashboard</a>
-            </li>
-            <li style="margin-bottom: 0.5rem;">
-                <a href="<?= url('/koordinator/problems') ?>" style="color: white; text-decoration: none; display: block; padding: 0.5rem; background: #334155; border-radius: 0.25rem;">All Problems</a>
-            </li>
-            <li>
-                <a href="<?= url('/logout') ?>" style="color: #cbd5e1; text-decoration: none; display: block; padding: 0.5rem;">Logout</a>
-            </li>
-        </ul>
-    </div>
+<div class="admin-layout antialiased bg-slate-50 min-h-screen">
+    <?php include APP_PATH . '/views/layouts/sidebar.php'; ?>
     
-    <!-- Main Content -->
-    <div style="flex: 1; background: #f8fafc;">
-        <div style="background: white; padding: 1rem 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h2>🔧 Detail Masalah #<?= $problem['id'] ?></h2>
-                <p>Informasi lengkap dan riwayat masalah</p>
+    <main class="p-4 sm:ml-64 pt-10">
+        <div class="max-w-4xl mx-auto">
+        <div class="admin-navbar">
+            <div class="admin-navbar-brand">Problem Detail</div>
+            <div class="admin-navbar-profile">
+                <span><?= e(getUserName()) ?></span>
             </div>
-            <a href="<?= BASE_URL ?>/koordinator/problems" class="btn btn-secondary">← Kembali</a>
         </div>
         
-        <div style="padding: 2rem;">
-            <?php if (hasFlash()): ?>
-                <div class="alert alert-<?= getFlash()['type'] ?>">
-                    <?= getFlash()['message'] ?>
-                </div>
-            <?php endif; ?>
-
-            <div class="grid" style="grid-template-columns: 2fr 1fr; gap: 2rem;">
-                <!-- Problem Details -->
-                <div>
-            <div class="card" style="margin-bottom: 2rem;">
-                <div class="card-body">
-                    <h3>📝 Informasi Masalah</h3>
-                    
-                    <div class="detail-group">
-                        <label>Laboratorium:</label>
-                        <p><?= htmlspecialchars($problem['lab_name']) ?></p>
-                    </div>
-
-                    <div class="detail-group">
-                        <label>Lokasi Lab:</label>
-                        <p><?= htmlspecialchars($problem['location']) ?></p>
-                    </div>
-
-                    <div class="detail-group">
-                        <label>PC Number:</label>
-                        <p><strong><?= htmlspecialchars($problem['pc_number']) ?></strong></p>
-                    </div>
-
-                    <div class="detail-group">
-                        <label>Tipe Masalah:</label>
-                        <p>
-                            <span class="badge badge-secondary">
-                                <?= ucfirst($problem['problem_type']) ?>
-                            </span>
-                        </p>
-                    </div>
-
-                    <div class="detail-group">
-                        <label>Status:</label>
-                        <p><?= getStatusBadge($problem['status']) ?></p>
-                    </div>
-
-                    <div class="detail-group">
-                        <label>Deskripsi Lengkap:</label>
-                        <p style="white-space: pre-wrap;"><?= htmlspecialchars($problem['description']) ?></p>
-                    </div>
-
-                    <div class="detail-group">
-                        <label>Dilaporkan Oleh:</label>
-                        <p><?= htmlspecialchars($problem['reporter_name']) ?> (<?= htmlspecialchars($problem['reporter_email']) ?>)</p>
-                    </div>
-
-                    <div class="detail-group">
-                        <label>Tanggal Laporan:</label>
-                        <p><?= formatDate($problem['reported_at']) ?></p>
-                    </div>
-                </div>
+        <div class="admin-content">
+            <?php displayFlash(); ?>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <a href="<?= url('/admin/problems') ?>" class="btn" style="background: #64748b; color: white;">← Back to List</a>
             </div>
-
+            
+            <div class="card">
+                <div class="card-header">Problem Information</div>
+                <table class="table">
+                    <tr>
+                        <th style="width: 200px;">Laboratory</th>
+                        <td><?= e($problem['lab_name']) ?> - <?= e($problem['location']) ?></td>
+                    </tr>
+                    <tr>
+                        <th>PC Number</th>
+                        <td><?= e($problem['pc_number']) ?></td>
+                    </tr>
+                    <tr>
+                        <th>Problem Type</th>
+                        <td><?= getProblemTypeLabel($problem['problem_type']) ?></td>
+                    </tr>
+                    <tr>
+                        <th>Description</th>
+                        <td><?= nl2br(e($problem['description'])) ?></td>
+                    </tr>
+                    <tr>
+                        <th>Current Status</th>
+                        <td><?= getStatusBadge($problem['status']) ?></td>
+                    </tr>
+                    <tr>
+                        <th>Reported By</th>
+                        <td><?= e($problem['reporter_name']) ?> (<?= e($problem['reporter_email']) ?>)</td>
+                    </tr>
+                    <tr>
+                        <th>Reported At</th>
+                        <td><?= formatDateTime($problem['reported_at']) ?></td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- Update Status Form -->
+            <div class="card">
+                <div class="card-header">Update Status</div>
+                <form method="POST" action="<?= url('/admin/problems/' . $problem['id'] . '/update-status') ?>">
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-control" required>
+                            <option value="reported" <?= $problem['status'] == 'reported' ? 'selected' : '' ?>>Reported</option>
+                            <option value="in_progress" <?= $problem['status'] == 'in_progress' ? 'selected' : '' ?>>In Progress</option>
+                            <option value="resolved" <?= $problem['status'] == 'resolved' ? 'selected' : '' ?>>Resolved</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Note</label>
+                        <textarea name="note" class="form-control" rows="3" placeholder="Add note about this update..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Update Status</button>
+                    </div>
+                </form>
+            </div>
+            
             <!-- History -->
             <div class="card">
-                <div class="card-body">
-                    <h3>📜 Riwayat Update</h3>
-                    
-                    <?php if (empty($histories)): ?>
-                        <div class="empty-state">
-                            <p>Belum ada riwayat update</p>
-                        </div>
-                    <?php else: ?>
-                        <div class="timeline">
+                <div class="card-header">Update History</div>
+                <?php if (!empty($histories)): ?>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Note</th>
+                                <th>Updated By</th>
+                                <th>Updated At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                             <?php foreach ($histories as $history): ?>
-                                <div class="timeline-item">
-                                    <div class="timeline-marker"></div>
-                                    <div class="timeline-content">
-                                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                            <span><?= getStatusBadge($history['status']) ?></span>
-                                            <span class="text-muted"><?= formatDate($history['updated_at']) ?></span>
-                                        </div>
-                                        <?php if (!empty($history['note'])): ?>
-                                            <p style="margin: 0; padding: 0.5rem; background: #f8f9fa; border-radius: 4px;">
-                                                💬 <?= htmlspecialchars($history['note']) ?>
-                                            </p>
-                                        <?php endif; ?>
-                                        <small class="text-muted">
-                                            Oleh: <?= htmlspecialchars($history['updated_by_name']) ?>
-                                        </small>
-                                    </div>
-                                </div>
+                                <tr>
+                                    <td><?= getStatusBadge($history['status']) ?></td>
+                                    <td><?= e($history['note']) ?></td>
+                                    <td><?= e($history['updater_name']) ?></td>
+                                    <td><?= formatDateTime($history['updated_at']) ?></td>
+                                </tr>
                             <?php endforeach; ?>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-                </div>
-
-                <!-- Update Status Form -->
-                <div>
-                    <div class="card" style="position: sticky; top: 2rem;">
-                        <div class="card-body">
-                            <h3>🔄 Update Status</h3>
-                            
-                            <form method="POST" action="<?= BASE_URL ?>/koordinator/problems/<?= $problem['id'] ?>/update-status">
-                                <div class="form-group">
-                                    <label for="status">Status Baru:</label>
-                                    <select name="status" id="status" class="form-control" required>
-                                        <option value="">-- Pilih Status --</option>
-                                        <option value="reported" <?= $problem['status'] === 'reported' ? 'selected' : '' ?>>
-                                            📝 Dilaporkan
-                                        </option>
-                                        <option value="in_progress" <?= $problem['status'] === 'in_progress' ? 'selected' : '' ?>>
-                                            ⚙️ Dalam Proses
-                                        </option>
-                                        <option value="resolved" <?= $problem['status'] === 'resolved' ? 'selected' : '' ?>>
-                                            ✅ Selesai
-                                        </option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="note">Catatan (opsional):</label>
-                                    <textarea name="note" id="note" class="form-control" rows="4" 
-                                        placeholder="Tambahkan catatan tentang update ini..."></textarea>
-                                </div>
-
-                                <button type="submit" class="btn btn-primary" style="width: 100%;">
-                                    💾 Simpan Update
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-                </div>
+                        </tbody>
+                    </table>
+                <?php else: ?>
+                    <p style="text-align: center; padding: 2rem; color: #64748b;">No history yet</p>
+                <?php endif; ?>
             </div>
         </div>
     </div>
+</div>    
+    </main>
 </div>
-
-<style>
-.detail-group {
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #e9ecef;
-}
-
-.detail-group:last-child {
-    border-bottom: none;
-}
-
-.detail-group label {
-    display: block;
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 0.5rem;
-}
-
-.detail-group p {
-    margin: 0;
-    color: #212529;
-}
-
-.timeline {
-    position: relative;
-    padding-left: 2rem;
-}
-
-.timeline-item {
-    position: relative;
-    padding-bottom: 2rem;
-}
-
-.timeline-item:last-child {
-    padding-bottom: 0;
-}
-
-.timeline-marker {
-    position: absolute;
-    left: -2rem;
-    top: 0;
-    width: 12px;
-    height: 12px;
-    background: var(--primary-color);
-    border-radius: 50%;
-    border: 3px solid #fff;
-    box-shadow: 0 0 0 2px var(--primary-color);
-}
-
-.timeline-item:before {
-    content: '';
-    position: absolute;
-    left: -1.5rem;
-    top: 12px;
-    bottom: -2rem;
-    width: 2px;
-    background: #e9ecef;
-}
-
-.timeline-item:last-child:before {
-    display: none;
-}
-
-.timeline-content {
-    background: #f8f9fa;
-    padding: 1rem;
-    border-radius: 8px;
-    border-left: 3px solid var(--primary-color);
-}
-</style>
-
-<?php include APP_PATH . '/views/layouts/footer.php'; ?>

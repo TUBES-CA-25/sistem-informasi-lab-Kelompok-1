@@ -12,7 +12,7 @@ define('DB_PASS', '');
 define('DB_CHARSET', 'utf8mb4');
 
 /**
- * Get Database Connection
+ * bapak
  * @return PDO
  */
 function getDBConnection()

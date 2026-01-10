@@ -1,60 +1,73 @@
-<?php $title = 'Asisten Dashboard'; ?>
+<?php $title = 'Asisten Dashboard'; $adminLayout = true; ?>
 <?php include APP_PATH . '/views/layouts/header.php'; ?>
 
-<div style="display: flex; min-height: 100vh;">
-    <!-- Simple Sidebar for Asisten -->
-    <div style="width: 250px; background: #1e293b; color: white; padding: 1.5rem;">
-        <div style="font-size: 1.5rem; font-weight: bold; margin-bottom: 2rem;">ICLABS</div>
-        <ul style="list-style: none; padding: 0;">
-            <li style="margin-bottom: 0.5rem;"><a href="<?= url('/asisten/dashboard') ?>" style="color: white; text-decoration: none; display: block; padding: 0.5rem; background: #334155; border-radius: 0.25rem;">Dashboard</a></li>
-            <li style="margin-bottom: 0.5rem;"><a href="<?= url('/asisten/report-problem') ?>" style="color: #cbd5e1; text-decoration: none; display: block; padding: 0.5rem;">Report Problem</a></li>
-            <li style="margin-bottom: 0.5rem;"><a href="<?= url('/asisten/my-reports') ?>" style="color: #cbd5e1; text-decoration: none; display: block; padding: 0.5rem;">My Reports</a></li>
-            <li><a href="<?= url('/logout') ?>" style="color: #cbd5e1; text-decoration: none; display: block; padding: 0.5rem;">Logout</a></li>
-        </ul>
-    </div>
+<div class="admin-layout antialiased bg-slate-50 min-h-screen">
+    <?php include APP_PATH . '/views/layouts/sidebar.php'; ?>
     
-    <div style="flex: 1; background: #f8fafc;">
-        <div style="background: white; padding: 1rem 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            <h2>Dashboard</h2>
-            <p>Welcome, <?= e($userName) ?></p>
+    <main class="p-4 sm:ml-64 pt-10">
+    <div class="main-content">
+        <div class="admin-navbar">
+            <div class="admin-navbar-brand">Dashboard</div>
+            <div class="admin-navbar-profile">
+                <span>Welcome, <?= e($userName) ?></span>
+            </div>
         </div>
         
-        <div style="padding: 2rem;">
+        <div class="admin-content">
             <?php displayFlash(); ?>
             
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                
+                <div class="stat-card warning">
+                    <div class="stat-label">Pending Problems</div>
+                    <div class="stat-value"><?= $statistics['pending_problems'] ?? 0 ?></div>
+                </div>
+                
+                <div class="stat-card danger">
+                    <div class="stat-label">Total Problems</div>
+                    <div class="stat-value"><?= $statistics['total_problems'] ?? 0 ?></div>
+                </div>
+            </div>
+            
+            <!-- Recent Problems -->
             <div class="card">
-                <div class="card-header">My Problem Reports</div>
-                <?php if (!empty($myReports)): ?>
+                <div class="card-header">Recent Problems</div>
+                <?php if (!empty($recentProblems)): ?>
                     <table class="table">
                         <thead>
                             <tr>
                                 <th>Laboratory</th>
                                 <th>PC Number</th>
                                 <th>Type</th>
-                                <th>Description</th>
                                 <th>Status</th>
-                                <th>Reported At</th>
+                                <th>Reported By</th>
+                                <th>Date</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($myReports as $report): ?>
+                            <?php foreach (array_slice($recentProblems, 0, 10) as $problem): ?>
                                 <tr>
-                                    <td><?= e($report['lab_name']) ?></td>
-                                    <td><?= e($report['pc_number']) ?></td>
-                                    <td><?= getProblemTypeLabel($report['problem_type']) ?></td>
-                                    <td><?= e(substr($report['description'], 0, 50)) ?>...</td>
-                                    <td><?= getStatusBadge($report['status']) ?></td>
-                                    <td><?= formatDateTime($report['reported_at']) ?></td>
+                                    <td><?= e($problem['lab_name']) ?></td>
+                                    <td><?= e($problem['pc_number']) ?></td>
+                                    <td><?= getProblemTypeLabel($problem['problem_type']) ?></td>
+                                    <td><?= getStatusBadge($problem['status']) ?></td>
+                                    <td><?= e($problem['reporter_name']) ?></td>
+                                    <td><?= formatDateTime($problem['reported_at']) ?></td>
+                                    <td>
+                                        <a href="<?= url('/admin/problems/' . $problem['id']) ?>" class="btn btn-primary" style="padding: 0.375rem 0.75rem; font-size: 0.75rem;">View</a>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
                 <?php else: ?>
-                    <p style="text-align: center; padding: 2rem; color: #64748b;">You haven't reported any problems yet</p>
+                    <p style="text-align: center; padding: 2rem; color: #64748b;">No problems reported</p>
                 <?php endif; ?>
             </div>
         </div>
     </div>
+    </main>
 </div>
 
-<?php include APP_PATH . '/views/layouts/footer.php'; ?>

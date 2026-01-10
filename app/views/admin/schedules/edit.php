@@ -3,7 +3,7 @@
 
 <div class="antialiased bg-slate-50 min-h-screen">
 
-    <?php include APP_PATH . '/views/layouts/admin-sidebar.php'; ?>
+    <?php include APP_PATH . '/views/layouts/sidebar.php'; ?>
 
     <main class="p-4 sm:ml-64 pt-10">
         <div class="max-w-4xl mx-auto">
@@ -170,4 +170,3 @@
         </div>
     </main>
 </div>
-<?php include APP_PATH . '/views/layouts/footer.php'; ?>
