@@ -155,37 +155,23 @@ function isSidebarActive($uri, $path)
         <ul class="space-y-1">
             <li class="px-3 mt-2 mb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Main Menu</li>
             <li>
-                <a href="<?= url('/admin/dashboard') ?>" class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/admin/dashboard') ?>">
+                <a href="<?= url('/asisten/dashboard') ?>" class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/asisten/dashboard') ?>">
                     <i class="bi bi-grid-1x2-fill text-lg opacity-80"></i>
                     <span class="ms-3 text-sm">Dashboard</span>
                 </a>
             </li>
 
-            <li class="px-3 mt-6 mb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Jadwal</li>
+            <li class="px-3 mt-6 mb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Laporan Masalah</li>
             <li>
-                <a href="<?= url('/admin/schedules') ?>" class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/admin/schedules') ?>">
-                    <i class="bi bi-calendar-check-fill text-lg opacity-80"></i>
-                    <span class="ms-3 text-sm">Jadwal Praktikum</span>
-                </a>
-            </li>
-            <li>
-                <a href="<?= url('/admin/assistant-schedules') ?>" class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/admin/assistant-schedules') ?>">
-                    <i class="bi bi-clock-fill text-lg opacity-80"></i>
-                    <span class="ms-3 text-sm">Jadwal Piket Saya</span>
-                </a>
-            </li>
-
-            <li class="px-3 mt-6 mb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Laporan</li>
-            <li>
-                <a href="<?= url('/admin/activities') ?>" class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/admin/activities') ?>">
-                    <i class="bi bi-pencil-square text-lg opacity-80"></i>
-                    <span class="ms-3 text-sm">Input Kegiatan</span>
-                </a>
-            </li>
-            <li>
-                <a href="<?= url('/admin/problems') ?>" class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/admin/problems') ?>">
-                    <i class="bi bi-tools text-lg opacity-80"></i>
+                <a href="<?= url('/asisten/report-problem') ?>" class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/asisten/report-problem') ?>">
+                    <i class="bi bi-plus-circle-fill text-lg opacity-80"></i>
                     <span class="ms-3 text-sm">Lapor Kerusakan</span>
+                </a>
+            </li>
+            <li>
+                <a href="<?= url('/asisten/my-reports') ?>" class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/asisten/my-reports') ?>">
+                    <i class="bi bi-list-ul text-lg opacity-80"></i>
+                    <span class="ms-3 text-sm">Laporan Saya</span>
                 </a>
             </li>
         </ul>
