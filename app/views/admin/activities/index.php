@@ -4,83 +4,128 @@
 <div class="antialiased bg-slate-50 min-h-screen">
     <?php include APP_PATH . '/views/layouts/sidebar.php'; ?>
 
-    <main class="p-4 sm:ml-64 pt-10">
-        <div class="p-4 border-2 border-dashed border-slate-200 rounded-lg bg-white min-h-[80vh]">
+    <main class="p-4 sm:ml-64 pt-8 transition-all duration-300">
+        <div class="max-w-7xl mx-auto">
 
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-800">Kegiatan & Berita</h1>
-                    <p class="text-slate-500 text-sm">Kelola informasi yang tampil di halaman depan.</p>
+                    <h1 class="text-2xl font-bold tracking-tight text-slate-900">Kegiatan & Berita</h1>
+                    <p class="text-slate-500 text-sm mt-1">Kelola publikasi kegiatan laboratorium dan berita terkini.</p>
                 </div>
-                <a href="<?= url('/admin/activities/create') ?>" class="text-white bg-sky-600 hover:bg-sky-700 font-medium rounded-lg text-sm px-5 py-2.5 flex items-center shadow-lg shadow-sky-500/30">
-                    <i class="bi bi-plus-lg mr-2"></i> Tambah Kegiatan
+                
+                <a href="<?= url('/admin/activities/create') ?>" 
+                   class="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl shadow-lg shadow-primary-500/30 transition-all transform hover:-translate-y-0.5 focus:ring-4 focus:ring-primary-100">
+                    <i class="bi bi-plus-lg text-lg"></i>
+                    <span>Tambah Kegiatan</span>
                 </a>
             </div>
 
             <?php displayFlash(); ?>
 
-            <div class="relative overflow-x-auto sm:rounded-lg">
-                <table class="w-full text-sm text-left text-slate-500">
-                    <thead class="text-xs text-slate-700 uppercase bg-slate-50 border-b">
-                        <tr>
-                            <th class="px-6 py-3">Cover & Judul</th>
-                            <th class="px-6 py-3">Link Tujuan</th>
-                            <th class="px-6 py-3">Tanggal</th>
-                            <th class="px-6 py-3 text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        <?php if (!empty($activities)): ?>
-                            <?php foreach ($activities as $activity): ?>
-                                <tr class="bg-white hover:bg-slate-50 transition-colors">
-                                    <td class="px-6 py-4 flex items-center gap-4">
-                                        <div class="w-16 h-10 rounded overflow-hidden bg-slate-200 shrink-0 border border-slate-200">
-                                            <?php if (!empty($activity['image_cover'])): ?>
-                                                <img src="<?= e($activity['image_cover']) ?>" class="w-full h-full object-cover">
-                                            <?php else: ?>
-                                                <div class="w-full h-full flex items-center justify-center text-slate-400"><i class="bi bi-image"></i></div>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div>
-                                            <div class="font-bold text-slate-800 line-clamp-1"><?= e($activity['title']) ?></div>
-                                            <span class="text-xs bg-slate-100 px-2 py-0.5 rounded text-slate-500 uppercase tracking-wide">
-                                                <?= e($activity['activity_type']) ?>
-                                            </span>
-                                        </div>
-                                    </td>
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden min-h-[600px] flex flex-col">
+                
+                <div class="overflow-x-auto w-full">
+                    <table class="w-full text-sm text-left text-slate-600">
+                        <thead class="text-xs text-slate-500 uppercase bg-slate-50/80 border-b border-slate-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-4 font-semibold w-[40%]">Cover & Informasi</th>
+                                <th scope="col" class="px-6 py-4 font-semibold">Tautan</th>
+                                <th scope="col" class="px-6 py-4 font-semibold">Tanggal Posting</th>
+                                <th scope="col" class="px-6 py-4 font-semibold text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <?php if (!empty($activities)): ?>
+                                <?php foreach ($activities as $activity): ?>
+                                    <tr class="group hover:bg-slate-50/80 transition-colors duration-200">
+                                        
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-start gap-4">
+                                                <div class="w-20 h-14 rounded-lg overflow-hidden bg-slate-100 shrink-0 border border-slate-200 relative group-hover:shadow-sm transition-all">
+                                                    <?php if (!empty($activity['image_cover'])): ?>
+                                                        <img src="<?= e($activity['image_cover']) ?>" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                                                    <?php else: ?>
+                                                        <div class="w-full h-full flex items-center justify-center text-slate-400">
+                                                            <i class="bi bi-image text-xl"></i>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                </div>
+                                                
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="font-bold text-slate-800 line-clamp-2 leading-snug mb-1.5">
+                                                        <?= e($activity['title']) ?>
+                                                    </div>
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-primary-50 text-primary-700 border border-primary-100/50">
+                                                        <?= e($activity['activity_type']) ?>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </td>
 
-                                    <td class="px-6 py-4">
-                                        <a href="<?= e($activity['link_url']) ?>" target="_blank" class="text-sky-600 hover:underline flex items-center gap-1 max-w-[200px] truncate">
-                                            <i class="bi bi-box-arrow-up-right text-xs"></i>
-                                            <?= e($activity['link_url']) ?>
-                                        </a>
-                                    </td>
-
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <?= formatDate($activity['activity_date']) ?>
-                                    </td>
-
-                                    <td class="px-6 py-4 text-center">
-                                        <div class="flex items-center justify-center space-x-2">
-                                            <a href="<?= url('/admin/activities/' . $activity['id'] . '/edit') ?>" class="p-2 text-amber-600 bg-amber-50 rounded hover:bg-amber-100" title="Edit">
-                                                <i class="bi bi-pencil-square"></i>
+                                        <td class="px-6 py-4">
+                                            <a href="<?= e($activity['link_url']) ?>" target="_blank" 
+                                               class="group/link flex items-center gap-2 max-w-[200px] text-slate-500 hover:text-primary-600 transition-colors p-1.5 rounded-lg hover:bg-white">
+                                                <div class="w-8 h-8 rounded bg-slate-100 flex items-center justify-center text-slate-500 group-hover/link:bg-primary-50 group-hover/link:text-primary-600 transition-colors shrink-0">
+                                                    <i class="bi bi-link-45deg text-lg"></i>
+                                                </div>
+                                                <span class="truncate text-xs font-mono"><?= e($activity['link_url']) ?></span>
                                             </a>
-                                            <form method="POST" action="<?= url('/admin/activities/' . $activity['id'] . '/delete') ?>" onsubmit="return confirm('Hapus kegiatan ini?')" class="inline">
-                                                <button type="submit" class="p-2 text-rose-600 bg-rose-50 rounded hover:bg-rose-100" title="Hapus">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </form>
+                                        </td>
+
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center gap-2 text-slate-500">
+                                                <i class="bi bi-calendar4-week text-slate-400"></i>
+                                                <span><?= formatDate($activity['activity_date']) ?></span>
+                                            </div>
+                                        </td>
+
+                                        <td class="px-6 py-4 text-right">
+                                            <div class="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
+                                                
+                                                <a href="<?= url('/admin/activities/' . $activity['id'] . '/edit') ?>" 
+                                                   class="w-9 h-9 flex items-center justify-center rounded-full text-amber-600 bg-amber-50 hover:bg-amber-100 hover:scale-105 hover:shadow-sm transition-all border border-transparent hover:border-amber-200" 
+                                                   title="Edit Data">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+
+                                                <form method="POST" action="<?= url('/admin/activities/' . $activity['id'] . '/delete') ?>" onsubmit="return confirm('Apakah anda yakin ingin menghapus kegiatan ini? Tindakan ini tidak dapat dibatalkan.')" class="inline">
+                                                    <button type="submit" 
+                                                            class="w-9 h-9 flex items-center justify-center rounded-full text-rose-600 bg-rose-50 hover:bg-rose-100 hover:scale-105 hover:shadow-sm transition-all border border-transparent hover:border-rose-200" 
+                                                            title="Hapus Data">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="4">
+                                        <div class="flex flex-col items-center justify-center py-20 text-center">
+                                            <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-4 animate-pulse">
+                                                <i class="bi bi-postcard text-4xl"></i>
+                                            </div>
+                                            <h3 class="text-lg font-semibold text-slate-900">Belum ada kegiatan</h3>
+                                            <p class="text-slate-500 max-w-sm mt-1 mb-6">Mulai tambahkan kegiatan atau berita untuk menampilkannya di halaman depan website.</p>
+                                            <a href="<?= url('/admin/activities/create') ?>" class="text-primary-600 hover:text-primary-700 font-medium hover:underline">
+                                                + Tambah Kegiatan Pertama
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="4" class="px-6 py-10 text-center text-slate-400">Belum ada kegiatan yang diposting.</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <?php if (!empty($activities) && count($activities) > 10): ?>
+                <div class="border-t border-slate-100 px-6 py-4 bg-slate-50">
+                    <span class="text-xs text-slate-500">Menampilkan semua data</span>
+                </div>
+                <?php endif; ?>
+
             </div>
         </div>
     </main>
