@@ -104,47 +104,15 @@ function isSidebarActive($uri, $path)
         <ul class="space-y-1">
             <li class="px-3 mt-2 mb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Main Menu</li>
             <li>
-                <a href="<?= url('/admin/dashboard') ?>" class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/admin/dashboard') ?>">
+                <a href="<?= url('/koordinator/dashboard') ?>" class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/koordinator/dashboard') ?>">
                     <i class="bi bi-grid-1x2-fill text-lg opacity-80"></i>
                     <span class="ms-3 text-sm">Dashboard</span>
                 </a>
             </li>
 
-            <li class="px-3 mt-6 mb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Akademik</li>
+            <li class="px-3 mt-6 mb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Laporan Masalah</li>
             <li>
-                <a href="<?= url('/admin/schedules') ?>" class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/admin/schedules') ?>">
-                    <i class="bi bi-calendar-week-fill text-lg opacity-80"></i>
-                    <span class="ms-3 text-sm">Jadwal Praktikum</span>
-                </a>
-            </li>
-            <li>
-                <a href="<?= url('/admin/assistant-schedules') ?>" class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/admin/assistant-schedules') ?>">
-                    <i class="bi bi-clock-history text-lg opacity-80"></i>
-                    <span class="ms-3 text-sm">Jadwal Piket</span>
-                </a>
-            </li>
-
-            <li class="px-3 mt-6 mb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Monitoring</li>
-            <li>
-                <a href="<?= url('/admin/head-laboran') ?>" class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/admin/head-laboran') ?>">
-                    <i class="bi bi-person-badge-fill text-lg opacity-80"></i>
-                    <span class="ms-3 text-sm">Staff & Presence</span>
-                </a>
-            </li>
-            <li>
-                <a href="<?= url('/admin/laboratories') ?>" class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/admin/laboratories') ?>">
-                    <i class="bi bi-pc-display text-lg opacity-80"></i>
-                    <span class="ms-3 text-sm">Data Lab</span>
-                </a>
-            </li>
-            <li>
-                <a href="<?= url('/admin/activities') ?>" class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/admin/activities') ?>">
-                    <i class="bi bi-newspaper text-lg opacity-80"></i>
-                    <span class="ms-3 text-sm">Kegiatan</span>
-                </a>
-            </li>
-            <li>
-                <a href="<?= url('/admin/problems') ?>" class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/admin/problems') ?>">
+                <a href="<?= url('/koordinator/problems') ?>" class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/koordinator/problems') ?>">
                     <i class="bi bi-exclamation-triangle-fill text-lg opacity-80"></i>
                     <span class="ms-3 text-sm">Laporan Masalah</span>
                 </a>
@@ -171,7 +139,7 @@ function isSidebarActive($uri, $path)
             <li>
                 <a href="<?= url('/asisten/my-reports') ?>" class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/asisten/my-reports') ?>">
                     <i class="bi bi-list-ul text-lg opacity-80"></i>
-                    <span class="ms-3 text-sm">Laporan Saya</span>
+                    <span class="ms-3 text-sm">Laporan Kerusakan</span>
                 </a>
             </li>
         </ul>
