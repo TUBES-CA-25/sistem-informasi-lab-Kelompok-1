@@ -1,7 +1,5 @@
 <?php
 $uri = $_SERVER['REQUEST_URI'] ?? '';
-
-// Helper function untuk menentukan class active
 function isSidebarActive($uri, $path)
 {
     return strpos($uri, $path) !== false
@@ -13,7 +11,7 @@ function isSidebarActive($uri, $path)
 <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0 bg-slate-900 border-r border-slate-800 flex flex-col shadow-2xl" aria-label="Sidebar">
 
     <div class="h-16 flex items-center px-6 border-b border-slate-800 bg-slate-900 shrink-0">
-        <a href="#" class="flex items-center gap-3 group">
+        <a href="<?= url('/admin/dashboard') ?>" class="flex items-center gap-3 group">
             <div class="w-8 h-8 rounded bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg shadow-sky-500/30">
                 IC
             </div>
@@ -89,15 +87,6 @@ function isSidebarActive($uri, $path)
     </div>
 
     <div class="border-t border-slate-800 p-4 bg-slate-900 shrink-0">
-        <div class="flex items-center gap-3 mb-3 px-2">
-            <div class="w-9 h-9 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-white border border-slate-600">
-                <?= strtoupper(substr($_SESSION['user_name'] ?? 'A', 0, 1)) ?>
-            </div>
-            <div class="overflow-hidden">
-                <p class="text-sm font-medium text-white truncate"><?= e($_SESSION['user_name'] ?? 'Admin') ?></p>
-                <p class="text-[10px] text-sky-400 uppercase tracking-wide font-bold">Administrator</p>
-            </div>
-        </div>
         <a href="<?= url('/logout') ?>" class="flex items-center justify-center w-full p-2.5 text-xs font-bold text-rose-300 bg-rose-950/30 border border-rose-900/50 rounded-lg hover:bg-rose-900/50 hover:text-white transition-colors">
             <i class="bi bi-box-arrow-right me-2 text-sm"></i> LOGOUT
         </a>

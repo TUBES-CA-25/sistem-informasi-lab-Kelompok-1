@@ -37,7 +37,7 @@
                         <ul class="py-2" aria-labelledby="user-menu-button">
                             <li>
                                 <a href="<?= url('/admin/dashboard') ?>" class="block px-4 py-2 text-sm text-sky-600 hover:bg-sky-50 font-bold">
-                                    <i class="bi bi-speedometer2 me-2"></i> Ke Dashboard Admin
+                                    <i class="bi bi-speedometer2 me-2"></i> Admin Dashboard
                                 </a>
                             </li>
                         </ul>
@@ -45,7 +45,7 @@
 
                     <ul class="py-2" aria-labelledby="user-menu-button">
                         <li>
-                            <a href="<?= url('/logout') ?>" class="block px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 font-medium transition-colors">
+                            <a href="<?= url('/logout') ?>" class="block px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 font-medium">
                                 <i class="bi bi-box-arrow-right me-2"></i> Sign out
                             </a>
                         </li>
@@ -89,31 +89,25 @@
                     <?php $role = getUserRole(); ?>
 
                     <?php if ($role == 'koordinator'): ?>
-                        <li class="hidden md:block w-px h-5 bg-slate-300 mx-1"></li>
-
+                        <li class="hidden md:block w-px h-5 bg-slate-300 mx-2"></li>
                         <li>
-                            <a href="<?= url('/koordinator/assistant-schedules') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/assistant-schedules') !== false ? 'text-amber-600 font-bold' : 'text-slate-600 hover:text-amber-600' ?>">
+                            <a href="<?= url('/koordinator/assistant-schedules') ?>" class="block py-2 px-3 rounded md:p-0 text-amber-600 hover:text-amber-700 font-medium transition-colors">
                                 Piket
                             </a>
                         </li>
                         <li>
-                            <a href="<?= url('/koordinator/laboratories') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/laboratories') !== false ? 'text-amber-600 font-bold' : 'text-slate-600 hover:text-amber-600' ?>">
+                            <a href="<?= url('/koordinator/laboratories') ?>" class="block py-2 px-3 rounded md:p-0 text-amber-600 hover:text-amber-700 font-medium transition-colors">
                                 Data Lab
                             </a>
                         </li>
                         <li>
-                            <a href="<?= url('/koordinator/problems') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/problems') !== false ? 'text-amber-600 font-bold' : 'text-slate-600 hover:text-amber-600' ?>">
-                                Masalah
+                            <a href="<?= url('/koordinator/problems') ?>" class="block py-2 px-3 rounded md:p-0 text-amber-600 hover:text-amber-700 font-medium transition-colors">
+                                Permasalahan
                             </a>
                         </li>
                         <li>
-                            <a href="<?= url('/koordinator/activities') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/activities') !== false ? 'text-amber-600 font-bold' : 'text-slate-600 hover:text-amber-600' ?>">
+                            <a href="<?= url('/koordinator/activities') ?>" class="block py-2 px-3 rounded md:p-0 text-amber-600 hover:text-amber-700 font-medium transition-colors">
                                 Kegiatan
-                            </a>
-                        </li>
-                        <li>
-                            <a href="<?= url('/koordinator/reports') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/reports') !== false ? 'text-amber-600 font-bold' : 'text-slate-600 hover:text-amber-600' ?>">
-                                Laporan
                             </a>
                         </li>
                     <?php endif; ?>
@@ -122,13 +116,18 @@
                         <li class="hidden md:block w-px h-5 bg-slate-300 mx-1"></li>
 
                         <li>
-                            <a href="<?= url('/asisten/assistant-schedules') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/assistant-schedules') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
-                                Piket Saya
+                            <a href="<?= url('/asisten/jobdesk') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/jobdesk') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
+                                Jobdesk Saya
                             </a>
                         </li>
                         <li>
                             <a href="<?= url('/asisten/problems') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/problems') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
-                                Lapor Masalah
+                                Permasalahan Lab
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<?= url('/asisten/assistant-schedules') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/assistant-schedules') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
+                                Jadwal Piket
                             </a>
                         </li>
                     <?php endif; ?>

@@ -1,95 +1,111 @@
 <?php
-/**
- * ICLABS - Asisten Controller
- * Handles asisten role operations
- */
+class AsistenController extends Controller
+{
 
-class AsistenController extends Controller {
-    
-    public function __construct() {
+    public function __construct()
+    {
         $this->requireRole('asisten');
     }
-    
-    /**
-     * Asisten dashboard
-     */
-    public function dashboard() {
-        $problemModel = $this->model('LabProblemModel');
-        $scheduleModel = $this->model('AssistantScheduleModel');
-        
-        $userId = getUserId();
-        
-        $data = [
-            'myReports' => $problemModel->getProblemsByReporter($userId),
-            'mySchedules' => $scheduleModel->getSchedulesByUser($userId),
-            'userName' => getUserName()
-        ];
-        
-        $this->view('asisten/dashboard', $data);
+
+    public function dashboard()
+    {
+        // Redirect dashboard ke jobdesk agar lebih fokus
+        $this->redirect('/asisten/jobdesk');
     }
-    
-    /**
-     * Show report problem form
-     */
-    public function reportProblemForm() {
-        $laboratoryModel = $this->model('LaboratoryModel');
-        
+
+    // ==========================================
+    // PAGE 1: JOBDESK SAYA (Tugas Asisten)
+    // ==========================================
+
+    public function jobdesk()
+    {
+        $problemModel = $this->model('LabProblemModel');
+        $userId = getUserId();
+
         $data = [
+            'myTasks' => $problemModel->getTasksByAssignee($userId)
+        ];
+
+        $this->view('asisten/jobdesk', $data);
+    }
+
+    public function updateTaskStatus($id)
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $status = sanitize($this->getPost('status'));
+            $note = sanitize($this->getPost('note')); // Keterangan tambahan
+
+            $problemModel = $this->model('LabProblemModel');
+            $historyModel = $this->model('ProblemHistoryModel');
+
+            // 1. Update Status & Tanggal di Tabel Masalah
+            $problemModel->updateTaskProgress($id, $status);
+
+            // 2. Catat di History (Keterangan masuk sini)
+            if (!empty($note)) {
+                $historyModel->addHistory($id, $status, "Update Jobdesk: " . $note);
+            } else {
+                $historyModel->addHistory($id, $status, "Status updated by assignee");
+            }
+
+            setFlash('success', 'Status pekerjaan berhasil diperbarui.');
+            $this->redirect('/asisten/jobdesk');
+        }
+    }
+
+    // ==========================================
+    // PAGE 2: PERMASALAHAN LAB (CRUD)
+    // ==========================================
+
+    public function problems()
+    {
+        $problemModel = $this->model('LabProblemModel');
+        $laboratoryModel = $this->model('LaboratoryModel');
+
+        $data = [
+            'problems' => $problemModel->getAllWithDetails(),
             'laboratories' => $laboratoryModel->getAllLaboratories()
         ];
-        
-        $this->view('asisten/report-problem', $data);
+
+        $this->view('asisten/problems', $data);
     }
-    
-    /**
-     * Submit problem report
-     */
-    public function reportProblem() {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->redirect('/asisten/report-problem');
+
+    public function createProblem()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'laboratory_id' => sanitize($this->getPost('laboratory_id')),
+                'pc_number' => sanitize($this->getPost('pc_number')),
+                'problem_type' => sanitize($this->getPost('problem_type')),
+                'description' => sanitize($this->getPost('description'))
+            ];
+
+            // Validasi sederhana
+            if (empty($data['laboratory_id']) || empty($data['description'])) {
+                setFlash('danger', 'Mohon lengkapi data laporan.');
+                $this->redirect('/asisten/problems');
+            }
+
+            $this->model('LabProblemModel')->createProblem($data);
+            setFlash('success', 'Laporan masalah berhasil ditambahkan.');
+            $this->redirect('/asisten/problems');
         }
-        
-        $data = [
-            'laboratory_id' => sanitize($this->getPost('laboratory_id')),
-            'pc_number' => sanitize($this->getPost('pc_number')),
-            'problem_type' => sanitize($this->getPost('problem_type')),
-            'description' => sanitize($this->getPost('description'))
-        ];
-        
-        // Validate
-        $errors = $this->validate($data, [
-            'laboratory_id' => 'required',
-            'problem_type' => 'required',
-            'description' => 'required|min:10'
-        ]);
-        
-        if (!empty($errors)) {
-            setFlash('danger', 'Please fill all required fields correctly');
-            $this->redirect('/asisten/report-problem');
-        }
-        
-        // Create problem report
-        $problemModel = $this->model('LabProblemModel');
-        $problemId = $problemModel->createProblem($data);
-        
-        // Add to history
-        $historyModel = $this->model('ProblemHistoryModel');
-        $historyModel->addHistory($problemId, 'reported', 'Problem reported by asisten');
-        
-        setFlash('success', 'Problem reported successfully');
-        $this->redirect('/asisten/dashboard');
     }
-    
-    /**
-     * View my reports
-     */
-    public function myReports() {
-        $problemModel = $this->model('LabProblemModel');
-        
-        $data = [
-            'reports' => $problemModel->getProblemsByReporter(getUserId())
-        ];
-        
-        $this->view('asisten/my-reports', $data);
+
+    public function deleteProblem($id)
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Optional: Cek apakah ini laporan milik sendiri sebelum hapus
+            $this->model('LabProblemModel')->deleteProblem($id);
+            setFlash('success', 'Laporan masalah dihapus.');
+            $this->redirect('/asisten/problems');
+        }
+    }
+
+    // Method Piket
+    public function listAssistantSchedules()
+    {
+        // Logic untuk jadwal piket (bisa diambil dari controller sebelumnya jika ada)
+        $this->redirect('/schedule'); // Placeholder jika belum ada view khusus
     }
 }
