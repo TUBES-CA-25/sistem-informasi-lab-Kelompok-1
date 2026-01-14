@@ -40,9 +40,13 @@ class LabProblemModel extends Model {
      * Get problems by reporter
      */
     public function getProblemsByReporter($userId) {
-        $sql = "SELECT p.*, l.lab_name 
+        $sql = "SELECT p.*, 
+                       l.lab_name,
+                       u.name as reporter_name,
+                       u.email as reporter_email
                 FROM lab_problems p 
                 JOIN laboratories l ON p.laboratory_id = l.id 
+                JOIN users u ON p.reported_by = u.id 
                 WHERE p.reported_by = ? 
                 ORDER BY p.reported_at DESC";
         return $this->query($sql, [$userId]);

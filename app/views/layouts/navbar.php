@@ -122,13 +122,13 @@
                         <li class="hidden md:block w-px h-5 bg-slate-300 mx-1"></li>
 
                         <li>
-                            <a href="<?= url('/asisten/assistant-schedules') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/assistant-schedules') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
-                                Piket Saya
+                            <a href="<?= url('/asisten/dashboard') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/asisten/dashboard') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
+                                Dashboard
                             </a>
                         </li>
                         <li>
-                            <a href="<?= url('/asisten/problems') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/problems') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
-                                Lapor Masalah
+                            <a href="<?= url('/asisten/problems') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/asisten/problems') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
+                                Masalah
                             </a>
                         </li>
                     <?php endif; ?>
