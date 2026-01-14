@@ -47,9 +47,8 @@ $router->get('/api/lab-activities', 'ApiController@getLabActivities');
 // ==========================================
 
 $router->get('/asisten/dashboard', 'AsistenController@dashboard');
-$router->get('/asisten/report-problem', 'AsistenController@reportProblemForm');
 $router->post('/asisten/report-problem', 'AsistenController@reportProblem');
-$router->get('/asisten/my-reports', 'AsistenController@myReports');
+$router->get('/asisten/problems', 'AsistenController@listProblems');
 
 // ==========================================
 // KOORDINATOR ROUTES (Role: koordinator)
@@ -59,6 +58,11 @@ $router->get('/koordinator/dashboard', 'KoordinatorController@dashboard');
 $router->get('/koordinator/problems', 'KoordinatorController@listProblems');
 $router->get('/koordinator/problems/:id', 'KoordinatorController@viewProblem');
 $router->post('/koordinator/problems/:id/update-status', 'KoordinatorController@updateProblemStatus');
+
+// Koordinator read-only views (using KoordinatorController)
+$router->get('/koordinator/assistant-schedules', 'KoordinatorController@listAssistantSchedules');
+$router->get('/koordinator/laboratories', 'KoordinatorController@listLaboratories');
+$router->get('/koordinator/activities', 'KoordinatorController@listActivities');
 
 // ==========================================
 // ADMIN ROUTES (Role: admin)

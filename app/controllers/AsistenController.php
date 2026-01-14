@@ -19,9 +19,30 @@ class AsistenController extends Controller {
         
         $userId = getUserId();
         
+        // Get my reports
+        $myReports = $problemModel->getProblemsByReporter($userId);
+        
+        // Count pending reports
+        $myPending = 0;
+        foreach ($myReports as $report) {
+            if ($report['status'] === 'reported' || $report['status'] === 'in_progress') {
+                $myPending++;
+            }
+        }
+        
+        // Get my schedules
+        $mySchedules = $scheduleModel->getSchedulesByUser($userId);
+        
+        $statistics = [
+            'my_reports' => count($myReports),
+            'my_pending' => $myPending,
+            'my_schedules' => count($mySchedules)
+        ];
+        
         $data = [
-            'myReports' => $problemModel->getProblemsByReporter($userId),
-            'mySchedules' => $scheduleModel->getSchedulesByUser($userId),
+            'myReports' => array_slice($myReports, 0, 10), // Latest 10
+            'recentProblems' => array_slice($myReports, 0, 10), // For table
+            'statistics' => $statistics,
             'userName' => getUserName()
         ];
         
@@ -29,24 +50,11 @@ class AsistenController extends Controller {
     }
     
     /**
-     * Show report problem form
-     */
-    public function reportProblemForm() {
-        $laboratoryModel = $this->model('LaboratoryModel');
-        
-        $data = [
-            'laboratories' => $laboratoryModel->getAllLaboratories()
-        ];
-        
-        $this->view('asisten/report-problem', $data);
-    }
-    
-    /**
      * Submit problem report
      */
     public function reportProblem() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->redirect('/asisten/report-problem');
+            $this->redirect('/asisten/problems?tab=lapor');
         }
         
         $data = [
@@ -65,7 +73,7 @@ class AsistenController extends Controller {
         
         if (!empty($errors)) {
             setFlash('danger', 'Please fill all required fields correctly');
-            $this->redirect('/asisten/report-problem');
+            $this->redirect('/asisten/problems?tab=lapor');
         }
         
         // Create problem report
@@ -77,19 +85,45 @@ class AsistenController extends Controller {
         $historyModel->addHistory($problemId, 'reported', 'Problem reported by asisten');
         
         setFlash('success', 'Problem reported successfully');
-        $this->redirect('/asisten/dashboard');
+        $this->redirect('/asisten/problems?tab=saya');
     }
     
     /**
-     * View my reports
+     * List all problems (read-only for asisten)
      */
-    public function myReports() {
+    public function listProblems() {
         $problemModel = $this->model('LabProblemModel');
+        $laboratoryModel = $this->model('LaboratoryModel');
         
-        $data = [
-            'reports' => $problemModel->getProblemsByReporter(getUserId())
+        $userId = getUserId();
+        
+        // Get filter if any
+        $status = isset($_GET['status']) ? sanitize($_GET['status']) : null;
+        
+        if ($status) {
+            $problems = $problemModel->getProblemsByStatus($status);
+        } else {
+            $problems = $problemModel->getAllWithDetails();
+        }
+        
+        // Get my reports
+        $myReports = $problemModel->getProblemsByReporter($userId);
+        
+        // Statistics
+        $statistics = [
+            'total' => $problemModel->count(),
+            'reported' => $problemModel->countByStatus('reported'),
+            'in_progress' => $problemModel->countByStatus('in_progress'),
+            'resolved' => $problemModel->countByStatus('resolved')
         ];
         
-        $this->view('asisten/my-reports', $data);
+        $data = [
+            'problems' => $problems,
+            'myReports' => $myReports,
+            'statistics' => $statistics,
+            'laboratories' => $laboratoryModel->getAllLaboratories()
+        ];
+        
+        $this->view('asisten/problems', $data);
     }
 }

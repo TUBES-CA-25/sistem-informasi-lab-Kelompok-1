@@ -1,0 +1,10 @@
+# ICLABS - Root .htaccess
+# Redirect all requests to public/ folder
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Redirect to public folder
+    RewriteRule ^$ public/ [L]
+    RewriteRule (.*) public/$1 [L]
+</IfModule>
