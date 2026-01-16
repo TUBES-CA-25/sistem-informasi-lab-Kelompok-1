@@ -2,7 +2,7 @@
 
 /**
  * ICLABS - Koordinator Controller
- * Handles koordinator role operations
+ * Full Features: Dashboard, Piket, Lab Data, Activities, Problems
  */
 
 class KoordinatorController extends Controller
@@ -13,9 +13,7 @@ class KoordinatorController extends Controller
         $this->requireRole('koordinator');
     }
 
-    // ==========================================
-    // DASHBOARD
-    // ==========================================
+    // --- DASHBOARD ---
     public function dashboard()
     {
         $problemModel = $this->model('LabProblemModel');
@@ -23,32 +21,23 @@ class KoordinatorController extends Controller
 
         $data = [
             'statistics' => $statistics,
-            'pendingProblems' => $problemModel->getPendingProblems(),
+            'pendingProblems' => $problemModel->getPendingProblems(), // Ini yang tadi error
             'userName' => getUserName()
         ];
-
         $this->view('koordinator/dashboard', $data);
     }
 
-    // ==========================================
-    // JADWAL PIKET (Assistant Schedules)
-    // ==========================================
+    // --- MENU 1: JADWAL PIKET ---
     public function listAssistantSchedules()
     {
         $scheduleModel = $this->model('AssistantScheduleModel');
-
         $data = [
-            'schedules' => $scheduleModel->getAllWithDetails() // Method ini yang tadi error
+            'schedules' => $scheduleModel->getAllWithDetails()
         ];
-
-        // Kita gunakan view yang sama dengan admin atau buat view khusus koordinator
-        // Disini saya arahkan ke view koordinator (kita buat di langkah 3)
         $this->view('koordinator/assistant-schedules', $data);
     }
 
-    // ==========================================
-    // DATA LABORATORIUM
-    // ==========================================
+    // --- MENU 2: DATA LAB ---
     public function listLaboratories()
     {
         $labModel = $this->model('LaboratoryModel');
@@ -58,21 +47,7 @@ class KoordinatorController extends Controller
         $this->view('koordinator/laboratories', $data);
     }
 
-    // ==========================================
-    // KEGIATAN LAB (Activities)
-    // ==========================================
-    public function listActivities()
-    {
-        $activityModel = $this->model('LabActivityModel');
-        $data = [
-            'activities' => $activityModel->getAllActivities()
-        ];
-        $this->view('koordinator/activities', $data);
-    }
-
-    // ==========================================
-    // PERMASALAHAN LAB (Problems)
-    // ==========================================
+    // --- MENU 3: PERMASALAHAN ---
     public function listProblems()
     {
         $problemModel = $this->model('LabProblemModel');
@@ -88,7 +63,6 @@ class KoordinatorController extends Controller
             'problems' => $problems,
             'currentStatus' => $status
         ];
-
         $this->view('koordinator/problems', $data);
     }
 
@@ -107,7 +81,6 @@ class KoordinatorController extends Controller
             'problem' => $problem,
             'histories' => $historyModel->getHistoryByProblem($id)
         ];
-
         $this->view('koordinator/problem-detail', $data);
     }
 
@@ -120,21 +93,27 @@ class KoordinatorController extends Controller
         $status = sanitize($this->getPost('status'));
         $note = sanitize($this->getPost('note'));
 
-        // Update problem status
         $this->model('LabProblemModel')->updateProblem($id, ['status' => $status]);
-        // Add to history
         $this->model('ProblemHistoryModel')->addHistory($id, $status, $note);
 
         setFlash('success', 'Problem status updated successfully');
         $this->redirect('/koordinator/problems/' . $id);
     }
 
-    // ==========================================
-    // LAPORAN (Reports) - Placeholder
-    // ==========================================
+    // --- MENU 4: KEGIATAN ---
+    public function listActivities()
+    {
+        $activityModel = $this->model('LabActivityModel');
+        $data = [
+            'activities' => $activityModel->getAllActivities()
+        ];
+        $this->view('koordinator/activities', $data);
+    }
+
+    // --- MENU 5: LAPORAN (Placeholder) ---
     public function reports()
     {
-        // Logika laporan bulanan (bisa dikembangkan nanti)
-        $this->view('koordinator/reports');
+        // Anda bisa buat view sederhana untuk ini nanti
+        echo "Halaman Laporan Bulanan (Coming Soon)";
     }
 }
