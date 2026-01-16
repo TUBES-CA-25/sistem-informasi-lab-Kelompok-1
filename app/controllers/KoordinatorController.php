@@ -98,4 +98,43 @@ class KoordinatorController extends Controller {
         setFlash('success', 'Problem status updated successfully');
         $this->redirect('/koordinator/problems/' . $id);
     }
+    
+    /**
+     * List all assistant schedules (read-only)
+     */
+    public function listAssistantSchedules() {
+        $scheduleModel = $this->model('AssistantScheduleModel');
+        
+        $data = [
+            'assistantSchedules' => $scheduleModel->getAllWithDetails()
+        ];
+        
+        $this->view('koordinator/assistant-schedules', $data);
+    }
+    
+    /**
+     * List all laboratories (read-only)
+     */
+    public function listLaboratories() {
+        $laboratoryModel = $this->model('LaboratoryModel');
+        
+        $data = [
+            'laboratories' => $laboratoryModel->getAllLaboratories()
+        ];
+        
+        $this->view('koordinator/laboratories', $data);
+    }
+    
+    /**
+     * List all lab activities (read-only)
+     */
+    public function listActivities() {
+        $activityModel = $this->model('LabActivityModel');
+        
+        $data = [
+            'activities' => $activityModel->getAllActivities()
+        ];
+        
+        $this->view('koordinator/activities', $data);
+    }
 }

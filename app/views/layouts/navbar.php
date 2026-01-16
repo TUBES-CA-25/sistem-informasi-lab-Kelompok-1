@@ -116,9 +116,10 @@
                         <li class="hidden md:block w-px h-5 bg-slate-300 mx-1"></li>
 
                         <li>
-                            <a href="<?= url('/asisten/jobdesk') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/jobdesk') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
+                            <<<<<<< HEAD
+                                <a href="<?= url('/asisten/jobdesk') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/jobdesk') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
                                 Jobdesk Saya
-                            </a>
+                                </a>
                         </li>
                         <li>
                             <a href="<?= url('/asisten/problems') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/problems') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
@@ -128,6 +129,15 @@
                         <li>
                             <a href="<?= url('/asisten/assistant-schedules') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/assistant-schedules') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
                                 Jadwal Piket
+                                =======
+                                <a href="<?= url('/asisten/dashboard') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/asisten/dashboard') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
+                                    Dashboard
+                                </a>
+                        </li>
+                        <li>
+                            <a href="<?= url('/asisten/problems') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/asisten/problems') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
+                                Masalah
+                                >>>>>>> bba3d3cec42f44ae1957c2be26a847eb1d4bb746
                             </a>
                         </li>
                     <?php endif; ?>

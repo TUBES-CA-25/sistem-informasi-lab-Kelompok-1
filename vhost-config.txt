@@ -1,0 +1,16 @@
+# ICLABS Virtual Host Configuration
+# Add this to: C:\xampp\apache\conf\extra\httpd-vhosts.conf
+
+<VirtualHost *:80>
+    ServerName iclabs.test
+    DocumentRoot "C:/xampp/htdocs/iclabs/public"
+    
+    <Directory "C:/xampp/htdocs/iclabs/public">
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+    
+    ErrorLog "logs/iclabs-error.log"
+    CustomLog "logs/iclabs-access.log" common
+</VirtualHost>

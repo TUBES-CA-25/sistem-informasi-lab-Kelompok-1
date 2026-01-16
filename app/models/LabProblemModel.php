@@ -29,9 +29,19 @@ class LabProblemModel extends Model
                 FROM lab_problems p 
                 JOIN laboratories l ON p.laboratory_id = l.id 
                 JOIN users u ON p.reported_by = u.id 
-                LEFT JOIN users pj ON p.assigned_to = pj.id
-                WHERE p.assigned_to = ?
-                ORDER BY p.status ASC, p.reported_at DESC";
+                WHERE p.id = ?";
+        return $this->queryOne($sql, [$id]);
+    }
+    
+    /**
+     * Get problems by reporter
+     */
+    public function getProblemsByReporter($userId) {
+        $sql = "SELECT p.*, l.lab_name 
+                FROM lab_problems p 
+                JOIN laboratories l ON p.laboratory_id = l.id 
+                WHERE p.reported_by = ? 
+                ORDER BY p.reported_at DESC";
         return $this->query($sql, [$userId]);
     }
 
