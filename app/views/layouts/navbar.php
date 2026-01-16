@@ -37,7 +37,7 @@
                         <ul class="py-2" aria-labelledby="user-menu-button">
                             <li>
                                 <a href="<?= url('/admin/dashboard') ?>" class="block px-4 py-2 text-sm text-sky-600 hover:bg-sky-50 font-bold">
-                                    <i class="bi bi-speedometer2 me-2"></i> Admin Dashboard
+                                    <i class="bi bi-speedometer2 me-2"></i> Ke Dashboard Admin
                                 </a>
                             </li>
                         </ul>
@@ -116,28 +116,27 @@
                         <li class="hidden md:block w-px h-5 bg-slate-300 mx-1"></li>
 
                         <li>
-                            <<<<<<< HEAD
-                                <a href="<?= url('/asisten/jobdesk') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/jobdesk') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
-                                Jobdesk Saya
-                                </a>
+                            <a href="<?= url('/asisten/jobdesk') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/jobdesk') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
+                                <i class="bi bi-briefcase mr-1"></i> Jobdesk
+                            </a>
                         </li>
                         <li>
                             <a href="<?= url('/asisten/problems') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/problems') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
-                                Permasalahan Lab
+                                Masalah Lab
                             </a>
                         </li>
                         <li>
                             <a href="<?= url('/asisten/assistant-schedules') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/assistant-schedules') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
                                 Jadwal Piket
-                                =======
-                                <a href="<?= url('/asisten/dashboard') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/asisten/dashboard') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
-                                    Dashboard
-                                </a>
+                            </a>
                         </li>
+                    <?php endif; ?>
+
+                    <?php if ($role == 'admin'): ?>
+                        <li class="hidden md:block w-px h-5 bg-slate-300 mx-1"></li>
                         <li>
-                            <a href="<?= url('/asisten/problems') ?>" class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/asisten/problems') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
-                                Masalah
-                                >>>>>>> bba3d3cec42f44ae1957c2be26a847eb1d4bb746
+                            <a href="<?= url('/admin/dashboard') ?>" class="block py-2 px-3 rounded md:p-0 text-white bg-sky-600 hover:bg-sky-700 md:bg-transparent md:text-sky-600 md:hover:text-sky-800 font-bold transition-colors">
+                                <i class="bi bi-shield-lock-fill mr-1"></i> ADMIN PANEL
                             </a>
                         </li>
                     <?php endif; ?>

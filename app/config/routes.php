@@ -47,8 +47,21 @@ $router->get('/api/lab-activities', 'ApiController@getLabActivities');
 // ==========================================
 
 $router->get('/asisten/dashboard', 'AsistenController@dashboard');
-$router->post('/asisten/report-problem', 'AsistenController@reportProblem');
-$router->get('/asisten/problems', 'AsistenController@listProblems');
+
+// 1. Fitur Jobdesk (Baru)
+$router->get('/asisten/jobdesk', 'AsistenController@jobdesk');
+$router->post('/asisten/update-task-status/:id', 'AsistenController@updateTaskStatus');
+
+// 2. Fitur Permasalahan Lab (CRUD)
+$router->get('/asisten/problems', 'AsistenController@problems');
+$router->post('/asisten/create-problem', 'AsistenController@createProblem');
+$router->post('/asisten/delete-problem/:id', 'AsistenController@deleteProblem');
+
+// 3. Fitur Jadwal Piket
+$router->get('/asisten/assistant-schedules', 'AsistenController@listAssistantSchedules');
+$router->get('/asisten/problems/:id/edit', 'AsistenController@editProblemForm'); // Route Edit Form
+$router->post('/asisten/problems/:id/edit', 'AsistenController@updateProblem'); // Route Submit Edit
+
 
 // ==========================================
 // KOORDINATOR ROUTES (Role: koordinator)
@@ -58,6 +71,7 @@ $router->get('/koordinator/dashboard', 'KoordinatorController@dashboard');
 $router->get('/koordinator/problems', 'KoordinatorController@listProblems');
 $router->get('/koordinator/problems/:id', 'KoordinatorController@viewProblem');
 $router->post('/koordinator/problems/:id/update-status', 'KoordinatorController@updateProblemStatus');
+$router->post('/koordinator/problems/:id/assign', 'KoordinatorController@assignProblem'); // Route Baru
 
 // Koordinator read-only views (using KoordinatorController)
 $router->get('/koordinator/assistant-schedules', 'KoordinatorController@listAssistantSchedules');

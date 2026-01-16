@@ -70,6 +70,8 @@ class KoordinatorController extends Controller
     {
         $problemModel = $this->model('LabProblemModel');
         $historyModel = $this->model('ProblemHistoryModel');
+        $userModel = $this->model('UserModel'); // Load User Model
+
         $problem = $problemModel->getProblemWithDetails($id);
 
         if (!$problem) {
@@ -77,10 +79,16 @@ class KoordinatorController extends Controller
             $this->redirect('/koordinator/problems');
         }
 
+        // Ambil daftar user dengan role 'asisten' untuk dropdown assignment
+        // Kita asumsikan role_id 3 adalah asisten (sesuai seed database Anda)
+        $assistants = $userModel->getUsersByRole(3);
+
         $data = [
             'problem' => $problem,
-            'histories' => $historyModel->getHistoryByProblem($id)
+            'histories' => $historyModel->getHistoryByProblem($id),
+            'assistants' => $assistants // Kirim data asisten ke view
         ];
+
         $this->view('koordinator/problem-detail', $data);
     }
 
@@ -115,5 +123,24 @@ class KoordinatorController extends Controller
     {
         // Anda bisa buat view sederhana untuk ini nanti
         echo "Halaman Laporan Bulanan (Coming Soon)";
+    }
+
+    public function assignProblem($id)
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/koordinator/problems/' . $id);
+        }
+
+        $assignedTo = sanitize($this->getPost('assigned_to'));
+
+        // Update kolom assigned_to
+        $this->model('LabProblemModel')->updateProblem($id, ['assigned_to' => $assignedTo]);
+
+        // Catat di history
+        $assigneeName = $this->model('UserModel')->find($assignedTo)['name'];
+        $this->model('ProblemHistoryModel')->addHistory($id, 'reported', "Ditugaskan kepada: " . $assigneeName);
+
+        setFlash('success', 'Tugas berhasil diberikan kepada asisten.');
+        $this->redirect('/koordinator/problems/' . $id);
     }
 }
