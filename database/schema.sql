@@ -226,28 +226,7 @@ CREATE INDEX idx_lab_problems_status ON lab_problems(status);
 CREATE INDEX idx_lab_problems_lab ON lab_problems(laboratory_id);
 CREATE INDEX idx_lab_activities_date ON lab_activities(activity_date);
 
--- ==========================================
--- DONE
--- ==========================================
--- Database ICLABS berhasil dibuat dengan:
--- - 9 Tabel sesuai spesifikasi
--- - 3 Role (admin, koordinator, asisten)
--- - 5 User (1 admin, 1 koordinator, 3 asisten)
--- - 4 Laboratories
--- - 7 Lab Schedules
--- - 5 Assistant Schedules
--- - 1 Head Laboran
--- - 4 Lab Activities
--- - 4 Lab Problems dengan histories
--- 
--- Default Login:
--- Admin: admin@iclabs.com / password123
--- Koordinator: koordinator@iclabs.com / password123
--- Asisten1: asisten1@iclabs.com / password123
--- ==========================================
 
---Update Rifky
--- 1. Tambah kolom untuk Jadwal Lengkap
 ALTER TABLE lab_schedules
 ADD COLUMN program_study VARCHAR(100) AFTER course,
 ADD COLUMN semester INT AFTER program_study,

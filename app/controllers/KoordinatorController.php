@@ -1,140 +1,140 @@
 <?php
+
 /**
  * ICLABS - Koordinator Controller
  * Handles koordinator role operations
  */
 
-class KoordinatorController extends Controller {
-    
-    public function __construct() {
+class KoordinatorController extends Controller
+{
+
+    public function __construct()
+    {
         $this->requireRole('koordinator');
     }
-    
-    /**
-     * Koordinator dashboard
-     */
-    public function dashboard() {
+
+    // ==========================================
+    // DASHBOARD
+    // ==========================================
+    public function dashboard()
+    {
         $problemModel = $this->model('LabProblemModel');
-        
         $statistics = $problemModel->getStatistics();
-        
+
         $data = [
             'statistics' => $statistics,
             'pendingProblems' => $problemModel->getPendingProblems(),
             'userName' => getUserName()
         ];
-        
+
         $this->view('koordinator/dashboard', $data);
     }
-    
-    /**
-     * List all problems
-     */
-    public function listProblems() {
+
+    // ==========================================
+    // JADWAL PIKET (Assistant Schedules)
+    // ==========================================
+    public function listAssistantSchedules()
+    {
+        $scheduleModel = $this->model('AssistantScheduleModel');
+
+        $data = [
+            'schedules' => $scheduleModel->getAllWithDetails() // Method ini yang tadi error
+        ];
+
+        // Kita gunakan view yang sama dengan admin atau buat view khusus koordinator
+        // Disini saya arahkan ke view koordinator (kita buat di langkah 3)
+        $this->view('koordinator/assistant-schedules', $data);
+    }
+
+    // ==========================================
+    // DATA LABORATORIUM
+    // ==========================================
+    public function listLaboratories()
+    {
+        $labModel = $this->model('LaboratoryModel');
+        $data = [
+            'laboratories' => $labModel->getAllLaboratories()
+        ];
+        $this->view('koordinator/laboratories', $data);
+    }
+
+    // ==========================================
+    // KEGIATAN LAB (Activities)
+    // ==========================================
+    public function listActivities()
+    {
+        $activityModel = $this->model('LabActivityModel');
+        $data = [
+            'activities' => $activityModel->getAllActivities()
+        ];
+        $this->view('koordinator/activities', $data);
+    }
+
+    // ==========================================
+    // PERMASALAHAN LAB (Problems)
+    // ==========================================
+    public function listProblems()
+    {
         $problemModel = $this->model('LabProblemModel');
-        
         $status = $this->getQuery('status');
-        
+
         if ($status) {
             $problems = $problemModel->getProblemsByStatus($status);
         } else {
             $problems = $problemModel->getAllWithDetails();
         }
-        
+
         $data = [
             'problems' => $problems,
             'currentStatus' => $status
         ];
-        
+
         $this->view('koordinator/problems', $data);
     }
-    
-    /**
-     * View problem detail
-     */
-    public function viewProblem($id) {
+
+    public function viewProblem($id)
+    {
         $problemModel = $this->model('LabProblemModel');
         $historyModel = $this->model('ProblemHistoryModel');
-        
         $problem = $problemModel->getProblemWithDetails($id);
-        
+
         if (!$problem) {
             setFlash('danger', 'Problem not found');
             $this->redirect('/koordinator/problems');
         }
-        
+
         $data = [
             'problem' => $problem,
             'histories' => $historyModel->getHistoryByProblem($id)
         ];
-        
+
         $this->view('koordinator/problem-detail', $data);
     }
-    
-    /**
-     * Update problem status
-     */
-    public function updateProblemStatus($id) {
+
+    public function updateProblemStatus($id)
+    {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/koordinator/problems/' . $id);
         }
-        
+
         $status = sanitize($this->getPost('status'));
         $note = sanitize($this->getPost('note'));
-        
-        if (empty($status)) {
-            setFlash('danger', 'Status is required');
-            $this->redirect('/koordinator/problems/' . $id);
-        }
-        
+
         // Update problem status
-        $problemModel = $this->model('LabProblemModel');
-        $problemModel->updateProblem($id, ['status' => $status]);
-        
+        $this->model('LabProblemModel')->updateProblem($id, ['status' => $status]);
         // Add to history
-        $historyModel = $this->model('ProblemHistoryModel');
-        $historyModel->addHistory($id, $status, $note);
-        
+        $this->model('ProblemHistoryModel')->addHistory($id, $status, $note);
+
         setFlash('success', 'Problem status updated successfully');
         $this->redirect('/koordinator/problems/' . $id);
     }
-    
-    /**
-     * List all assistant schedules (read-only)
-     */
-    public function listAssistantSchedules() {
-        $scheduleModel = $this->model('AssistantScheduleModel');
-        
-        $data = [
-            'assistantSchedules' => $scheduleModel->getAllWithDetails()
-        ];
-        
-        $this->view('koordinator/assistant-schedules', $data);
-    }
-    
-    /**
-     * List all laboratories (read-only)
-     */
-    public function listLaboratories() {
-        $laboratoryModel = $this->model('LaboratoryModel');
-        
-        $data = [
-            'laboratories' => $laboratoryModel->getAllLaboratories()
-        ];
-        
-        $this->view('koordinator/laboratories', $data);
-    }
-    
-    /**
-     * List all lab activities (read-only)
-     */
-    public function listActivities() {
-        $activityModel = $this->model('LabActivityModel');
-        
-        $data = [
-            'activities' => $activityModel->getAllActivities()
-        ];
-        
-        $this->view('koordinator/activities', $data);
+
+    // ==========================================
+    // LAPORAN (Reports) - Placeholder
+    // ==========================================
+    public function reports()
+    {
+        // Logika laporan bulanan (bisa dikembangkan nanti)
+        $this->view('koordinator/reports');
     }
 }
