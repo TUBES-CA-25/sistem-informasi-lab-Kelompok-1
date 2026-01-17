@@ -43,6 +43,17 @@ class UserModel extends Model {
     }
     
     /**
+     * Get users by role name (e.g., 'asisten', 'koordinator', 'admin')
+     */
+    public function getUsersByRoleName($roleName) {
+        $sql = "SELECT u.* FROM users u 
+                JOIN roles r ON u.role_id = r.id 
+                WHERE r.role_name = ?
+                ORDER BY u.name ASC";
+        return $this->query($sql, [$roleName]);
+    }
+    
+    /**
      * Get active users by role
      */
     public function getActiveUsersByRole($roleId) {
