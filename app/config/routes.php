@@ -68,15 +68,39 @@ $router->post('/asisten/problems/:id/edit', 'AsistenController@updateProblem'); 
 // ==========================================
 
 $router->get('/koordinator/dashboard', 'KoordinatorController@dashboard');
+
+// Problem CRUD
 $router->get('/koordinator/problems', 'KoordinatorController@listProblems');
+$router->get('/koordinator/problems/create', 'KoordinatorController@createProblemForm');
+$router->post('/koordinator/problems/create', 'KoordinatorController@createProblem');
 $router->get('/koordinator/problems/:id', 'KoordinatorController@viewProblem');
+$router->get('/koordinator/problems/:id/edit', 'KoordinatorController@editProblemForm');
+$router->post('/koordinator/problems/:id/edit', 'KoordinatorController@updateProblem');
+$router->post('/koordinator/problems/:id/delete', 'KoordinatorController@deleteProblem');
 $router->post('/koordinator/problems/:id/update-status', 'KoordinatorController@updateProblemStatus');
-$router->post('/koordinator/problems/:id/assign', 'KoordinatorController@assignProblem'); // Route Baru
+$router->post('/koordinator/problems/:id/assign', 'KoordinatorController@assignProblem');
 
 // Koordinator read-only views (using KoordinatorController)
 $router->get('/koordinator/assistant-schedules', 'KoordinatorController@listAssistantSchedules');
+$router->get('/koordinator/assistant-schedules/create', 'KoordinatorController@createScheduleForm');
+$router->post('/koordinator/assistant-schedules/create', 'KoordinatorController@createSchedule');
+$router->get('/koordinator/assistant-schedules/:id/edit', 'KoordinatorController@editScheduleForm');
+$router->post('/koordinator/assistant-schedules/:id/edit', 'KoordinatorController@updateSchedule');
+$router->post('/koordinator/assistant-schedules/:id/delete', 'KoordinatorController@deleteSchedule');
+
 $router->get('/koordinator/laboratories', 'KoordinatorController@listLaboratories');
+$router->get('/koordinator/laboratories/create', 'KoordinatorController@createLaboratoryForm');
+$router->post('/koordinator/laboratories/create', 'KoordinatorController@createLaboratory');
+$router->get('/koordinator/laboratories/:id/edit', 'KoordinatorController@editLaboratoryForm');
+$router->post('/koordinator/laboratories/:id/edit', 'KoordinatorController@updateLaboratory');
+$router->post('/koordinator/laboratories/:id/delete', 'KoordinatorController@deleteLaboratory');
+
 $router->get('/koordinator/activities', 'KoordinatorController@listActivities');
+$router->get('/koordinator/activities/create', 'KoordinatorController@createActivityForm');
+$router->post('/koordinator/activities/create', 'KoordinatorController@createActivity');
+$router->get('/koordinator/activities/:id/edit', 'KoordinatorController@editActivityForm');
+$router->post('/koordinator/activities/:id/edit', 'KoordinatorController@updateActivity');
+$router->post('/koordinator/activities/:id/delete', 'KoordinatorController@deleteActivity');
 
 // ==========================================
 // ADMIN ROUTES (Role: admin)

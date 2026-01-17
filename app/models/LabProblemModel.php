@@ -29,11 +29,11 @@ class LabProblemModel extends Model
         $sql = "SELECT p.*, 
                        l.lab_name, 
                        u.name as reporter_name,
-                       pj.name as pj_name
+                       assigned.name as assigned_to_name
                 FROM lab_problems p 
                 JOIN laboratories l ON p.laboratory_id = l.id 
                 JOIN users u ON p.reported_by = u.id 
-                LEFT JOIN users pj ON p.assigned_to = pj.id
+                LEFT JOIN users assigned ON p.assigned_to = assigned.id
                 WHERE p.assigned_to = ?
                 ORDER BY p.status ASC, p.reported_at DESC";
         return $this->query($sql, [$userId]);
@@ -57,11 +57,11 @@ class LabProblemModel extends Model
                        l.lab_name, l.location,
                        u.name as reporter_name,
                        u.email as reporter_email,
-                       pj.name as pj_name
+                       assigned.name as assigned_to_name
                 FROM lab_problems p 
                 JOIN laboratories l ON p.laboratory_id = l.id 
                 JOIN users u ON p.reported_by = u.id 
-                LEFT JOIN users pj ON p.assigned_to = pj.id
+                LEFT JOIN users assigned ON p.assigned_to = assigned.id
                 WHERE p.id = ?";
         return $this->queryOne($sql, [$id]);
     }
@@ -188,12 +188,16 @@ class LabProblemModel extends Model
                         p.status,
                         p.reported_at,
                         p.reported_by,
+                        p.assigned_to,
                         l.lab_name,
                         u.name as reporter_name,
-                        u.email as reporter_email
+                        u.email as reporter_email,
+                        u.name as reported_by_name,
+                        assigned.name as assigned_to_name
                     FROM lab_problems p
                     JOIN laboratories l ON p.laboratory_id = l.id
                     JOIN users u ON p.reported_by = u.id
+                    LEFT JOIN users assigned ON p.assigned_to = assigned.id
                     WHERE {$whereStatus}{$searchWhere}
                     ORDER BY p.reported_at DESC
                     LIMIT :limit OFFSET :offset";
