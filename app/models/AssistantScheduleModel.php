@@ -2,6 +2,7 @@
 
 /**
  * ICLABS - Assistant Schedule Model
+ * Updated to support Admin & Koordinator features
  */
 
 class AssistantScheduleModel extends Model
@@ -10,9 +11,9 @@ class AssistantScheduleModel extends Model
 
     /**
      * Ambil semua jadwal dengan detail user (nama asisten)
-     * Digunakan oleh: Admin & Koordinator
+     * Digunakan oleh: AdminController (listAssistantSchedules)
      */
-    public function getAllWithDetails()
+    public function getAllWithUser()
     {
         $sql = "SELECT s.*, u.name as assistant_name, u.email 
                 FROM assistant_schedules s 
@@ -22,8 +23,17 @@ class AssistantScheduleModel extends Model
     }
 
     /**
+     * Alias method untuk kompatibilitas
+     * Digunakan oleh: KoordinatorController (listAssistantSchedules)
+     */
+    public function getAllWithDetails()
+    {
+        return $this->getAllWithUser();
+    }
+
+    /**
      * Ambil jadwal spesifik user
-     * Digunakan oleh: Asisten (Jadwal Saya)
+     * Digunakan oleh: AsistenController (listAssistantSchedules)
      */
     public function getSchedulesByUser($userId)
     {
