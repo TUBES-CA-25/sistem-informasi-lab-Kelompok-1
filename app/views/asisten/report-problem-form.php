@@ -11,7 +11,7 @@
         </div>
     </div>
 
-    <form method="POST" action="<?= url('/asisten/report-problem') ?>" class="p-6 space-y-6">
+    <form method="POST" action="<?= url('/asisten/create-problem') ?>" class="p-6 space-y-6">
         
         <!-- Laboratory Selection -->
         <div>
@@ -23,7 +23,7 @@
                 <option value="">-- Pilih Laboratorium --</option>
                 <?php if (!empty($laboratories)): ?>
                     <?php foreach ($laboratories as $lab): ?>
-                        <option value="<?= $lab['id'] ?>"><?= e($lab['name']) ?></option>
+                        <option value="<?= $lab['id'] ?>"><?= e($lab['lab_name']) ?></option>
                     <?php endforeach; ?>
                 <?php endif; ?>
             </select>
@@ -37,6 +37,21 @@
             <input type="text" name="pc_number" id="pc_number" required
                 placeholder="Contoh: PC-01, PC-15"
                 class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all">
+        </div>
+
+        <!-- Pelapor (Reporter Name) -->
+        <div>
+            <label for="reporter_name" class="block text-sm font-semibold text-slate-700 mb-2">
+                Nama Pelapor <span class="text-rose-500">*</span>
+            </label>
+            <input type="text" name="reporter_name" id="reporter_name" required
+                value="<?= e(getUserName()) ?>"
+                placeholder="Nama pelapor masalah"
+                class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all bg-slate-50">
+            <p class="text-xs text-slate-500 mt-1">
+                <i class="bi bi-info-circle"></i>
+                Nama Anda (bisa diubah jika melaporkan atas nama orang lain)
+            </p>
         </div>
 
         <!-- Problem Type -->
@@ -81,32 +96,6 @@
                 Batal
             </a>
         </div>
-
     </form>
 </div>
 
-<!-- Info Card -->
-<div class="bg-gradient-to-br from-sky-50 to-blue-50 border border-sky-200 rounded-2xl p-6 mt-6">
-    <div class="flex items-start gap-4">
-        <div class="w-12 h-12 bg-sky-100 rounded-full flex items-center justify-center flex-shrink-0">
-            <i class="bi bi-lightbulb text-sky-600 text-2xl"></i>
-        </div>
-        <div>
-            <h3 class="font-bold text-slate-800 mb-2">Tips Melaporkan Masalah</h3>
-            <ul class="space-y-2 text-sm text-slate-600">
-                <li class="flex items-start gap-2">
-                    <i class="bi bi-check-circle-fill text-emerald-500 mt-0.5"></i>
-                    <span>Pastikan nomor PC sudah benar sesuai dengan label di komputer</span>
-                </li>
-                <li class="flex items-start gap-2">
-                    <i class="bi bi-check-circle-fill text-emerald-500 mt-0.5"></i>
-                    <span>Jelaskan gejala masalah dengan spesifik (error message, masalah fisik, dll)</span>
-                </li>
-                <li class="flex items-start gap-2">
-                    <i class="bi bi-check-circle-fill text-emerald-500 mt-0.5"></i>
-                    <span>Laporan Anda akan segera ditinjau oleh koordinator laboratorium</span>
-                </li>
-            </ul>
-        </div>
-    </div>
-</div>

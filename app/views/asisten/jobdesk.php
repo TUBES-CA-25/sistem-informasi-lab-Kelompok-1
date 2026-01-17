@@ -76,18 +76,31 @@
                                                         </button>
                                                     </div>
                                                     <div class="p-6 text-left">
-                                                        <form action="<?= url('/asisten/update-task-status/' . $task['id']) ?>" method="POST">
+                                                        <form action="<?= url('/asisten/update-task-status/' . $task['id']) ?>" method="POST" enctype="multipart/form-data">
                                                             <div class="mb-4">
                                                                 <label class="block mb-2 text-sm font-bold text-slate-700">Status Terbaru</label>
-                                                                <select name="status" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                                                <select name="status" id="status-<?= $task['id'] ?>" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5" onchange="toggleCompletionFields(<?= $task['id'] ?>)">
                                                                     <option value="in_progress" <?= $task['status'] == 'in_progress' ? 'selected' : '' ?>>Sedang Dikerjakan</option>
                                                                     <option value="resolved" <?= $task['status'] == 'resolved' ? 'selected' : '' ?>>Selesai (Resolved)</option>
                                                                     <option value="reported" <?= $task['status'] == 'reported' ? 'selected' : '' ?>>Pending</option>
                                                                 </select>
                                                             </div>
-                                                            <div class="mb-6">
+                                                            <div class="mb-4">
                                                                 <label class="block mb-2 text-sm font-bold text-slate-700">Catatan Pengerjaan</label>
-                                                                <textarea name="note" rows="3" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5" placeholder="Apa yang sudah Anda lakukan?"></textarea>
+                                                                <textarea name="note" rows="2" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5" placeholder="Apa yang sudah Anda lakukan?"></textarea>
+                                                            </div>
+                                                            <div id="completion-fields-<?= $task['id'] ?>" class="hidden">
+                                                                <div class="mb-4">
+                                                                    <label class="block mb-2 text-sm font-bold text-slate-700">Keterangan Perbaikan</label>
+                                                                    <textarea name="solution_notes" rows="2" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5" placeholder="Jelaskan solusi/penyebab masalah..."></textarea>
+                                                                </div>
+                                                                <div class="mb-4">
+                                                                    <label class="block mb-2 text-sm font-bold text-slate-700">
+                                                                        Foto Bukti Penyelesaian <span class="text-xs text-slate-400 font-normal">(Opsional)</span>
+                                                                    </label>
+                                                                    <input type="file" name="completion_photo" accept="image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 transition-all">
+                                                                    <p class="text-xs text-slate-400 mt-1"><i class="bi bi-info-circle"></i> Format: JPG, PNG, GIF (Max 2MB)</p>
+                                                                </div>
                                                             </div>
                                                             <button type="submit" class="w-full text-white bg-sky-600 hover:bg-sky-700 font-bold rounded-lg text-sm px-5 py-3 text-center transition-all">Simpan Perubahan</button>
                                                         </form>
@@ -115,4 +128,26 @@
         </div>
     </div>
 </div>
+
+<script>
+function toggleCompletionFields(taskId) {
+    const statusSelect = document.getElementById('status-' + taskId);
+    const completionFields = document.getElementById('completion-fields-' + taskId);
+    
+    if (statusSelect.value === 'resolved') {
+        completionFields.classList.remove('hidden');
+    } else {
+        completionFields.classList.add('hidden');
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('[id^=\"status-\"]').forEach(function(select) {
+        const taskId = select.id.replace('status-', '');
+        toggleCompletionFields(taskId);
+    });
+});
+</script>
+
 <?php include APP_PATH . '/views/layouts/footer.php'; ?>
