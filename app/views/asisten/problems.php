@@ -1,219 +1,147 @@
-<?php $title = 'Masalah Laboratorium'; ?>
+<?php $title = 'Permasalahan Lab'; ?>
 <?php include APP_PATH . '/views/layouts/header.php'; ?>
 <?php include APP_PATH . '/views/layouts/navbar.php'; ?>
 
-<div class="bg-slate-50 min-h-screen py-8">
+<div class="bg-slate-50 min-h-screen py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
             <div>
-                <h1 class="text-3xl font-bold text-slate-800">Masalah Laboratorium</h1>
-                <p class="text-slate-500 mt-1">Kelola dan pantau semua laporan masalah.</p>
+                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Permasalahan Laboratorium</h1>
+                <p class="text-slate-500 mt-2 text-lg">Laporkan dan pantau kerusakan hardware/software di sini.</p>
             </div>
+
+            <button data-modal-target="addProblemModal" data-modal-toggle="addProblemModal" class="text-white bg-sky-600 hover:bg-sky-700 font-bold rounded-full text-sm px-6 py-3 shadow-lg shadow-sky-500/30 transition-transform hover:-translate-y-1 flex items-center gap-2">
+                <i class="bi bi-plus-lg text-lg"></i>
+                Lapor Masalah Baru
+            </button>
         </div>
 
         <?php displayFlash(); ?>
 
-        <!-- Tabs -->
-        <div class="mb-6">
-            <div class="border-b border-slate-200">
-                <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-                    <button onclick="switchTab('semua')" id="tab-semua" class="tab-button border-emerald-500 text-emerald-600 whitespace-nowrap py-4 px-1 border-b-2 font-bold text-sm">
-                        <i class="bi bi-list-ul mr-2"></i>
-                        Semua Masalah
-                    </button>
-                    <button onclick="switchTab('lapor')" id="tab-lapor" class="tab-button border-transparent text-slate-500 hover:text-emerald-600 hover:border-emerald-300 whitespace-nowrap py-4 px-1 border-b-2 font-bold text-sm">
-                        <i class="bi bi-plus-circle-fill mr-2"></i>
-                        Lapor Masalah
-                    </button>
-                    <button onclick="switchTab('saya')" id="tab-saya" class="tab-button border-transparent text-slate-500 hover:text-emerald-600 hover:border-emerald-300 whitespace-nowrap py-4 px-1 border-b-2 font-bold text-sm">
-                        <i class="bi bi-file-earmark-text mr-2"></i>
-                        Laporan Saya
-                    </button>
-                </nav>
-            </div>
-        </div>
-
-        <!-- Tab Content: Semua Masalah -->
-        <div id="content-semua" class="tab-content">
-            <!-- Statistics -->
-            <?php if (isset($statistics)): ?>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-slate-500">Total Masalah</p>
-                            <p class="text-3xl font-bold text-slate-800 mt-2"><?= $statistics['total'] ?? 0 ?></p>
-                        </div>
-                        <div class="w-14 h-14 bg-slate-50 rounded-xl flex items-center justify-center">
-                            <i class="bi bi-exclamation-circle text-slate-400 text-2xl"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl shadow-sm border border-rose-200 p-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-rose-600">Dilaporkan</p>
-                            <p class="text-3xl font-bold text-rose-700 mt-2"><?= $statistics['reported'] ?? 0 ?></p>
-                        </div>
-                        <div class="w-14 h-14 bg-rose-50 rounded-xl flex items-center justify-center">
-                            <i class="bi bi-flag text-rose-600 text-2xl"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl shadow-sm border border-amber-200 p-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-amber-600">Dalam Proses</p>
-                            <p class="text-3xl font-bold text-amber-700 mt-2"><?= $statistics['in_progress'] ?? 0 ?></p>
-                        </div>
-                        <div class="w-14 h-14 bg-amber-50 rounded-xl flex items-center justify-center">
-                            <i class="bi bi-hourglass-split text-amber-600 text-2xl"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl shadow-sm border border-emerald-200 p-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-emerald-600">Selesai</p>
-                            <p class="text-3xl font-bold text-emerald-700 mt-2"><?= $statistics['resolved'] ?? 0 ?></p>
-                        </div>
-                        <div class="w-14 h-14 bg-emerald-50 rounded-xl flex items-center justify-center">
-                            <i class="bi bi-check-circle text-emerald-600 text-2xl"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <?php endif; ?>
-            
-            <!-- Filter -->
-            <div class="flex flex-wrap gap-3 mb-6">
-                <a href="<?= url('/asisten/problems') ?>" class="px-4 py-2 bg-slate-600 text-white font-medium rounded-lg hover:bg-slate-700 transition-colors">
-                    Semua
-                </a>
-                <a href="<?= url('/asisten/problems?status=reported') ?>" class="px-4 py-2 bg-rose-600 text-white font-medium rounded-lg hover:bg-rose-700 transition-colors">
-                    Dilaporkan
-                </a>
-                <a href="<?= url('/asisten/problems?status=in_progress') ?>" class="px-4 py-2 bg-amber-600 text-white font-medium rounded-lg hover:bg-amber-700 transition-colors">
-                    Dalam Proses
-                </a>
-                <a href="<?= url('/asisten/problems?status=resolved') ?>" class="px-4 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors">
-                    Selesai
-                </a>
-            </div>
-            
-            <!-- Table -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-slate-200">
-                        <thead class="bg-emerald-50">
-                            <tr>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">ID</th>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">Laboratorium</th>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">PC</th>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">Tipe</th>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">Deskripsi</th>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">Pelapor</th>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">Tanggal</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-slate-200">
-                            <?php if (!empty($problems)): ?>
-                                <?php foreach ($problems as $problem): ?>
-                                    <tr class="hover:bg-slate-50 transition-colors">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">#<?= e($problem['id']) ?></td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700"><?= e($problem['lab_name']) ?></td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">PC-<?= e($problem['pc_number']) ?></td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                            <?php
-                                                $typeColors = [
-                                                    'hardware' => 'bg-rose-50 text-rose-700 border-rose-200',
-                                                    'software' => 'bg-sky-50 text-sky-700 border-sky-200',
-                                                    'network' => 'bg-purple-50 text-purple-700 border-purple-200',
-                                                    'other' => 'bg-slate-50 text-slate-700 border-slate-200'
-                                                ];
-                                                $typeColor = $typeColors[$problem['problem_type']] ?? $typeColors['other'];
-                                            ?>
-                                            <span class="inline-flex px-3 py-1 text-xs font-bold rounded-lg border <?= $typeColor ?>">
-                                                <?= ucfirst($problem['problem_type']) ?>
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-slate-600"><?= e(substr($problem['description'], 0, 50)) ?>...</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                            <?php
-                                                $statusColors = [
-                                                    'reported' => 'bg-rose-50 text-rose-700 border-rose-200',
-                                                    'in_progress' => 'bg-amber-50 text-amber-700 border-amber-200',
-                                                    'resolved' => 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                                ];
-                                                $statusColor = $statusColors[$problem['status']] ?? 'bg-slate-50 text-slate-700 border-slate-200';
-                                            ?>
-                                            <span class="inline-flex px-3 py-1 text-xs font-bold rounded-lg border <?= $statusColor ?>">
-                                                <?= ucfirst(str_replace('_', ' ', $problem['status'])) ?>
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700"><?= e($problem['reporter_name']) ?></td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600"><?= date('d M Y', strtotime($problem['reported_at'])) ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <tr>
-                                    <td colspan="8" class="px-6 py-12 text-center">
-                                        <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <i class="bi bi-inbox text-4xl text-slate-300"></i>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-slate-500">
+                    <thead class="bg-slate-50 text-slate-700 uppercase text-xs font-bold tracking-wider">
+                        <tr>
+                            <th class="px-6 py-4">Lokasi & PC</th>
+                            <th class="px-6 py-4">Detail Masalah</th>
+                            <th class="px-6 py-4">Pelapor</th>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <?php if (!empty($problems)): ?>
+                            <?php foreach ($problems as $problem): ?>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 align-top">
+                                        <div class="font-bold text-slate-900 text-base"><?= e($problem['lab_name']) ?></div>
+                                        <span class="inline-flex items-center mt-1 px-2.5 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">
+                                            <i class="bi bi-pc-display mr-1"></i> PC-<?= e($problem['pc_number']) ?>
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 align-top max-w-md">
+                                        <span class="inline-flex mb-2 px-2 py-1 text-[10px] font-bold uppercase rounded-md <?= $problem['problem_type'] == 'hardware' ? 'bg-rose-50 text-rose-700 border border-rose-100' : 'bg-indigo-50 text-indigo-700 border border-indigo-100' ?>">
+                                            <?= e($problem['problem_type']) ?>
+                                        </span>
+                                        <p class="text-slate-600 text-sm leading-relaxed"><?= nl2br(e($problem['description'])) ?></p>
+                                    </td>
+                                    <td class="px-6 py-4 align-top">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-500">
+                                                <?= strtoupper(substr($problem['reporter_name'], 0, 1)) ?>
+                                            </div>
+                                            <div>
+                                                <div class="font-medium text-slate-900 text-sm"><?= e($problem['reporter_name']) ?></div>
+                                                <div class="text-xs text-slate-400"><?= formatDate($problem['reported_at']) ?></div>
+                                            </div>
                                         </div>
-                                        <h3 class="text-lg font-medium text-slate-900">Tidak ada masalah</h3>
-                                        <p class="text-slate-500">Belum ada laporan masalah yang tersedia.</p>
+                                    </td>
+                                    <td class="px-6 py-4 align-top">
+                                        <?= getStatusBadge($problem['status']) ?>
+                                    </td>
+                                    <td class="px-6 py-4 align-top text-center whitespace-nowrap">
+                                        <?php if ($problem['reported_by'] == getUserId()): ?>
+
+                                            <a href="<?= url('/asisten/problems/' . $problem['id'] . '/edit') ?>" class="inline-block text-amber-500 hover:text-amber-700 p-2 hover:bg-amber-50 rounded-full transition-colors mr-1" title="Edit Laporan">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+
+                                            <form method="POST" action="<?= url('/asisten/delete-problem/' . $problem['id']) ?>" onsubmit="return confirm('Yakin ingin menghapus laporan ini?')" class="inline-block">
+                                                <button type="submit" class="text-rose-500 hover:text-rose-700 p-2 hover:bg-rose-50 rounded-full transition-colors" title="Hapus Laporan">
+                                                    <i class="bi bi-trash-fill"></i>
+                                                </button>
+                                            </form>
+
+                                        <?php else: ?>
+                                            <span class="text-xs text-slate-400 italic">View Only</span>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="5" class="px-6 py-16 text-center">
+                                    <div class="bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <i class="bi bi-check-circle-fill text-4xl text-emerald-400"></i>
+                                    </div>
+                                    <h3 class="text-lg font-medium text-slate-900">Aman Terkendali!</h3>
+                                    <p class="text-slate-500 mt-1">Belum ada laporan kerusakan di laboratorium.</p>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
-        </div>
-
-        <!-- Tab Content: Lapor Masalah -->
-        <div id="content-lapor" class="tab-content hidden">
-            <?php include APP_PATH . '/views/asisten/report-problem-form.php'; ?>
-        </div>
-
-        <!-- Tab Content: Laporan Saya -->
-        <div id="content-saya" class="tab-content hidden">
-            <?php include APP_PATH . '/views/asisten/my-reports-content.php'; ?>
         </div>
 
     </div>
 </div>
 
-<script>
-function switchTab(tabName) {
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.add('hidden');
-    });
-    
-    document.querySelectorAll('.tab-button').forEach(button => {
-        button.classList.remove('border-emerald-500', 'text-emerald-600');
-        button.classList.add('border-transparent', 'text-slate-500');
-    });
-    
-    document.getElementById('content-' + tabName).classList.remove('hidden');
-    
-    const activeTab = document.getElementById('tab-' + tabName);
-    activeTab.classList.remove('border-transparent', 'text-slate-500');
-    activeTab.classList.add('border-emerald-500', 'text-emerald-600');
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const tab = urlParams.get('tab') || 'semua';
-    switchTab(tab);
-});
-</script>
+<div id="addProblemModal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full backdrop-blur-sm bg-slate-900/50">
+    <div class="relative w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-2xl shadow-2xl">
+            <div class="flex items-start justify-between p-5 border-b rounded-t">
+                <h3 class="text-xl font-bold text-slate-900">Lapor Kerusakan</h3>
+                <button type="button" class="text-slate-400 bg-transparent hover:bg-slate-100 hover:text-slate-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center" data-modal-hide="addProblemModal">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form action="<?= url('/asisten/create-problem') ?>" method="POST">
+                    <div class="mb-4">
+                        <label class="block mb-2 text-sm font-bold text-slate-700">Laboratorium</label>
+                        <select name="laboratory_id" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5" required>
+                            <?php foreach ($laboratories as $lab): ?>
+                                <option value="<?= $lab['id'] ?>"><?= e($lab['lab_name']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block mb-2 text-sm font-bold text-slate-700">No. PC</label>
+                            <input type="text" name="pc_number" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5" placeholder="01" required>
+                        </div>
+                        <div>
+                            <label class="block mb-2 text-sm font-bold text-slate-700">Kategori</label>
+                            <select name="problem_type" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                <option value="software">Software</option>
+                                <option value="hardware">Hardware</option>
+                                <option value="network">Jaringan</option>
+                                <option value="other">Lainnya</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block mb-2 text-sm font-bold text-slate-700">Deskripsi Masalah</label>
+                        <textarea name="description" rows="3" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5" placeholder="Contoh: Layar monitor berkedip..." required></textarea>
+                    </div>
+                    <button type="submit" class="w-full text-white bg-sky-600 hover:bg-sky-700 focus:ring-4 focus:outline-none focus:ring-sky-300 font-bold rounded-lg text-sm px-5 py-3 text-center transition-all">Kirim Laporan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <?php include APP_PATH . '/views/layouts/footer.php'; ?>
-

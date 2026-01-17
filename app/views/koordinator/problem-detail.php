@@ -55,6 +55,29 @@ $adminLayout = true; ?>
                     </table>
                 </div>
 
+                <div class="card mb-4">
+                    <div class="card-header bg-slate-100 font-bold text-slate-700">Tugaskan Penanggung Jawab</div>
+                    <div class="p-4">
+                        <form method="POST" action="<?= url('/koordinator/problems/' . $problem['id'] . '/assign') ?>">
+                            <label class="block mb-2 text-sm font-medium text-slate-700">Pilih Asisten Teknisi</label>
+                            <div class="flex gap-2">
+                                <select name="assigned_to" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg block w-full p-2.5" required>
+                                    <option value="">-- Pilih Asisten --</option>
+                                    <?php foreach ($assistants as $asisten): ?>
+                                        <option value="<?= $asisten['id'] ?>" <?= $problem['assigned_to'] == $asisten['id'] ? 'selected' : '' ?>>
+                                            <?= e($asisten['name']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <button type="submit" class="text-white bg-indigo-600 hover:bg-indigo-700 font-medium rounded-lg text-sm px-5 py-2.5">
+                                    Simpan
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+
                 <!-- Update Status Form -->
                 <div class="card">
                     <div class="card-header">Update Status</div>
