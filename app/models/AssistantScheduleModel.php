@@ -42,6 +42,19 @@ class AssistantScheduleModel extends Model
                 ORDER BY FIELD(day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'), s.start_time";
         return $this->query($sql, [$userId]);
     }
+    
+    /**
+     * Get schedules by specific day
+     */
+    public function getSchedulesByDay($day)
+    {
+        $sql = "SELECT s.*, u.name as assistant_name, u.email 
+                FROM assistant_schedules s 
+                JOIN users u ON s.user_id = u.id 
+                WHERE s.day = ?
+                ORDER BY s.start_time";
+        return $this->query($sql, [$day]);
+    }
 
     /**
      * CRUD Operations
