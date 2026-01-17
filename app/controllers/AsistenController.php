@@ -40,15 +40,40 @@ class AsistenController extends Controller
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $status = sanitize($this->getPost('status'));
             $note = sanitize($this->getPost('note'));
+            $solutionNotes = sanitize($this->getPost('solution_notes'));
 
             $problemModel = $this->model('LabProblemModel');
             $historyModel = $this->model('ProblemHistoryModel');
 
-            // Update status & timestamp
-            $problemModel->updateTaskProgress($id, $status);
+            // Handle photo upload if task is marked as resolved
+            $photoPath = null;
+            if ($status === 'resolved' && isset($_FILES['completion_photo']) && $_FILES['completion_photo']['error'] === UPLOAD_ERR_OK) {
+                $uploadDir = APP_PATH . '/../public/uploads/completion-photos/';
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+
+                $fileExtension = strtolower(pathinfo($_FILES['completion_photo']['name'], PATHINFO_EXTENSION));
+                $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+
+                if (in_array($fileExtension, $allowedExtensions)) {
+                    $fileName = 'completion_' . $id . '_' . time() . '.' . $fileExtension;
+                    $targetPath = $uploadDir . $fileName;
+
+                    if (move_uploaded_file($_FILES['completion_photo']['tmp_name'], $targetPath)) {
+                        $photoPath = 'uploads/completion-photos/' . $fileName;
+                    }
+                }
+            }
+
+            // Update status, timestamp, photo, and solution notes
+            $problemModel->updateTaskProgress($id, $status, $photoPath, $solutionNotes);
 
             // Catat history
             $historyLog = !empty($note) ? "Update Jobdesk: " . $note : "Status updated by assignee";
+            if ($photoPath) {
+                $historyLog .= " (Bukti foto terlampir)";
+            }
             $historyModel->addHistory($id, $status, $historyLog);
 
             setFlash('success', 'Status pekerjaan berhasil diperbarui.');
@@ -64,9 +89,36 @@ class AsistenController extends Controller
     {
         $problemModel = $this->model('LabProblemModel');
         $laboratoryModel = $this->model('LaboratoryModel');
-
+        
+        // Get filter parameters
+        $statusFilter = $this->getQuery('status') ?? 'active';
+        $search = $this->getQuery('search') ?? '';
+        $page = (int)($this->getQuery('page') ?? 1);
+        
+        // Validate
+        $validStatuses = ['all', 'active', 'reported', 'in_progress', 'resolved'];
+        if (!in_array($statusFilter, $validStatuses)) {
+            $statusFilter = 'active';
+        }
+        if ($page < 1) {
+            $page = 1;
+        }
+        
+        // Get filtered data
+        $result = $problemModel->getFilteredProblems($statusFilter, $search, $page, 10);
+        
         $data = [
-            'problems' => $problemModel->getAllWithDetails(),
+            'problems' => $result['data'],
+            'pagination' => [
+                'current' => $result['page'],
+                'total' => $result['totalPages'],
+                'perPage' => $result['perPage'],
+                'totalRecords' => $result['total']
+            ],
+            'filters' => [
+                'status' => $statusFilter,
+                'search' => $search
+            ],
             'laboratories' => $laboratoryModel->getAllLaboratories()
         ];
 
@@ -79,11 +131,12 @@ class AsistenController extends Controller
             $data = [
                 'laboratory_id' => sanitize($this->getPost('laboratory_id')),
                 'pc_number' => sanitize($this->getPost('pc_number')),
+                'reporter_name' => sanitize($this->getPost('reporter_name')),
                 'problem_type' => sanitize($this->getPost('problem_type')),
                 'description' => sanitize($this->getPost('description'))
             ];
 
-            if (empty($data['laboratory_id']) || empty($data['description'])) {
+            if (empty($data['laboratory_id']) || empty($data['description']) || empty($data['reporter_name'])) {
                 setFlash('danger', 'Mohon lengkapi data laporan.');
                 $this->redirect('/asisten/problems');
             }
@@ -119,7 +172,8 @@ class AsistenController extends Controller
         $userId = getUserId();
 
         $data = [
-            'mySchedules' => $scheduleModel->getSchedulesByUser($userId)
+            'allSchedules' => $scheduleModel->getAllWithDetails(), // Get all schedules for grid view
+            'mySchedules' => $scheduleModel->getSchedulesByUser($userId) // Keep for reference
         ];
 
         $this->view('asisten/assistant-schedules', $data);
