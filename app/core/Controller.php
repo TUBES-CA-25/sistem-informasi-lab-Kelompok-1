@@ -72,7 +72,8 @@ class Controller {
         }
         
         if (!hasRole($allowedRoles)) {
-            $this->json(['error' => 'Unauthorized access'], 403);
+            setFlash('danger', 'Akses ditolak. Anda tidak memiliki izin untuk mengakses halaman ini.');
+            $this->redirect('/dashboard');
         }
     }
     
