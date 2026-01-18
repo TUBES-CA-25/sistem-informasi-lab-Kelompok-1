@@ -2,7 +2,7 @@
 <?php include APP_PATH . '/views/layouts/header.php'; ?>
 <?php include APP_PATH . '/views/layouts/navbar.php'; ?>
 
-<section class="relative pt-24 pb-12 lg:pt-32 lg:pb-20 overflow-hidden bg-white">
+<section class="relative pt-24 pb-12 lg:pt-10 lg:pb-20 overflow-hidden bg-white">
 
     <div class="absolute top-0 right-0 -mr-24 -mt-24 w-[500px] h-[500px] bg-sky-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
     <div class="absolute top-0 left-0 -ml-24 -mt-24 w-[400px] h-[400px] bg-blue-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
