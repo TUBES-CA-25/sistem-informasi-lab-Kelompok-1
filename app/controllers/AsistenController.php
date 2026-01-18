@@ -32,7 +32,7 @@ class AsistenController extends Controller
             'myTasks' => $problemModel->getTasksByAssignee($userId)
         ];
 
-        $this->view('asisten/jobdesk', $data);
+        $this->view('asisten/jobdesk/index', $data);
     }
 
     public function updateTaskStatus($id)
@@ -122,7 +122,7 @@ class AsistenController extends Controller
             'laboratories' => $laboratoryModel->getAllLaboratories()
         ];
 
-        $this->view('asisten/problems', $data);
+        $this->view('asisten/reports/index', $data);
     }
 
     public function createProblem()
@@ -176,7 +176,7 @@ class AsistenController extends Controller
             'mySchedules' => $scheduleModel->getSchedulesByUser($userId) // Keep for reference
         ];
 
-        $this->view('asisten/assistant-schedules', $data);
+        $this->view('asisten/schedules/index', $data);
     }
 
     // Form Edit Masalah
@@ -210,7 +210,7 @@ class AsistenController extends Controller
             'laboratories' => $laboratoryModel->getAllLaboratories()
         ];
 
-        $this->view('asisten/edit-problem', $data);
+        $this->view('asisten/reports/edit', $data);
     }
 
     // Proses Update Masalah

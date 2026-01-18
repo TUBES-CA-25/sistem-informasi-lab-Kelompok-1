@@ -65,7 +65,7 @@ class KoordinatorController extends Controller {
             ]
         ];
         
-        $this->view('koordinator/problems', $data);
+        $this->view('koordinator/problems/index', $data);
     }
     
     /**
@@ -79,7 +79,7 @@ class KoordinatorController extends Controller {
             'laboratories' => $laboratoryModel->getAllLaboratories()
         ];
         
-        $this->view('koordinator/create-problem', $data);
+        $this->view('koordinator/problems/create', $data);
     }
     
     /**
@@ -136,7 +136,7 @@ class KoordinatorController extends Controller {
             'assistants' => $userModel->getUsersByRoleName('asisten')
         ];
         
-        $this->view('koordinator/problem-detail', $data);
+        $this->view('koordinator/problems/detail', $data);
     }
     
     /**
@@ -187,7 +187,7 @@ class KoordinatorController extends Controller {
             'laboratories' => $laboratoryModel->getAllLaboratories()
         ];
         
-        $this->view('koordinator/edit-problem', $data);
+        $this->view('koordinator/problems/edit', $data);
     }
     
     /**
@@ -301,7 +301,7 @@ class KoordinatorController extends Controller {
             'currentFilter' => $filter
         ];
         
-        $this->view('koordinator/assistant-schedules', $data);
+        $this->view('koordinator/schedules/index', $data);
     }
     
     /**
@@ -337,7 +337,7 @@ class KoordinatorController extends Controller {
             'assistants' => $userModel->getUsersByRoleName('asisten')
         ];
         
-        $this->view('koordinator/create-schedule', $data);
+        $this->view('koordinator/schedules/create', $data);
     }
     
     /**
@@ -389,7 +389,7 @@ class KoordinatorController extends Controller {
             'assistants' => $userModel->getUsersByRoleName('asisten')
         ];
         
-        $this->view('koordinator/edit-schedule', $data);
+        $this->view('koordinator/schedules/edit', $data);
     }
     
     /**
@@ -442,7 +442,7 @@ class KoordinatorController extends Controller {
             'laboratories' => $laboratoryModel->getAllLaboratories()
         ];
         
-        $this->view('koordinator/laboratories', $data);
+        $this->view('koordinator/laboratories/index', $data);
     }
     
     /**
@@ -450,7 +450,7 @@ class KoordinatorController extends Controller {
      */
     public function createLaboratoryForm()
     {
-        $this->view('koordinator/create-laboratory');
+        $this->view('koordinator/laboratories/create');
     }
     
     /**
@@ -502,7 +502,7 @@ class KoordinatorController extends Controller {
         
         $data = ['laboratory' => $lab];
         
-        $this->view('koordinator/edit-laboratory', $data);
+        $this->view('koordinator/laboratories/edit', $data);
     }
     
     /**
@@ -559,7 +559,7 @@ class KoordinatorController extends Controller {
             'activities' => $activityModel->getAllActivities()
         ];
         
-        $this->view('koordinator/activities', $data);
+        $this->view('koordinator/activities/index', $data);
     }
     
     /**
@@ -567,7 +567,7 @@ class KoordinatorController extends Controller {
      */
     public function createActivityForm()
     {
-        $this->view('koordinator/create-activity');
+        $this->view('koordinator/activities/create');
     }
     
     /**
@@ -622,7 +622,7 @@ class KoordinatorController extends Controller {
         }
         
         $data = ['activity' => $activity];
-        $this->view('koordinator/edit-activity', $data);
+        $this->view('koordinator/activities/edit', $data);
     }
     
     /**
