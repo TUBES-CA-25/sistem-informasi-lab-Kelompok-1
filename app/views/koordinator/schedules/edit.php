@@ -54,8 +54,20 @@
                     </select>
                 </div>
 
+                <!-- Task Selection -->
+                <div>
+                    <label for="Task" class="block text-sm font-medium text-slate-700 mb-2">
+                        Tugas<span class="text-red-500">*</span>
+                    </label>
+                    <select id="task" name="task" required class="block w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                        <option value="">Pilih Jenis</option>
+                        <option value="Domestik">Membersihkan, Memasak, dan Cuci Piring</option>
+                        <option value="Logistik">Buang Sampah, Beli Lauk, dan Galon</option>
+                    </select>
+                </div>
+
                 <!-- Time Range -->
-                <div class="grid grid-cols-2 gap-4">
+                <!-- <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label for="start_time" class="block text-sm font-medium text-slate-700 mb-2">
                             Waktu Mulai <span class="text-red-500">*</span>
@@ -68,7 +80,7 @@
                         </label>
                         <input type="time" id="end_time" name="end_time" value="<?= htmlspecialchars($schedule['end_time']) ?>" required class="block w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Task Description -->
                 <div>
