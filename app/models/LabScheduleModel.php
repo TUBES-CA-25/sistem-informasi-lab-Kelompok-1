@@ -1,106 +1,118 @@
 <?php
 
 /**
- * ICLABS - Lab Schedule Model
+ * ICLABS - Lab Schedule Model (Cleaned)
+ * Handles Scheduling Logic Only
  */
-
 class LabScheduleModel extends Model
 {
-    protected $table = 'lab_schedules';
+    protected $table = 'course_plans';
 
-    /**
-     * Get all schedules with laboratory info
-     * Updated: Now includes program_study, semester, etc via ls.*
-     */
-    public function getAllWithLaboratory()
+    public function countSchedules()
     {
-        $sql = "SELECT ls.*, l.lab_name, l.location 
-                FROM lab_schedules ls 
-                JOIN laboratories l ON ls.laboratory_id = l.id 
-                ORDER BY 
-                    FIELD(ls.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'),
-                    ls.start_time ASC";
-        return $this->query($sql);
+        $sql = "SELECT COUNT(*) as total FROM course_plans";
+        $result = $this->queryOne($sql);
+        return $result['total'];
     }
 
-    /**
-     * Get SINGLE schedule with laboratory info (For Modal Detail)
-     * [NEW METHOD] Ini yang dibutuhkan untuk fitur tombol Detail
-     */
-    public function getScheduleDetail($id)
+    public function isSlotOccupied($labId, $date, $startTime, $endTime)
     {
-        $sql = "SELECT ls.*, l.lab_name, l.location 
-                FROM lab_schedules ls 
-                JOIN laboratories l ON ls.laboratory_id = l.id 
-                WHERE ls.id = ?";
-        return $this->queryOne($sql, [$id]);
+        $sql = "SELECT COUNT(*) as count 
+                FROM schedule_sessions ss
+                JOIN course_plans cp ON ss.course_plan_id = cp.id
+                WHERE cp.laboratory_id = ? 
+                AND ss.session_date = ? 
+                AND ss.status != 'cancelled'
+                AND (ss.start_time < ? AND ss.end_time > ?)";
+        $result = $this->queryOne($sql, [$labId, $date, $endTime, $startTime]);
+        return $result['count'] > 0;
     }
 
-    /**
-     * Get schedules by laboratory
-     */
-    public function getSchedulesByLaboratory($laboratoryId)
+    public function createCoursePlan($data)
     {
-        $sql = "SELECT * FROM lab_schedules 
-                WHERE laboratory_id = ? 
-                ORDER BY 
-                    FIELD(day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'),
-                    start_time ASC";
-        return $this->query($sql, [$laboratoryId]);
-    }
-
-    /**
-     * Get schedules by day
-     */
-    public function getSchedulesByDay($day)
-    {
-        $sql = "SELECT ls.*, l.lab_name, l.location 
-                FROM lab_schedules ls 
-                JOIN laboratories l ON ls.laboratory_id = l.id 
-                WHERE ls.day = ? 
-                ORDER BY ls.start_time ASC";
-        return $this->query($sql, [$day]);
-    }
-
-    /**
-     * Get today's schedules
-     */
-    public function getTodaySchedules()
-    {
-        $today = date('l'); // Monday, Tuesday, etc.
-        return $this->getSchedulesByDay($today);
-    }
-
-    /**
-     * Create schedule
-     */
-    public function createSchedule($data)
-    {
-        $data['created_at'] = date('Y-m-d H:i:s');
+        $this->table = 'course_plans';
         return $this->insert($data);
     }
 
-    /**
-     * Update schedule
-     */
-    public function updateSchedule($id, $data)
+    public function createSession($data)
     {
-        return $this->update($id, $data);
+        $this->table = 'schedule_sessions';
+        return $this->insert($data);
     }
 
-    /**
-     * Delete schedule
-     */
+    // Ambil semua jadwal (untuk halaman Admin List Schedule)
+    public function getAllWithLaboratory()
+    {
+        $sql = "SELECT cp.*, l.lab_name, l.location 
+                FROM course_plans cp 
+                JOIN laboratories l ON cp.laboratory_id = l.id 
+                ORDER BY cp.created_at DESC";
+        return $this->query($sql);
+    }
+
+    public function getScheduleDetail($id)
+    {
+        $sql = "SELECT cp.*, l.lab_name, l.location 
+                FROM course_plans cp 
+                JOIN laboratories l ON cp.laboratory_id = l.id 
+                WHERE cp.id = ?";
+        return $this->queryOne($sql, [$id]);
+    }
+
     public function deleteSchedule($id)
     {
+        $this->table = 'course_plans';
         return $this->delete($id);
     }
 
-    /**
-     * Count schedules
-     */
-    public function countSchedules()
+    public function updateSchedule($id, $data)
     {
-        return $this->count();
+        $this->table = 'course_plans';
+        return $this->update($id, $data);
+    }
+
+    public function getCalendarEvents($labId = null)
+    {
+        $sql = "SELECT ss.id, ss.session_date, ss.start_time, ss.end_time, 
+                       cp.course_name, cp.class_code, cp.lecturer_name,
+                       l.lab_name
+                FROM schedule_sessions ss
+                JOIN course_plans cp ON ss.course_plan_id = cp.id
+                JOIN laboratories l ON cp.laboratory_id = l.id
+                WHERE ss.status != 'cancelled'";
+        $params = [];
+        if ($labId) {
+            $sql .= " AND cp.laboratory_id = ?";
+            $params[] = $labId;
+        }
+        return $this->query($sql, $params);
+    }
+
+    public function getTodaySchedules()
+    {
+        $today = date('Y-m-d');
+        $sql = "SELECT ss.*, cp.course_name, cp.lecturer_name, cp.class_code, 
+                       l.lab_name, l.location, cp.lecturer_photo, cp.laboratory_id 
+                FROM schedule_sessions ss
+                JOIN course_plans cp ON ss.course_plan_id = cp.id
+                JOIN laboratories l ON cp.laboratory_id = l.id
+                WHERE ss.session_date = ? 
+                AND ss.status != 'cancelled'
+                ORDER BY ss.start_time ASC";
+        return $this->query($sql, [$today]);
+    }
+
+    public function deleteByDate($date, $labId = null)
+    {
+        $sql = "DELETE FROM schedule_sessions WHERE session_date = ?";
+        $params = [$date];
+        if ($labId) {
+            // Join ke course_plans untuk filter by Lab
+            $sql = "DELETE ss FROM schedule_sessions ss 
+                JOIN course_plans cp ON ss.course_plan_id = cp.id 
+                WHERE ss.session_date = ? AND cp.laboratory_id = ?";
+            $params[] = $labId;
+        }
+        return $this->query($sql, $params);
     }
 }

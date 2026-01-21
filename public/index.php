@@ -1,8 +1,12 @@
 <?php
+
 /**
  * ICLABS - Laboratory Information System
  * Front Controller
  */
+
+// 1. SET TIMEZONE WITA (MAKASSAR)
+date_default_timezone_set('Asia/Makassar');
 
 // Start session
 session_start();

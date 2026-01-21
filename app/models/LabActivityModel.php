@@ -1,78 +1,88 @@
 <?php
 
+/**
+ * ICLABS - Lab Activity Model
+ * Handles Blog/News/Activities data
+ */
 class LabActivityModel extends Model
 {
     protected $table = 'lab_activities';
 
     /**
-     * Ambil semua kegiatan (untuk Admin List)
-     * Diurutkan dari yang terbaru
+     * Ambil semua kegiatan (Untuk Admin List)
      */
     public function getAllActivities()
     {
-        $sql = "SELECT * FROM {$this->table} ORDER BY activity_date DESC, created_at DESC";
+        $sql = "SELECT a.*, u.name as author_name 
+                FROM lab_activities a
+                JOIN users u ON a.created_by = u.id 
+                ORDER BY a.created_at DESC";
         return $this->query($sql);
     }
 
     /**
-     * Ambil kegiatan untuk Halaman Depan (Public Landing Page)
+     * Ambil kegiatan terbaru untuk Landing Page (Carousel/Grid Home)
+     * Digunakan di: LandingController@index
      */
-    public function getPublicActivities($limit = 6)
+    public function getRecentActivities($limit = 3)
     {
-        $sql = "SELECT * FROM {$this->table} ORDER BY activity_date DESC LIMIT ?";
-        return $this->query($sql, [$limit]);
+        $limit = (int)$limit; // Casting ke int untuk keamanan query
+        $sql = "SELECT * FROM lab_activities 
+                WHERE status = 'published' 
+                ORDER BY activity_date DESC, created_at DESC 
+                LIMIT $limit";
+        return $this->query($sql);
     }
 
     /**
-     * Cari satu kegiatan berdasarkan ID
+     * Ambil kegiatan publik untuk halaman /activities
+     * Digunakan di: LandingController@labActivities
      */
-    public function find($id)
+    public function getPublicActivities($limit = 20)
     {
-        $sql = "SELECT * FROM {$this->table} WHERE id = ?";
-        $result = $this->query($sql, [$id]);
-
-        // Mengembalikan baris pertama atau false jika kosong
-        return isset($result[0]) ? $result[0] : false;
+        $limit = (int)$limit;
+        $sql = "SELECT a.*, u.name as author_name 
+                FROM lab_activities a
+                JOIN users u ON a.created_by = u.id 
+                WHERE a.status = 'published' 
+                ORDER BY a.activity_date DESC 
+                LIMIT $limit";
+        return $this->query($sql);
     }
 
     /**
-     * Hitung kegiatan yang akan datang
+     * Hitung kegiatan yang akan datang (Upcoming)
+     * Digunakan di: AdminController@dashboard
      */
     public function countUpcoming()
     {
-        $sql = "SELECT COUNT(*) as total FROM {$this->table} WHERE activity_date >= CURDATE()";
-        $result = $this->query($sql);
-        return isset($result[0]['total']) ? $result[0]['total'] : 0;
+        $today = date('Y-m-d');
+        $sql = "SELECT COUNT(*) as total FROM lab_activities 
+                WHERE activity_date >= ? AND status = 'published'";
+        $result = $this->queryOne($sql, [$today]);
+        return $result['total'];
     }
 
-    /**
-     * Tambah Kegiatan Baru
-     */
+    // ==========================================
+    // CRUD OPERATIONS
+    // ==========================================
+
     public function createActivity($data)
     {
-        // Tambahkan data sistem otomatis (Pembuat & Waktu)
-        $data['created_by'] = $_SESSION['user_id'] ?? 0;
-        $data['created_at'] = date('Y-m-d H:i:s');
-
-        // Menggunakan method bawaan framework Anda (insert)
+        // Set default created_by jika belum ada
+        if (!isset($data['created_by'])) {
+            $data['created_by'] = getUserId();
+        }
         return $this->insert($data);
     }
 
-    /**
-     * Update Kegiatan
-     */
     public function updateActivity($id, $data)
     {
-        // Menggunakan method bawaan framework Anda (update)
         return $this->update($id, $data);
     }
 
-    /**
-     * Hapus Kegiatan
-     */
     public function deleteActivity($id)
     {
-        // Menggunakan method bawaan framework Anda (delete)
         return $this->delete($id);
     }
 }

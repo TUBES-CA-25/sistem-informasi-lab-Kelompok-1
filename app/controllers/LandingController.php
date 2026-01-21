@@ -1,123 +1,83 @@
 <?php
 
-/**
- * ICLABS - Landing Controller
- * Handles public pages with updated logic
- */
-
 class LandingController extends Controller
 {
-
-    /**
-     * Dashboard / Landing Page
-     * - Welcome Message
-     * - Stats (Labs, Assistants, Lecturers)
-     * - Lab Carousel Data
-     * - Blog Activities
-     */
     public function index()
     {
         $labModel = $this->model('LaboratoryModel');
-        $userModel = $this->model('UserModel');
         $activityModel = $this->model('LabActivityModel');
+        $userModel = $this->model('UserModel');
+        $scheduleModel = $this->model('LabScheduleModel');
 
-        // 1. Statistics Data
+        // 1. Data Statistik (Dashboard)
         $stats = [
             'labs_count' => $labModel->countLaboratories(),
-            // Asisten = Role ID 3
             'assistants_count' => $userModel->countByRole(3),
-            // Dosen/Staff (Kita pakai Koordinator/Role 2 sebagai proxy data dosen)
-            'lecturers_count' => $userModel->countByRole(2)
+            'lecturers_count' => 31,
+            'students_count' => '300+'
         ];
 
-        // 2. Data for Lab Carousel
-        // Mengambil semua lab untuk ditampilkan fotonya di kanan
-        $labs = $labModel->getAllLaboratories();
+        // 2. LOGIKA CAROUSEL (Slide 1: Banner, Slide 2-N: Jadwal per Lab)
+        $allLabs = $labModel->getAllLaboratories(); // Ambil semua lab + Fotonya
+        $rawSchedules = $scheduleModel->getTodaySchedules(); // Jadwal Hari Ini
 
-        // 3. Blog Activities
-        // Mengambil 6 kegiatan terakhir untuk bagian bawah
-        $activities = $activityModel->getPublicActivities(6);
+        $labSlides = [];
+        foreach ($allLabs as $lab) {
+            $labId = $lab['id'];
+            // Filter jadwal hanya untuk lab ini
+            $labSchedules = array_filter($rawSchedules, function ($s) use ($labId) {
+                return $s['laboratory_id'] == $labId;
+            });
+
+            $labSlides[] = [
+                'lab_info' => $lab,
+                'schedules' => $labSchedules
+            ];
+        }
 
         $data = [
             'stats' => $stats,
-            'labs' => $labs,
-            'activities' => $activities
+            'labs' => $allLabs,
+            'activities' => $activityModel->getRecentActivities(3),
+            'labSlides' => $labSlides,
+            'currentDayName' => $this->getIndonesianDay(date('l')),
+            'currentDate' => date('d F Y')
         ];
 
         $this->view('landing/index', $data);
     }
 
-    /**
-     * Laboratory Schedule Page
-     * Menampilkan tabel jadwal (Prodi, MK, Kelas, dll)
-     */
+    private function getIndonesianDay($englishDay)
+    {
+        $days = [
+            'Sunday' => 'MINGGU',
+            'Monday' => 'SENIN',
+            'Tuesday' => 'SELASA',
+            'Wednesday' => 'RABU',
+            'Thursday' => 'KAMIS',
+            'Friday' => 'JUMAT',
+            'Saturday' => 'SABTU'
+        ];
+        return $days[$englishDay] ?? $englishDay;
+    }
+
+    // ... (Biarkan method schedule, presence, dll tetap ada seperti sebelumnya) ...
     public function schedule()
     {
-        $scheduleModel = $this->model('LabScheduleModel');
-
-        // Mengambil semua jadwal lengkap dengan nama Lab
-        $schedules = $scheduleModel->getAllWithLaboratory();
-
-        $data = [
-            'schedules' => $schedules
-        ];
-
-        $this->view('landing/schedule', $data);
+        $this->view('landing/schedule', ['schedules' => $this->model('LabScheduleModel')->getAllWithLaboratory()]);
     }
-
-    /**
-     * Management Presence Page (Dulu: headLaboran)
-     * Menampilkan status kehadiran Kepala Lab & Laboran
-     */
     public function presence()
     {
-        $headLaboranModel = $this->model('HeadLaboranModel');
-
-        // Mengambil data presence yang sudah diurutkan (Active first)
-        // Menggunakan method baru 'getAllPresence' yang kita buat di Model
-        $presenceList = $headLaboranModel->getAllPresence();
-
-        $data = [
-            'presenceList' => $presenceList
-        ];
-
-        $this->view('landing/presence', $data);
+        $this->view('landing/presence', ['presenceList' => $this->model('HeadLaboranModel')->getAllPresence()]);
     }
-
-    /**
-     * Lab Activities (Full Page - Optional)
-     */
     public function labActivities()
     {
-        $activityModel = $this->model('LabActivityModel');
-
-        $data = [
-            'activities' => $activityModel->getPublicActivities(20)
-        ];
-
-        $this->view('landing/lab-activities', $data);
+        $this->view('landing/lab-activities', ['activities' => $this->model('LabActivityModel')->getPublicActivities(20)]);
     }
-
-    /**
-     * Schedule Detail Page (Full Page)
-     */
     public function scheduleDetail($id)
     {
-        $scheduleModel = $this->model('LabScheduleModel');
-
-        // Ambil data detail (Method ini sudah kita buat sebelumnya di langkah update Model)
-        $schedule = $scheduleModel->getScheduleDetail($id);
-
-        // Jika data tidak ditemukan, redirect ke halaman jadwal
-        if (!$schedule) {
-            header('Location: ' . BASE_URL . '/schedule');
-            exit;
-        }
-
-        $data = [
-            'schedule' => $schedule
-        ];
-
-        $this->view('landing/schedule-detail', $data);
+        $s = $this->model('LabScheduleModel')->getScheduleDetail($id);
+        if (!$s) header('Location: ' . BASE_URL . '/schedule');
+        $this->view('landing/schedule-detail', ['schedule' => $s]);
     }
 }
