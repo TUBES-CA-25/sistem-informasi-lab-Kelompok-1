@@ -137,6 +137,7 @@ $router->get('/admin/schedules/:id', 'AdminController@viewSchedule');
 
 
 
+
 // Assistant Schedules (Piket)
 $router->get('/admin/assistant-schedules', 'AdminController@listAssistantSchedules');
 $router->get('/admin/assistant-schedules/create', 'AdminController@createAssistantScheduleForm');
@@ -177,3 +178,9 @@ $router->get('/admin/problems', 'AdminController@listProblems');
 $router->get('/admin/problems/:id', 'AdminController@viewProblem');
 $router->post('/admin/problems/:id/update-status', 'AdminController@updateProblemStatus');
 $router->post('/admin/problems/:id/delete', 'AdminController@deleteProblem');
+
+// Route Kalender Admin
+$router->get('/admin/calendar', 'AdminController@calendar');
+$router->get('/admin/calendar/data', 'AdminController@getCalendarData');
+// Tambahkan di grup route Admin
+$router->post('/admin/calendar/clear', 'AdminController@clearScheduleByDate'); // Route untuk Hapus Harian

@@ -181,18 +181,34 @@ class AdminController extends Controller
         $this->redirect('/admin/users');
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // ==========================================
-    // LABORATORY MANAGEMENT
+    // LABORATORY MANAGEMENT (FIXED)
     // ==========================================
 
     public function listLaboratories()
     {
         $laboratoryModel = $this->model('LaboratoryModel');
-
-        $data = [
-            'laboratories' => $laboratoryModel->getAllLaboratories()
-        ];
-
+        $data = ['laboratories' => $laboratoryModel->getAllLaboratories()];
         $this->view('admin/laboratories/list', $data);
     }
 
@@ -207,16 +223,23 @@ class AdminController extends Controller
             $this->redirect('/admin/laboratories/create');
         }
 
+        // 1. Handle Upload Foto
+        // Pastikan folder public/uploads/laboratories/ sudah dibuat
+        $imagePath = $this->handleFileUpload('image_file', 'uploads/laboratories/');
+
         $data = [
             'lab_name' => sanitize($this->getPost('lab_name')),
+            'image' => $imagePath, // INI YANG SEBELUMNYA HILANG
             'description' => sanitize($this->getPost('description')),
+            'pc_count' => (int) sanitize($this->getPost('pc_count')),
+            'tv_count' => (int) sanitize($this->getPost('tv_count')),
             'location' => sanitize($this->getPost('location'))
         ];
 
         $laboratoryModel = $this->model('LaboratoryModel');
         $laboratoryModel->createLaboratory($data);
 
-        setFlash('success', 'Laboratory created successfully');
+        setFlash('success', 'Laboratorium berhasil ditambahkan');
         $this->redirect('/admin/laboratories');
     }
 
@@ -240,16 +263,24 @@ class AdminController extends Controller
             $this->redirect('/admin/laboratories/' . $id . '/edit');
         }
 
+        $laboratoryModel = $this->model('LaboratoryModel');
+        $oldData = $laboratoryModel->find($id);
+
+        // 1. Cek Upload Baru (Pakai foto lama jika tidak ada upload baru)
+        $imagePath = $this->handleFileUpload('image_file', 'uploads/laboratories/') ?? $oldData['image'];
+
         $data = [
             'lab_name' => sanitize($this->getPost('lab_name')),
+            'image' => $imagePath, // Update Foto
             'description' => sanitize($this->getPost('description')),
+            'pc_count' => (int) sanitize($this->getPost('pc_count')),
+            'tv_count' => (int) sanitize($this->getPost('tv_count')),
             'location' => sanitize($this->getPost('location'))
         ];
 
-        $laboratoryModel = $this->model('LaboratoryModel');
         $laboratoryModel->updateLaboratory($id, $data);
 
-        setFlash('success', 'Laboratory updated successfully');
+        setFlash('success', 'Laboratorium berhasil diperbarui');
         $this->redirect('/admin/laboratories');
     }
 
@@ -265,6 +296,22 @@ class AdminController extends Controller
         setFlash('success', 'Laboratory deleted successfully');
         $this->redirect('/admin/laboratories');
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // ==========================================
     // SCHEDULE MANAGEMENT (UPDATED)
@@ -286,11 +333,44 @@ class AdminController extends Controller
     {
         $laboratoryModel = $this->model('LaboratoryModel');
 
+        // Tangkap tanggal dari URL (jika ada)
+        $prefillDate = $this->getQuery('date') ?? '';
+
         $data = [
-            'laboratories' => $laboratoryModel->getAllLaboratories()
+            'laboratories' => $laboratoryModel->getAllLaboratories(),
+            'prefillDate' => $prefillDate // Kirim ke View
         ];
 
         $this->view('admin/schedules/create', $data);
+    }
+
+    public function clearScheduleByDate()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid Request']);
+            exit;
+        }
+
+        // Ambil data JSON dari fetch JS
+        $input = json_decode(file_get_contents('php://input'), true);
+        $date = $input['date'] ?? null;
+        $labId = $input['lab_id'] ?? null;
+
+        if (!$date) {
+            echo json_encode(['status' => 'error', 'message' => 'Tanggal wajib ada']);
+            exit;
+        }
+
+        $scheduleModel = $this->model('LabScheduleModel');
+
+        // Hapus berdasarkan tanggal (dan lab jika dipilih)
+        // Kita butuh method deleteByDate di Model (lihat langkah bawah)
+        if ($scheduleModel->deleteByDate($date, $labId)) {
+            echo json_encode(['status' => 'success']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Gagal menghapus jadwal']);
+        }
+        exit;
     }
 
 
@@ -322,50 +402,111 @@ class AdminController extends Controller
 
 
 
+    // ... kode AdminController lainnya ...
+
     public function createSchedule()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/admin/schedules/create');
         }
 
-        // 1. Handle Uploads Dulu
-        $lecturerPhoto = $this->handleFileUpload('lecturer_photo_file');
-        $assistantPhoto = $this->handleFileUpload('assistant_photo_file');
-        $assistant2Photo = $this->handleFileUpload('assistant2_photo_file');
+        // 1. HANDLE UPLOAD 3 FOTO (Lecturer + 2 Assistants)
+        $lecturerPhoto = $this->handleFileUpload('lecturer_photo_file', 'uploads/lecturers/');
+        $asst1Photo = $this->handleFileUpload('assistant_photo_file', 'uploads/assistants/'); // Sesuai name di form
+        $asst2Photo = $this->handleFileUpload('assistant2_photo_file', 'uploads/assistants/'); // Sesuai name di form
 
-        // 2. Ambil Input Data
-        $data = [
+        // 2. DATA MASTER (Rencana Kuliah)
+        $totalMeetings = (int) sanitize($this->getPost('total_meetings'));
+        if ($totalMeetings < 1) $totalMeetings = 14; // Default jika kosong
+
+        $startDate = sanitize($this->getPost('start_date')); // Input Tanggal Mulai
+
+        $planData = [
             'laboratory_id' => sanitize($this->getPost('laboratory_id')),
-            'day' => sanitize($this->getPost('day')),
-            'start_time' => sanitize($this->getPost('start_time')),
-            'end_time' => sanitize($this->getPost('end_time')),
-            'course' => sanitize($this->getPost('course')),
+            'course_name' => sanitize($this->getPost('course')), // Sesuaikan name di form
             'program_study' => sanitize($this->getPost('program_study')),
             'semester' => sanitize($this->getPost('semester')),
             'class_code' => sanitize($this->getPost('class_code')),
-            'frequency' => sanitize($this->getPost('frequency')), // Input Manual
-            'lecturer' => sanitize($this->getPost('lecturer')),
-            'assistant' => sanitize($this->getPost('assistant')),
-            'assistant_2' => sanitize($this->getPost('assistant_2')),
-            'participant_count' => sanitize($this->getPost('participant_count')),
-            'description' => sanitize($this->getPost('description')),
 
-            // Masukkan path hasil upload
+            // Personil
+            'lecturer_name' => sanitize($this->getPost('lecturer')),
             'lecturer_photo' => $lecturerPhoto,
-            'assistant_photo' => $assistantPhoto,
-            'assistant2_photo' => $assistant2Photo,
+            'assistant_1_name' => sanitize($this->getPost('assistant')),
+            'assistant_1_photo' => $asst1Photo,
+            'assistant_2_name' => sanitize($this->getPost('assistant_2')),
+            'assistant_2_photo' => $asst2Photo,
+
+            // Waktu Template
+            'day' => sanitize($this->getPost('day')),
+            'start_time' => sanitize($this->getPost('start_time')),
+            'end_time' => sanitize($this->getPost('end_time')),
+            'total_meetings' => $totalMeetings,
+            'description' => sanitize($this->getPost('description')),
         ];
 
-        // 3. Simpan
         $scheduleModel = $this->model('LabScheduleModel');
-        if ($scheduleModel->createSchedule($data)) {
-            setFlash('success', 'Jadwal berhasil dibuat dengan foto.');
-            $this->redirect('/admin/schedules');
-        } else {
-            setFlash('danger', 'Gagal membuat jadwal.');
+
+        // Simpan ke tabel course_plans
+        // Note: insert() biasanya me-return ID, pastikan Core Model Anda mendukung ini.
+        // Jika tidak, Anda harus pakai $this->db->lastInsertId();
+        $planId = $scheduleModel->createCoursePlan($planData);
+
+        if (!$planId) {
+            setFlash('danger', 'Gagal menyimpan Data Rencana Kuliah.');
             $this->redirect('/admin/schedules/create');
         }
+
+        // 3. SMART SKIP GENERATOR (Looping & Collision Check)
+        $currentDate = new DateTime($startDate);
+        $successCount = 0;
+        $failDates = [];
+
+        for ($i = 1; $i <= $totalMeetings; $i++) {
+            $dateStr = $currentDate->format('Y-m-d');
+
+            // Cek apakah ada jadwal lain di tanggal & jam ini?
+            $isOccupied = $scheduleModel->isSlotOccupied(
+                $planData['laboratory_id'],
+                $dateStr,
+                $planData['start_time'],
+                $planData['end_time']
+            );
+
+            if (!$isOccupied) {
+                // AMAN: Insert ke schedule_sessions
+                $sessionData = [
+                    'course_plan_id' => $planId,
+                    'meeting_number' => $i,
+                    'session_date' => $dateStr,
+                    'start_time' => $planData['start_time'],
+                    'end_time' => $planData['end_time'],
+                    'status' => 'scheduled'
+                ];
+                $scheduleModel->createSession($sessionData);
+                $successCount++;
+            } else {
+                // BENTROK: Lewati dan catat tanggalnya
+                $failDates[] = $dateStr . " (Pertemuan ke-$i)";
+            }
+
+            // Geser tanggal ke minggu depan (+7 hari)
+            $currentDate->modify('+7 days');
+        }
+
+        // 4. FEEDBACK KE ADMIN
+        if (empty($failDates)) {
+            setFlash('success', "Sukses! $successCount pertemuan berhasil dijadwalkan tanpa bentrok.");
+            $this->redirect('/admin/schedules'); // Redirect ke List
+        } else {
+            // Ada yang bentrok
+            $failMsg = implode(', ', $failDates);
+            setFlash('warning', "<b>Jadwal Parsial:</b> Berhasil menyimpan $successCount pertemuan.<br> 
+            <b>GAGAL (Bentrok) pada:</b> $failMsg.<br> 
+            Silakan cek Kalender dan input manual jadwal pengganti untuk tanggal tersebut.");
+            $this->redirect('/admin/schedules'); // Redirect ke List (atau Kalender nanti)
+        }
     }
+
 
 
 
@@ -1067,5 +1208,76 @@ class AdminController extends Controller
 
         setFlash('success', 'Problem deleted successfully');
         $this->redirect('/admin/problems');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // ... di dalam AdminController ...
+
+    // ==========================================
+    // CALENDAR FEATURE (NEW PAGE)
+    // ==========================================
+
+    public function calendar()
+    {
+        $laboratoryModel = $this->model('LaboratoryModel');
+
+        $data = [
+            'laboratories' => $laboratoryModel->getAllLaboratories()
+        ];
+
+        // View khusus di folder baru
+        $this->view('admin/calendar/index', $data);
+    }
+
+    /**
+     * API untuk FullCalendar (Returns JSON)
+     */
+    public function getCalendarData()
+    {
+        $labId = $this->getQuery('lab_id'); // Filter jika ada
+
+        $scheduleModel = $this->model('LabScheduleModel');
+        // Pastikan model LabScheduleModel punya method getCalendarEvents()
+        $events = $scheduleModel->getCalendarEvents($labId);
+
+        $calendarEvents = [];
+        // Warna untuk setiap lab agar beda-beda di kalender
+        $colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4'];
+
+        foreach ($events as $event) {
+            $colorIndex = ($event['laboratory_id'] ?? 0) % count($colors);
+
+            $calendarEvents[] = [
+                'id' => $event['id'],
+                'title' => $event['course_name'],
+                'start' => $event['session_date'] . 'T' . $event['start_time'],
+                'end' => $event['session_date'] . 'T' . $event['end_time'],
+                'backgroundColor' => $colors[$colorIndex],
+                'borderColor' => $colors[$colorIndex],
+                'extendedProps' => [
+                    'lecturer' => $event['lecturer_name'],
+                    'lab_name' => $event['lab_name'],
+                    'class_code' => $event['class_code']
+                ]
+            ];
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode($calendarEvents);
+        exit;
     }
 }

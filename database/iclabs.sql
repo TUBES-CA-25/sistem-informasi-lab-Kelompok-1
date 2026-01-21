@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 16, 2026 at 05:06 AM
+-- Generation Time: Jan 21, 2026 at 05:55 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -50,6 +50,41 @@ INSERT INTO `assistant_schedules` (`id`, `user_id`, `day`, `start_time`, `end_ti
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `course_plans`
+--
+
+CREATE TABLE `course_plans` (
+  `id` int(11) NOT NULL,
+  `laboratory_id` int(11) NOT NULL,
+  `course_name` varchar(100) NOT NULL,
+  `program_study` varchar(100) DEFAULT NULL,
+  `semester` int(11) DEFAULT NULL,
+  `class_code` varchar(20) DEFAULT NULL,
+  `lecturer_name` varchar(100) NOT NULL,
+  `lecturer_photo` varchar(255) DEFAULT NULL,
+  `assistant_1_name` varchar(100) DEFAULT NULL,
+  `assistant_1_photo` varchar(255) DEFAULT NULL,
+  `assistant_2_name` varchar(100) DEFAULT NULL,
+  `assistant_2_photo` varchar(255) DEFAULT NULL,
+  `day` enum('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday') NOT NULL,
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL,
+  `total_meetings` int(11) DEFAULT 14,
+  `description` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `course_plans`
+--
+
+INSERT INTO `course_plans` (`id`, `laboratory_id`, `course_name`, `program_study`, `semester`, `class_code`, `lecturer_name`, `lecturer_photo`, `assistant_1_name`, `assistant_1_photo`, `assistant_2_name`, `assistant_2_photo`, `day`, `start_time`, `end_time`, `total_meetings`, `description`, `created_at`) VALUES
+(2, 14, 'ALGORITMA PEMROGRAMAN', 'TEKNIK INFORMATIKA', 4, 'A1', 'WINDA', 'http://localhost/iclabs/public/uploads/lecturers/69703714563f4_1768961812.jpg', 'FRANCO', 'http://localhost/iclabs/public/uploads/assistants/6970371456c81_1768961812.jpg', 'BASUDARA', 'http://localhost/iclabs/public/uploads/assistants/6970371457440_1768961812.jpg', 'Wednesday', '10:20:00', '00:00:00', 5, 'BAPAK', '2026-01-21 02:16:52'),
+(3, 15, 'Alpro bapak', 'ti', 1, 'b1', 'uceng', 'http://localhost/iclabs/public/uploads/lecturers/6970503a0e8f7_1768968250.jpg', 'basudara', 'http://localhost/iclabs/public/uploads/assistants/6970503a1027f_1768968250.jpg', 'windah', 'http://localhost/iclabs/public/uploads/assistants/6970503a10ef9_1768968250.jpg', 'Thursday', '09:40:00', '12:10:00', 6, 'bapak', '2026-01-21 04:04:10');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `head_laboran`
 --
 
@@ -85,7 +120,10 @@ INSERT INTO `head_laboran` (`id`, `user_id`, `position`, `photo`, `status`, `loc
 CREATE TABLE `laboratories` (
   `id` int(11) NOT NULL,
   `lab_name` varchar(100) NOT NULL,
+  `image` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
+  `pc_count` int(11) DEFAULT 0,
+  `tv_count` int(11) DEFAULT 0,
   `location` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -93,11 +131,10 @@ CREATE TABLE `laboratories` (
 -- Dumping data for table `laboratories`
 --
 
-INSERT INTO `laboratories` (`id`, `lab_name`, `description`, `location`) VALUES
-(1, 'Lab Komputer 1', 'Laboratorium komputer untuk praktikum pemrograman dasar', 'Gedung A - Lantai 2'),
-(2, 'Lab Komputer 2', 'Laboratorium komputer untuk praktikum web programming', 'Gedung A - Lantai 3'),
-(3, 'Lab Jaringan', 'Laboratorium khusus untuk praktikum jaringan komputer', 'Gedung B - Lantai 1'),
-(4, 'Lab Multimedia', 'Laboratorium untuk praktikum desain grafis dan multimedia', 'Gedung B - Lantai 2');
+INSERT INTO `laboratories` (`id`, `lab_name`, `image`, `description`, `pc_count`, `tv_count`, `location`) VALUES
+(13, 'Multimedia', 'http://localhost/iclabs/public/uploads/laboratories/69701d042bdf2_1768955140.jpg', '...', 24, 1, '2nd Floor'),
+(14, 'DS', 'http://localhost/iclabs/public/uploads/laboratories/6970369fe20b6_1768961695.jpg', 'BAPAK', 26, 1, 'FIKOM LT2'),
+(15, 'IoT', 'http://localhost/iclabs/public/uploads/laboratories/69704fb108e98_1768968113.jpg', 'bapak', 26, 2, '2nd floor');
 
 -- --------------------------------------------------------
 
@@ -131,6 +168,19 @@ INSERT INTO `lab_activities` (`id`, `title`, `image_cover`, `activity_type`, `ac
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `lab_photos`
+--
+
+CREATE TABLE `lab_photos` (
+  `id` int(11) NOT NULL,
+  `laboratory_id` int(11) NOT NULL,
+  `file_path` varchar(255) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `lab_problems`
 --
 
@@ -148,23 +198,13 @@ CREATE TABLE `lab_problems` (
   `completed_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `lab_problems`
---
-
-INSERT INTO `lab_problems` (`id`, `laboratory_id`, `pc_number`, `problem_type`, `description`, `status`, `reported_by`, `assigned_to`, `reported_at`, `started_at`, `completed_at`) VALUES
-(1, 1, 'PC-05', 'hardware', 'Monitor tidak menyala, kemungkinan kabel VGA rusak', 'reported', 3, NULL, '2026-01-16 03:50:50', NULL, NULL),
-(2, 1, 'PC-12', 'software', 'Microsoft Office tidak bisa dibuka, perlu install ulang', 'in_progress', 4, NULL, '2026-01-16 03:50:50', NULL, NULL),
-(3, 2, 'PC-08', 'network', 'Tidak bisa connect ke internet, IP conflict', 'resolved', 5, NULL, '2026-01-16 03:50:50', NULL, NULL),
-(4, 3, 'PC-03', 'hardware', 'Keyboard beberapa tombol tidak berfungsi', 'reported', 3, NULL, '2026-01-16 03:50:50', NULL, NULL);
-
 -- --------------------------------------------------------
 
 --
--- Table structure for table `lab_schedules`
+-- Table structure for table `lab_schedules_old`
 --
 
-CREATE TABLE `lab_schedules` (
+CREATE TABLE `lab_schedules_old` (
   `id` int(11) NOT NULL,
   `laboratory_id` int(11) NOT NULL,
   `day` enum('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday') NOT NULL,
@@ -186,20 +226,6 @@ CREATE TABLE `lab_schedules` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `lab_schedules`
---
-
-INSERT INTO `lab_schedules` (`id`, `laboratory_id`, `day`, `start_time`, `end_time`, `course`, `program_study`, `semester`, `class_code`, `frequency`, `description`, `lecturer`, `lecturer_photo`, `assistant`, `assistant_photo`, `assistant_2`, `assistant2_photo`, `participant_count`, `created_at`) VALUES
-(1, 1, 'Monday', '08:00:00', '10:00:00', 'Pemrograman Dasar', 'Teknik Informatika', 1, 'A1', 'Mingguan', 'Praktikum ini berfokus pada penerapan algoritma Machine Learning dasar menggunakan Python.', 'Dr. Ahmad Fauzi', 'https://ui-avatars.com/api/?name=Dosen+A&background=random&size=200', 'Asisten 1', 'https://ui-avatars.com/api/?name=Asisten+1&background=0D8ABC&color=fff&size=200', 'Asisten Magang', 'https://ui-avatars.com/api/?name=Asisten+2&background=random&size=200', 30, '2026-01-16 03:50:50'),
-(2, 1, 'Monday', '10:00:00', '12:00:00', 'Algoritma Pemrograman', 'Sistem Informasi', 3, 'B2', 'Mingguan', 'Praktikum ini berfokus pada penerapan algoritma Machine Learning dasar menggunakan Python.', 'Prof. Siti Nurhaliza', 'https://ui-avatars.com/api/?name=Dosen+A&background=random&size=200', 'Asisten 2', 'https://ui-avatars.com/api/?name=Asisten+1&background=0D8ABC&color=fff&size=200', 'Asisten Senior', 'https://ui-avatars.com/api/?name=Asisten+2&background=random&size=200', 35, '2026-01-16 03:50:50'),
-(3, 2, 'Tuesday', '08:00:00', '11:00:00', 'Web Programming', 'Teknik Informatika', 5, 'C1', '2 Minggu Sekali', 'Praktikum ini berfokus pada penerapan algoritma Machine Learning dasar menggunakan Python.', 'Ir. Budi Santoso', 'https://ui-avatars.com/api/?name=Dosen+A&background=random&size=200', 'Asisten 3', 'https://ui-avatars.com/api/?name=Asisten+1&background=0D8ABC&color=fff&size=200', '-', 'https://ui-avatars.com/api/?name=Asisten+2&background=random&size=200', 32, '2026-01-16 03:50:50'),
-(4, 2, 'Wednesday', '13:00:00', '15:00:00', 'Database Management', NULL, NULL, NULL, NULL, 'Praktikum ini berfokus pada penerapan algoritma Machine Learning dasar menggunakan Python.', 'Dr. Dewi Sartika', 'https://ui-avatars.com/api/?name=Dosen+A&background=random&size=200', 'Asisten 1', 'https://ui-avatars.com/api/?name=Asisten+1&background=0D8ABC&color=fff&size=200', NULL, 'https://ui-avatars.com/api/?name=Asisten+2&background=random&size=200', 28, '2026-01-16 03:50:50'),
-(5, 3, 'Thursday', '08:00:00', '10:00:00', 'Jaringan Komputer', NULL, NULL, NULL, NULL, 'Praktikum ini berfokus pada penerapan algoritma Machine Learning dasar menggunakan Python.', 'M. Yusuf, M.T.', 'https://ui-avatars.com/api/?name=Dosen+A&background=random&size=200', 'Asisten 2', 'https://ui-avatars.com/api/?name=Asisten+1&background=0D8ABC&color=fff&size=200', NULL, 'https://ui-avatars.com/api/?name=Asisten+2&background=random&size=200', 25, '2026-01-16 03:50:50'),
-(6, 3, 'Friday', '10:00:00', '12:00:00', 'Keamanan Jaringan', NULL, NULL, NULL, NULL, 'Praktikum ini berfokus pada penerapan algoritma Machine Learning dasar menggunakan Python.', 'Dr. Rina Wijaya', 'https://ui-avatars.com/api/?name=Dosen+A&background=random&size=200', 'Asisten 3', 'https://ui-avatars.com/api/?name=Asisten+1&background=0D8ABC&color=fff&size=200', NULL, 'https://ui-avatars.com/api/?name=Asisten+2&background=random&size=200', 30, '2026-01-16 03:50:50'),
-(7, 4, 'Friday', '13:00:00', '16:00:00', 'Desain Grafis', NULL, NULL, NULL, NULL, 'Praktikum ini berfokus pada penerapan algoritma Machine Learning dasar menggunakan Python.', 'Drs. Hendra Kusuma', 'https://ui-avatars.com/api/?name=Dosen+A&background=random&size=200', 'Asisten 1', 'https://ui-avatars.com/api/?name=Asisten+1&background=0D8ABC&color=fff&size=200', NULL, 'https://ui-avatars.com/api/?name=Asisten+2&background=random&size=200', 20, '2026-01-16 03:50:50'),
-(8, 2, 'Wednesday', '08:00:00', '11:00:00', 'Kecerdasan Buatan', 'Teknik Informatika', 5, 'IF-5-A', 'Mingguan', 'Praktikum ini berfokus pada penerapan algoritma Machine Learning dasar menggunakan Python.', 'Prof. Dr. AI Expert', 'https://ui-avatars.com/api/?name=Dosen+A&background=random&size=200', 'Asisten 1', 'https://ui-avatars.com/api/?name=Asisten+1&background=0D8ABC&color=fff&size=200', 'Asisten 3', 'https://ui-avatars.com/api/?name=Asisten+2&background=random&size=200', 40, '2026-01-16 03:50:50');
-
 -- --------------------------------------------------------
 
 --
@@ -214,19 +240,6 @@ CREATE TABLE `problem_histories` (
   `updated_by` int(11) NOT NULL,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `problem_histories`
---
-
-INSERT INTO `problem_histories` (`id`, `problem_id`, `status`, `note`, `updated_by`, `updated_at`) VALUES
-(1, 1, 'reported', 'Problem dilaporkan oleh asisten', 3, '2026-01-16 03:50:50'),
-(2, 2, 'reported', 'Problem dilaporkan oleh asisten', 4, '2026-01-16 03:50:50'),
-(3, 2, 'in_progress', 'Sedang dalam proses perbaikan oleh koordinator', 2, '2026-01-16 03:50:50'),
-(4, 3, 'reported', 'Problem dilaporkan oleh asisten', 5, '2026-01-16 03:50:50'),
-(5, 3, 'in_progress', 'Sedang dicek oleh teknisi', 2, '2026-01-16 03:50:50'),
-(6, 3, 'resolved', 'Kabel VGA sudah diganti dan monitor normal', 2, '2026-01-16 03:50:50'),
-(7, 4, 'reported', 'Problem dilaporkan oleh asisten', 3, '2026-01-16 03:50:50');
 
 -- --------------------------------------------------------
 
@@ -252,6 +265,41 @@ INSERT INTO `roles` (`id`, `role_name`, `created_at`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `schedule_sessions`
+--
+
+CREATE TABLE `schedule_sessions` (
+  `id` int(11) NOT NULL,
+  `course_plan_id` int(11) NOT NULL,
+  `meeting_number` int(11) NOT NULL,
+  `session_date` date NOT NULL,
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL,
+  `topic` varchar(255) DEFAULT NULL,
+  `status` enum('scheduled','ongoing','completed','cancelled','rescheduled') DEFAULT 'scheduled',
+  `is_replacement` tinyint(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `schedule_sessions`
+--
+
+INSERT INTO `schedule_sessions` (`id`, `course_plan_id`, `meeting_number`, `session_date`, `start_time`, `end_time`, `topic`, `status`, `is_replacement`) VALUES
+(3, 2, 1, '2026-01-21', '10:20:00', '00:00:00', NULL, 'scheduled', 0),
+(4, 2, 2, '2026-01-28', '10:20:00', '00:00:00', NULL, 'scheduled', 0),
+(5, 2, 3, '2026-02-04', '10:20:00', '00:00:00', NULL, 'scheduled', 0),
+(6, 2, 4, '2026-02-11', '10:20:00', '00:00:00', NULL, 'scheduled', 0),
+(7, 2, 5, '2026-02-18', '10:20:00', '00:00:00', NULL, 'scheduled', 0),
+(8, 3, 1, '2026-01-22', '09:40:00', '12:10:00', NULL, 'scheduled', 0),
+(9, 3, 2, '2026-01-29', '09:40:00', '12:10:00', NULL, 'scheduled', 0),
+(10, 3, 3, '2026-02-05', '09:40:00', '12:10:00', NULL, 'scheduled', 0),
+(11, 3, 4, '2026-02-12', '09:40:00', '12:10:00', NULL, 'scheduled', 0),
+(12, 3, 5, '2026-02-19', '09:40:00', '12:10:00', NULL, 'scheduled', 0),
+(13, 3, 6, '2026-02-26', '09:40:00', '12:10:00', NULL, 'scheduled', 0);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -259,6 +307,7 @@ CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
+  `phone` varchar(20) DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `role_id` int(11) NOT NULL,
   `status` enum('active','inactive') DEFAULT 'active',
@@ -269,15 +318,16 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `password`, `role_id`, `status`, `created_at`) VALUES
-(1, 'Admin User', 'admin@iclabs.com', '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 1, 'active', '2026-01-16 03:50:50'),
-(2, 'Koordinator Lab', 'koordinator@iclabs.com', '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 2, 'active', '2026-01-16 03:50:50'),
-(3, 'Asisten 1', 'asisten1@iclabs.com', '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 3, 'active', '2026-01-16 03:50:50'),
-(4, 'Asisten 2', 'asisten2@iclabs.com', '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 3, 'active', '2026-01-16 03:50:50'),
-(5, 'Asisten 3', 'asisten3@iclabs.com', '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 3, 'active', '2026-01-16 03:50:50'),
-(6, 'Budi (KaLab Multimedia)', 'kalab2@iclabs.com', '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 2, 'active', '2026-01-16 03:50:50'),
-(7, 'Siti (KaLab Jaringan)', 'kalab3@iclabs.com', '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 2, 'active', '2026-01-16 03:50:50'),
-(8, 'Joko (Laboran Teknis)', 'laboran@iclabs.com', '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 2, 'active', '2026-01-16 03:50:50');
+INSERT INTO `users` (`id`, `name`, `email`, `phone`, `password`, `role_id`, `status`, `created_at`) VALUES
+(1, 'Admin User', 'admin@iclabs.com', '6281234567890', '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 1, 'active', '2026-01-16 03:50:50'),
+(2, 'Koordinator Lab', 'koordinator@iclabs.com', '6281234567890', '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 2, 'active', '2026-01-16 03:50:50'),
+(3, 'Asisten 1', 'asisten1@iclabs.com', NULL, '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 3, 'active', '2026-01-16 03:50:50'),
+(4, 'Asisten 2', 'asisten2@iclabs.com', NULL, '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 3, 'active', '2026-01-16 03:50:50'),
+(5, 'Asisten 3', 'asisten3@iclabs.com', NULL, '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 3, 'active', '2026-01-16 03:50:50'),
+(6, 'Budi (KaLab Multimedia)', 'kalab2@iclabs.com', '6281234567890', '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 2, 'active', '2026-01-16 03:50:50'),
+(7, 'Siti (KaLab Jaringan)', 'kalab3@iclabs.com', '6281234567890', '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 2, 'active', '2026-01-16 03:50:50'),
+(8, 'Joko (Laboran Teknis)', 'laboran@iclabs.com', '6281234567890', '$2y$10$UX7tq8QgvaFqYJEDrkqLwebWJKFRcwJw6KilsVOiuLeVQY.26594u', 2, 'active', '2026-01-16 03:50:50'),
+(10, 'MUHAMMAD RIFKY SAPUTRA SCANIA', 'rifky020504@gmail.com', NULL, '$2y$10$hQcLcLfg2enXMREWGBzFzuIks8GpW/iqoru5Bu3tFx00./SjqT84S', 3, 'active', '2026-01-19 19:48:31');
 
 --
 -- Indexes for dumped tables
@@ -289,6 +339,13 @@ INSERT INTO `users` (`id`, `name`, `email`, `password`, `role_id`, `status`, `cr
 ALTER TABLE `assistant_schedules`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `course_plans`
+--
+ALTER TABLE `course_plans`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `laboratory_id` (`laboratory_id`);
 
 --
 -- Indexes for table `head_laboran`
@@ -312,6 +369,13 @@ ALTER TABLE `lab_activities`
   ADD KEY `idx_lab_activities_date` (`activity_date`);
 
 --
+-- Indexes for table `lab_photos`
+--
+ALTER TABLE `lab_photos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `laboratory_id` (`laboratory_id`);
+
+--
 -- Indexes for table `lab_problems`
 --
 ALTER TABLE `lab_problems`
@@ -322,9 +386,9 @@ ALTER TABLE `lab_problems`
   ADD KEY `fk_lab_problems_assigned` (`assigned_to`);
 
 --
--- Indexes for table `lab_schedules`
+-- Indexes for table `lab_schedules_old`
 --
-ALTER TABLE `lab_schedules`
+ALTER TABLE `lab_schedules_old`
   ADD PRIMARY KEY (`id`),
   ADD KEY `laboratory_id` (`laboratory_id`),
   ADD KEY `idx_lab_schedules_day` (`day`);
@@ -343,6 +407,15 @@ ALTER TABLE `problem_histories`
 ALTER TABLE `roles`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `role_name` (`role_name`);
+
+--
+-- Indexes for table `schedule_sessions`
+--
+ALTER TABLE `schedule_sessions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `course_plan_id` (`course_plan_id`),
+  ADD KEY `idx_session_date` (`session_date`),
+  ADD KEY `idx_session_time` (`start_time`,`end_time`);
 
 --
 -- Indexes for table `users`
@@ -364,6 +437,12 @@ ALTER TABLE `assistant_schedules`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
+-- AUTO_INCREMENT for table `course_plans`
+--
+ALTER TABLE `course_plans`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `head_laboran`
 --
 ALTER TABLE `head_laboran`
@@ -373,7 +452,7 @@ ALTER TABLE `head_laboran`
 -- AUTO_INCREMENT for table `laboratories`
 --
 ALTER TABLE `laboratories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `lab_activities`
@@ -382,22 +461,28 @@ ALTER TABLE `lab_activities`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
+-- AUTO_INCREMENT for table `lab_photos`
+--
+ALTER TABLE `lab_photos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `lab_problems`
 --
 ALTER TABLE `lab_problems`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT for table `lab_schedules`
+-- AUTO_INCREMENT for table `lab_schedules_old`
 --
-ALTER TABLE `lab_schedules`
+ALTER TABLE `lab_schedules_old`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `problem_histories`
 --
 ALTER TABLE `problem_histories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -406,10 +491,16 @@ ALTER TABLE `roles`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT for table `schedule_sessions`
+--
+ALTER TABLE `schedule_sessions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Constraints for dumped tables
@@ -420,6 +511,12 @@ ALTER TABLE `users`
 --
 ALTER TABLE `assistant_schedules`
   ADD CONSTRAINT `assistant_schedules_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `course_plans`
+--
+ALTER TABLE `course_plans`
+  ADD CONSTRAINT `course_plans_ibfk_1` FOREIGN KEY (`laboratory_id`) REFERENCES `laboratories` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `head_laboran`
@@ -434,6 +531,12 @@ ALTER TABLE `lab_activities`
   ADD CONSTRAINT `lab_activities_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `lab_photos`
+--
+ALTER TABLE `lab_photos`
+  ADD CONSTRAINT `lab_photos_ibfk_1` FOREIGN KEY (`laboratory_id`) REFERENCES `laboratories` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `lab_problems`
 --
 ALTER TABLE `lab_problems`
@@ -442,10 +545,10 @@ ALTER TABLE `lab_problems`
   ADD CONSTRAINT `lab_problems_ibfk_2` FOREIGN KEY (`reported_by`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `lab_schedules`
+-- Constraints for table `lab_schedules_old`
 --
-ALTER TABLE `lab_schedules`
-  ADD CONSTRAINT `lab_schedules_ibfk_1` FOREIGN KEY (`laboratory_id`) REFERENCES `laboratories` (`id`) ON DELETE CASCADE;
+ALTER TABLE `lab_schedules_old`
+  ADD CONSTRAINT `lab_schedules_old_ibfk_1` FOREIGN KEY (`laboratory_id`) REFERENCES `laboratories` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `problem_histories`
@@ -453,6 +556,12 @@ ALTER TABLE `lab_schedules`
 ALTER TABLE `problem_histories`
   ADD CONSTRAINT `problem_histories_ibfk_1` FOREIGN KEY (`problem_id`) REFERENCES `lab_problems` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `problem_histories_ibfk_2` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `schedule_sessions`
+--
+ALTER TABLE `schedule_sessions`
+  ADD CONSTRAINT `schedule_sessions_ibfk_1` FOREIGN KEY (`course_plan_id`) REFERENCES `course_plans` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `users`
