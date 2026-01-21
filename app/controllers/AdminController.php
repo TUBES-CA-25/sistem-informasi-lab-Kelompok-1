@@ -333,11 +333,44 @@ class AdminController extends Controller
     {
         $laboratoryModel = $this->model('LaboratoryModel');
 
+        // Tangkap tanggal dari URL (jika ada)
+        $prefillDate = $this->getQuery('date') ?? '';
+
         $data = [
-            'laboratories' => $laboratoryModel->getAllLaboratories()
+            'laboratories' => $laboratoryModel->getAllLaboratories(),
+            'prefillDate' => $prefillDate // Kirim ke View
         ];
 
         $this->view('admin/schedules/create', $data);
+    }
+
+    public function clearScheduleByDate()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid Request']);
+            exit;
+        }
+
+        // Ambil data JSON dari fetch JS
+        $input = json_decode(file_get_contents('php://input'), true);
+        $date = $input['date'] ?? null;
+        $labId = $input['lab_id'] ?? null;
+
+        if (!$date) {
+            echo json_encode(['status' => 'error', 'message' => 'Tanggal wajib ada']);
+            exit;
+        }
+
+        $scheduleModel = $this->model('LabScheduleModel');
+
+        // Hapus berdasarkan tanggal (dan lab jika dipilih)
+        // Kita butuh method deleteByDate di Model (lihat langkah bawah)
+        if ($scheduleModel->deleteByDate($date, $labId)) {
+            echo json_encode(['status' => 'success']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Gagal menghapus jadwal']);
+        }
+        exit;
     }
 
 

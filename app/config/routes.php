@@ -182,3 +182,5 @@ $router->post('/admin/problems/:id/delete', 'AdminController@deleteProblem');
 // Route Kalender Admin
 $router->get('/admin/calendar', 'AdminController@calendar');
 $router->get('/admin/calendar/data', 'AdminController@getCalendarData');
+// Tambahkan di grup route Admin
+$router->post('/admin/calendar/clear', 'AdminController@clearScheduleByDate'); // Route untuk Hapus Harian

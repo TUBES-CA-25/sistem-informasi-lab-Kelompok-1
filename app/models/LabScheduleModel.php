@@ -43,7 +43,7 @@ class LabScheduleModel extends Model
     // Ambil semua jadwal (untuk halaman Admin List Schedule)
     public function getAllWithLaboratory()
     {
-        $sql = "SELECT cp.*, l.lab_name 
+        $sql = "SELECT cp.*, l.lab_name, l.location 
                 FROM course_plans cp 
                 JOIN laboratories l ON cp.laboratory_id = l.id 
                 ORDER BY cp.created_at DESC";
@@ -52,7 +52,7 @@ class LabScheduleModel extends Model
 
     public function getScheduleDetail($id)
     {
-        $sql = "SELECT cp.*, l.lab_name 
+        $sql = "SELECT cp.*, l.lab_name, l.location 
                 FROM course_plans cp 
                 JOIN laboratories l ON cp.laboratory_id = l.id 
                 WHERE cp.id = ?";
@@ -92,7 +92,7 @@ class LabScheduleModel extends Model
     {
         $today = date('Y-m-d');
         $sql = "SELECT ss.*, cp.course_name, cp.lecturer_name, cp.class_code, 
-                       l.lab_name, cp.lecturer_photo, cp.laboratory_id 
+                       l.lab_name, l.location, cp.lecturer_photo, cp.laboratory_id 
                 FROM schedule_sessions ss
                 JOIN course_plans cp ON ss.course_plan_id = cp.id
                 JOIN laboratories l ON cp.laboratory_id = l.id
@@ -100,5 +100,19 @@ class LabScheduleModel extends Model
                 AND ss.status != 'cancelled'
                 ORDER BY ss.start_time ASC";
         return $this->query($sql, [$today]);
+    }
+
+    public function deleteByDate($date, $labId = null)
+    {
+        $sql = "DELETE FROM schedule_sessions WHERE session_date = ?";
+        $params = [$date];
+        if ($labId) {
+            // Join ke course_plans untuk filter by Lab
+            $sql = "DELETE ss FROM schedule_sessions ss 
+                JOIN course_plans cp ON ss.course_plan_id = cp.id 
+                WHERE ss.session_date = ? AND cp.laboratory_id = ?";
+            $params[] = $labId;
+        }
+        return $this->query($sql, $params);
     }
 }

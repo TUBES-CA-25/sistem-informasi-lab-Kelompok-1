@@ -44,7 +44,7 @@
                                             class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block appearance-none">
                                             <option value="">-- Pilih Lab --</option>
                                             <?php foreach ($laboratories as $lab): ?>
-                                                <option value="<?= $lab['id'] ?>"><?= $lab['lab_name'] ?></option>
+                                            <option value="<?= $lab['id'] ?>"><?= $lab['lab_name'] ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                         <div
@@ -55,9 +55,10 @@
                                 </div>
 
                                 <div>
-                                    <label class="block mb-2 text-sm font-bold text-slate-800">Tanggal Mulai (Sesi 1)
-                                        <span class="text-rose-500">*</span></label>
-                                    <input type="date" name="start_date" required
+                                    <label class="block text-sm font-bold text-gray-800 mb-2">Tanggal Mulai (Sesi
+                                        1)</label>
+                                    <input type="date" name="start_date" id="start_date"
+                                        value="<?= !empty($prefillDate) ? $prefillDate : '' ?>" required
                                         class="w-full px-4 py-2.5 bg-amber-50 border border-amber-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-amber-100 focus:border-amber-500 block">
                                     <p class="text-[10px] text-slate-500 mt-1 ml-1">* Sistem akan looping dari tanggal
                                         ini</p>
@@ -68,8 +69,8 @@
                                 <div>
                                     <label class="block mb-2 text-sm font-semibold text-slate-700">Hari</label>
                                     <div class="relative">
-                                        <select name="day" required
-                                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block appearance-none">
+                                        <select name="day" id="day_selector" required
+                                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block appearance-none pointer-events-none bg-gray-100">
                                             <option value="Monday">Senin</option>
                                             <option value="Tuesday">Selasa</option>
                                             <option value="Wednesday">Rabu</option>
@@ -80,9 +81,10 @@
                                         </select>
                                         <div
                                             class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-500">
-                                            <i class="bi bi-chevron-down text-xs"></i>
+                                            <i class="bi bi-lock-fill text-xs opacity-50"></i>
                                         </div>
                                     </div>
+                                    <p class="text-[10px] text-slate-400 mt-1 ml-1">* Otomatis sesuai tanggal</p>
                                 </div>
                                 <div>
                                     <label class="block mb-2 text-sm font-semibold text-slate-700">Jam Mulai</label>
@@ -240,3 +242,29 @@
         </div>
     </main>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const startDateInput = document.getElementById('start_date');
+    const daySelector = document.getElementById('day_selector');
+
+    // Mapping Hari JS (0-6) ke Value Option (English)
+    const daysMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    function updateDay() {
+        const dateVal = startDateInput.value;
+        if (dateVal) {
+            const date = new Date(dateVal);
+            const dayIndex = date.getDay(); // 0 = Sunday
+            const dayName = daysMap[dayIndex];
+
+            // Set value dropdown
+            daySelector.value = dayName;
+        }
+    }
+
+    // Jalankan saat load (jika ada prefill) dan saat berubah
+    updateDay();
+    startDateInput.addEventListener('change', updateDay);
+});
+</script>
