@@ -1176,4 +1176,75 @@ class AdminController extends Controller
         setFlash('success', 'Problem deleted successfully');
         $this->redirect('/admin/problems');
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // ... di dalam AdminController ...
+
+    // ==========================================
+    // CALENDAR FEATURE (NEW PAGE)
+    // ==========================================
+
+    public function calendar()
+    {
+        $laboratoryModel = $this->model('LaboratoryModel');
+
+        $data = [
+            'laboratories' => $laboratoryModel->getAllLaboratories()
+        ];
+
+        // View khusus di folder baru
+        $this->view('admin/calendar/index', $data);
+    }
+
+    /**
+     * API untuk FullCalendar (Returns JSON)
+     */
+    public function getCalendarData()
+    {
+        $labId = $this->getQuery('lab_id'); // Filter jika ada
+
+        $scheduleModel = $this->model('LabScheduleModel');
+        // Pastikan model LabScheduleModel punya method getCalendarEvents()
+        $events = $scheduleModel->getCalendarEvents($labId);
+
+        $calendarEvents = [];
+        // Warna untuk setiap lab agar beda-beda di kalender
+        $colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4'];
+
+        foreach ($events as $event) {
+            $colorIndex = ($event['laboratory_id'] ?? 0) % count($colors);
+
+            $calendarEvents[] = [
+                'id' => $event['id'],
+                'title' => $event['course_name'],
+                'start' => $event['session_date'] . 'T' . $event['start_time'],
+                'end' => $event['session_date'] . 'T' . $event['end_time'],
+                'backgroundColor' => $colors[$colorIndex],
+                'borderColor' => $colors[$colorIndex],
+                'extendedProps' => [
+                    'lecturer' => $event['lecturer_name'],
+                    'lab_name' => $event['lab_name'],
+                    'class_code' => $event['class_code']
+                ]
+            ];
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode($calendarEvents);
+        exit;
+    }
 }
