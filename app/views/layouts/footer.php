@@ -36,7 +36,7 @@
             </div>
 
             <div class="text-center md:text-left">
-                <h3 class="font-bold text-slate-900 text-lg mb-6">Contact</h3>
+                <h3 class="font-bold text-slate-900 text-lg mb-2">Contact</h3>
                 <ul class="space-y-4">
                     <li>
                         <a href="https://www.instagram.com/labfikomumi/" target="_blank" class="flex items-center justify-center md:justify-start gap-3 text-slate-600 hover:text-sky-600 group transition-colors">
