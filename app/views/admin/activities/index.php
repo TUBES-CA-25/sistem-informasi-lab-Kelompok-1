@@ -63,12 +63,17 @@
                                         </td>
 
                                         <td class="px-6 py-4">
-                                            <a href="<?= e($activity['link_url']) ?>" target="_blank" 
+                                            <?php 
+                                            $link = $activity['link_url'] ?? $activity['link'] ?? '#'; 
+                                            $displayLink = ($link !== '#') ? $link : '-';
+                                            ?>
+                                            
+                                            <a href="<?= e($link) ?>" target="_blank" 
                                                class="group/link flex items-center gap-2 max-w-[200px] text-slate-500 hover:text-primary-600 transition-colors p-1.5 rounded-lg hover:bg-white">
                                                 <div class="w-8 h-8 rounded bg-slate-100 flex items-center justify-center text-slate-500 group-hover/link:bg-primary-50 group-hover/link:text-primary-600 transition-colors shrink-0">
                                                     <i class="bi bi-link-45deg text-lg"></i>
                                                 </div>
-                                                <span class="truncate text-xs font-mono"><?= e($activity['link_url']) ?></span>
+                                                <span class="truncate text-xs font-mono"><?= e($displayLink) ?></span>
                                             </a>
                                         </td>
 

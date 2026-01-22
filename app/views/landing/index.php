@@ -2,7 +2,7 @@
 <?php include APP_PATH . '/views/layouts/header.php'; ?>
 <?php include APP_PATH . '/views/layouts/navbar.php'; ?>
 
-<section class="relative bg-white overflow-hidden pt-24 pb-10 lg:pt-28">
+<section class="relative bg-white overflow-hidden pt-4 pb-12">
     <div
         class="absolute top-0 right-0 -mr-20 -mt-20 w-[600px] h-[600px] bg-sky-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob">
     </div>
@@ -14,10 +14,10 @@
 
         <div id="hero-carousel" class="relative w-full" data-carousel="static">
 
-            <div class="relative h-[650px] overflow-hidden rounded-2xl">
+            <div class="relative h-[650px] md:h-[500px] overflow-hidden rounded-2xl">
 
                 <div class="hidden duration-700 ease-in-out" data-carousel-item="active">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center h-full px-4 md:px-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center h-full px-12 md:px-20">
                         <div class="space-y-6 text-center lg:text-left pt-10 lg:pt-0">
                             <div>
                                 <h2 class="text-sky-500 font-bold tracking-widest text-sm uppercase mb-2">SISTEM
@@ -46,7 +46,7 @@
                             </div>
                         </div>
                         <div class="hidden lg:flex justify-center items-center">
-                            <img src="<?= BASE_URL ?>/assets/images/circuit-hero.png" alt="ICLABS Tech"
+                            <img src="<?= BASE_URL ?>/assets/images/logo-iclabs.png" alt="ICLABS Tech"
                                 class="relative z-10 w-full max-w-md animate-float"
                                 onerror="this.src='https://cdn-icons-png.flaticon.com/512/2083/2083213.png'">
                         </div>
@@ -55,7 +55,7 @@
 
                 <?php foreach ($labSlides as $index => $slide): ?>
                 <div class="hidden duration-700 ease-in-out" data-carousel-item>
-                    <div class="h-full flex flex-col pt-4 px-2 md:px-8">
+                    <div class="h-full flex flex-col pt-4 px-12 md:px-20">
 
                         <div class="text-center mb-6">
                             <h2 class="text-xl font-bold text-slate-400 tracking-widest uppercase">JADWAL HARI INI</h2>
@@ -222,76 +222,112 @@
     </div>
 </section>
 
-<section class="py-20 bg-slate-50 relative overflow-hidden">
-
-    <div class="max-w-6xl mx-auto px-4 relative z-10">
-        <div class="text-center mb-20">
-            <h2 class="text-3xl md:text-4xl font-extrabold text-blue-600">FASILITAS LABORATORIUM</h2>
-            <p class="text-slate-500 mt-2">Sarana penunjang kegiatan praktikum berstandar industri</p>
+<section id="sarana" class="py-20 bg-slate-50 relative overflow-hidden">
+    
+    <div class="max-w-7xl mx-auto px-4 relative z-10">
+        <div class="text-center mb-16">
+            <h2 class="text-sky-500 font-bold tracking-widest text-sm uppercase mb-2">FASILITAS LABORATORIUM</h2>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900">Sarana Penunjang Praktikum</h2>
         </div>
+        
+        <div class="relative">
+            <div class="absolute left-8 md:left-1/2 top-0 bottom-0 w-1 border-r-4 border-dashed border-slate-300 transform md:-translate-x-1/2 h-full z-0"></div>
 
-        <div class="space-y-24">
-            <?php foreach ($labs as $index => $lab): ?>
-            <?php
-                $isEven = ($index % 2 == 0);
-
-                // Logic Gambar
-                if (!empty($lab['image'])) {
-                    if (strpos($lab['image'], 'http') === 0) {
-                        $bgImage = $lab['image'];
+            <div class="space-y-24">
+                <?php foreach($labs as $index => $lab): ?>
+                    <?php 
+                    $isEven = ($index % 2 == 0);
+                    
+                    // Logic Gambar
+                    if (!empty($lab['image'])) {
+                        $bgImage = (strpos($lab['image'], 'http') === 0) ? $lab['image'] : BASE_URL . '/' . $lab['image'];
                     } else {
-                        $bgImage = BASE_URL . '/' . $lab['image'];
+                        $bgImage = "https://placehold.co/800x500/0ea5e9/ffffff?text=" . urlencode($lab['lab_name']);
                     }
-                } else {
-                    $bgImage = "https://placehold.co/800x500/0ea5e9/ffffff?text=" . urlencode($lab['lab_name']);
-                }
 
-                $pcCount = $lab['pc_count'] ?? 0;
-                $tvCount = $lab['tv_count'] ?? 0;
-                ?>
+                    $pcCount = $lab['pc_count'] ?? 0;
+                    $tvCount = $lab['tv_count'] ?? 0;
+                    ?>
+                    
+                    <div class="relative flex flex-col md:flex-row items-center justify-between w-full z-10">
+                        
+                        <div class="absolute left-8 md:left-1/2 transform -translate-x-1/2 w-8 h-8 rounded-full bg-white border-4 border-sky-500 shadow-lg z-20 flex items-center justify-center">
+                            <div class="w-3 h-3 bg-sky-500 rounded-full"></div>
+                        </div>
 
-            <div
-                class="flex flex-col lg:flex-row items-center gap-8 lg:gap-20 <?= $isEven ? '' : 'lg:flex-row-reverse' ?>">
+                        <div class="w-full md:w-[48%] pl-20 md:pl-0 <?= $isEven ? 'md:text-right order-2 md:order-1 pr-0 md:pr-6' : 'order-2 md:order-3 pl-0 md:pl-6' ?>">
+                            
+                            <?php if ($isEven): ?>
+                                <h3 class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-4"><?= e($lab['lab_name']) ?></h3>
+                                <p class="text-slate-600 leading-relaxed mb-6">
+                                    <?= e($lab['description'] ?? 'Laboratorium dengan spesifikasi tinggi.') ?>
+                                </p>
+                                
+                                <div class="flex items-center gap-4 justify-start md:justify-end">
+                                    <div class="text-center group">
+                                        <div class="w-16 py-2 bg-slate-200 rounded-t-lg text-xl font-black text-slate-800 group-hover:bg-sky-500 group-hover:text-white transition-colors">
+                                            <?= $pcCount ?>
+                                        </div>
+                                        <div class="w-16 py-1 bg-slate-100 border-t border-slate-300 rounded-b-lg text-[10px] font-bold text-slate-500 uppercase">
+                                            Komputer
+                                        </div>
+                                    </div>
+                                    <div class="text-center group">
+                                        <div class="w-16 py-2 bg-blue-100 rounded-t-lg text-xl font-black text-slate-800 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                            <?= $tvCount ?>
+                                        </div>
+                                        <div class="w-16 py-1 bg-slate-50 border-t border-slate-200 rounded-b-lg text-[10px] font-bold text-slate-500 uppercase">
+                                            TV / LCD
+                                        </div>
+                                    </div>
+                                </div>
 
-                <div class="w-full lg:w-1/2 relative group">
-                    <div
-                        class="relative overflow-hidden rounded-2xl shadow-xl border-4 border-white transform transition-transform group-hover:scale-[1.02] duration-500 bg-white">
-                        <img src="<?= e($bgImage) ?>" alt="<?= e($lab['lab_name']) ?>" loading="lazy"
-                            class="w-full h-auto object-cover aspect-video"
-                            onerror="this.src='https://placehold.co/800x500/e2e8f0/64748b?text=No+Image';">
+                            <?php else: ?>
+                                <h3 class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-4"><?= e($lab['lab_name']) ?></h3>
+                                <p class="text-slate-600 leading-relaxed mb-6">
+                                    <?= e($lab['description'] ?? 'Laboratorium dengan spesifikasi tinggi.') ?>
+                                </p>
+                                
+                                <div class="flex items-center gap-4 justify-start">
+                                    <div class="text-center group">
+                                        <div class="w-16 py-2 bg-slate-200 rounded-t-lg text-xl font-black text-slate-800 group-hover:bg-sky-500 group-hover:text-white transition-colors">
+                                            <?= $pcCount ?>
+                                        </div>
+                                        <div class="w-16 py-1 bg-slate-100 border-t border-slate-300 rounded-b-lg text-[10px] font-bold text-slate-500 uppercase">
+                                            Komputer
+                                        </div>
+                                    </div>
+                                    <div class="text-center group">
+                                        <div class="w-16 py-2 bg-blue-100 rounded-t-lg text-xl font-black text-slate-800 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                            <?= $tvCount ?>
+                                        </div>
+                                        <div class="w-16 py-1 bg-slate-50 border-t border-slate-200 rounded-b-lg text-[10px] font-bold text-slate-500 uppercase">
+                                            TV / LCD
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
 
-                        <div class="absolute bottom-4 left-4 flex gap-2">
-                            <div
-                                class="bg-white/90 backdrop-blur px-3 py-2 rounded-lg shadow-sm text-center min-w-[60px]">
-                                <span class="block text-lg font-bold text-slate-800"><?= $pcCount ?></span>
-                                <span class="block text-[10px] font-bold text-slate-500 uppercase">Komputer</span>
-                            </div>
-                            <div
-                                class="bg-white/90 backdrop-blur px-3 py-2 rounded-lg shadow-sm text-center min-w-[60px]">
-                                <span class="block text-lg font-bold text-slate-800"><?= $tvCount ?></span>
-                                <span class="block text-[10px] font-bold text-slate-500 uppercase">TV</span>
+                        </div>
+
+                        <div class="w-full md:w-[48%] pl-20 md:pl-0 mb-6 md:mb-0 <?= $isEven ? 'order-1 md:order-3 pl-0 md:pl-6' : 'order-1 md:order-1 pr-0 md:pr-6' ?>">
+                            <div class="relative group rounded-2xl shadow-xl overflow-hidden border-4 border-white transform transition-transform duration-500 hover:scale-[1.02]">
+                                <img src="<?= e($bgImage) ?>" 
+                                     alt="<?= e($lab['lab_name']) ?>" 
+                                     loading="lazy" 
+                                     class="w-full h-auto object-cover aspect-video">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <div class="w-full lg:w-1/2 <?= $isEven ? 'text-left lg:text-left' : 'text-left lg:text-right' ?>">
-                    <h3 class="text-2xl md:text-3xl font-extrabold text-slate-800 mb-4"><?= e($lab['lab_name']) ?></h3>
-                    <p class="text-slate-600 leading-relaxed text-lg mb-6">
-                        <?= e($lab['description'] ?? 'Laboratorium modern yang dilengkapi dengan spesifikasi hardware tinggi untuk menunjang kegiatan praktikum mahasiswa.') ?>
-                    </p>
-                    <div
-                        class="flex items-center gap-2 text-slate-500 font-medium <?= $isEven ? 'justify-start' : 'justify-start lg:justify-end' ?>">
-                        <i class="bi bi-geo-alt-fill text-sky-500"></i> <?= e($lab['location']) ?>
                     </div>
-                </div>
+                <?php endforeach; ?>
             </div>
-            <?php endforeach; ?>
         </div>
     </div>
 </section>
 
-<section class="py-20 bg-white">
+<section id="activity" class="py-20 bg-white">
     <div class="max-w-6xl mx-auto px-4">
         <h2 class="text-center text-3xl font-bold text-blue-600 mb-12 uppercase tracking-wide">Kegiatan Terbaru</h2>
         <div class="grid gap-8 md:grid-cols-3">

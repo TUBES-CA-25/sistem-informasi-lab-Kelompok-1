@@ -50,7 +50,7 @@
                     <table class="w-full text-sm">
                         <thead class="bg-slate-50 border-b">
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-700 uppercase w-32">Waktu</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-700 uppercase w-32">Tugas</th>
                                 <?php 
                                 $dayNames = ['Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu', 'Sunday' => 'Minggu'];
                                 foreach ($dayNames as $day => $label): 
@@ -125,16 +125,19 @@
                         <table class="w-full text-sm text-left text-slate-500">
                             <thead class="text-xs text-slate-700 uppercase bg-slate-50 border-b">
                                 <tr>
-                                    <th class="px-6 py-3">Hari</th>
-                                    <th class="px-6 py-3">Waktu</th>
-                                    <th class="px-6 py-3">Asisten</th>
                                     <th class="px-6 py-3">Tugas</th>
+                                    <th class="px-6 py-3">Hari</th>
+                                    <!-- <th class="px-6 py-3">Waktu</th> -->
+                                    <th class="px-6 py-3">Asisten</th>
                                     <th class="px-6 py-3 text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
                                 <?php foreach ($schedules as $schedule): ?>
                                     <tr class="bg-white hover:bg-slate-50">
+                                        <td class="px-6 py-4 text-slate-900">
+                                            <?= htmlspecialchars($schedule['start_time']) ?> - <?= htmlspecialchars($schedule['end_time']) ?>
+                                        </td>
                                         <td class="px-6 py-4 font-medium text-slate-900">
                                             <?php
                                             $dayLabels = [
@@ -149,9 +152,9 @@
                                             echo $dayLabels[$schedule['day']] ?? $schedule['day'];
                                             ?>
                                         </td>
-                                        <td class="px-6 py-4 text-slate-900">
+                                        <!-- <td class="px-6 py-4 text-slate-900">
                                             <?= htmlspecialchars($schedule['start_time']) ?> - <?= htmlspecialchars($schedule['end_time']) ?>
-                                        </td>
+                                        </td> -->
                                         <td class="px-6 py-4">
                                             <div class="flex items-center gap-2">
                                                 <div class="w-8 h-8 bg-sky-100 rounded-full flex items-center justify-center">

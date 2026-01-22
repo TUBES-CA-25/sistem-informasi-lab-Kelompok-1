@@ -53,7 +53,7 @@
                 </div>
 
                 <!-- Time Range -->
-                <div class="grid grid-cols-2 gap-4">
+                <!-- <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label for="start_time" class="block text-sm font-medium text-slate-700 mb-2">
                             Waktu Mulai <span class="text-red-500">*</span>
@@ -66,15 +66,27 @@
                         </label>
                         <input type="time" id="end_time" name="end_time" required class="block w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
                     </div>
+                </div> -->
+
+                <!-- Task Selection -->
+                <div>
+                    <label for="Task" class="block text-sm font-medium text-slate-700 mb-2">
+                        Tugas<span class="text-red-500">*</span>
+                    </label>
+                    <select id="task" name="task" required class="block w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                        <option value="">Pilih Jenis</option>
+                        <option value="Domestik">Membersihkan, Memasak, dan Cuci Piring</option>
+                        <option value="Logistik">Buang Sampah, Beli Lauk, dan Galon</option>
+                    </select>
                 </div>
 
                 <!-- Task Description -->
-                <div>
+                <!-- <div>
                     <label for="task_description" class="block text-sm font-medium text-slate-700 mb-2">
                         Deskripsi Tugas
                     </label>
                     <textarea id="task_description" name="task_description" rows="4" placeholder="Jelaskan tugas yang harus dikerjakan..." class="block w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"></textarea>
-                </div>
+                </div> -->
 
                 <!-- Action Buttons -->
                 <div class="flex gap-3 pt-4 border-t border-slate-200">
