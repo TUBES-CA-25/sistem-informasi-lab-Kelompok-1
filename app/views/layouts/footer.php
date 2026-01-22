@@ -6,12 +6,12 @@
             <div class="flex justify-center md:justify-start">
                 <img src="<?= BASE_URL ?>/assets/images/logo-iclabs.png" 
                      alt="ICLABS Logo" 
-                     class="h-32 w-auto object-contain animate-float"
+                     class="h-48 w-auto object-contain animate-float"
                      onerror="this.src='https://cdn-icons-png.flaticon.com/512/2083/2083213.png'">
             </div>
 
             <div class="flex justify-center mt-8 md:mt-2">
-                <ul class="space-y-4 text-center md:text-left">
+                <ul class="space-y-5 text-center md:text-left">
                     <li>
                         <a href="<?= url('/#sarana') ?>" class="text-slate-600 hover:text-sky-600 font-medium text-base transition-colors">
                             Sarana & Prasarana
@@ -37,8 +37,8 @@
 
             <div class="flex flex-col items-center md:items-end mt-8 md:mt-2">
                 <div class="text-center md:text-left">
-                    <h3 class="font-bold text-slate-900 text-lg mb-4">Contact</h3>
-                    <ul class="space-y-4">
+                    <h3 class="font-bold text-slate-900 text-lg mb-2">Contact</h3>
+                    <ul class="space-y-5">
                         <li>
                             <a href="https://www.instagram.com/labfikomumi/" target="_blank" class="flex items-center justify-center md:justify-start gap-3 text-slate-600 hover:text-sky-600 group transition-colors">
                                 <i class="bi bi-instagram text-xl text-slate-900 group-hover:text-sky-600 min-w-[24px]"></i>
