@@ -49,7 +49,7 @@
                                     <div class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none text-slate-400">
                                         <i class="bi bi-link-45deg text-xl"></i>
                                     </div>
-                                    <input type="url" name="link_url" value="<?= e($activity['link_url']) ?>" 
+                                    <input type="url" name="link_url" value="<?= e($activity['link_url'] ?? $activity['link'] ?? '') ?>"" 
                                            class="w-full ps-11 p-3 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block transition-all font-mono text-xs sm:text-sm" 
                                            placeholder="https://..." required>
                                 </div>
