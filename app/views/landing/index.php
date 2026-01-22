@@ -222,7 +222,7 @@
     </div>
 </section>
 
-<section class="py-20 bg-slate-50 relative overflow-hidden">
+<section id="sarana" class="py-20 bg-slate-50 relative overflow-hidden">
     
     <div class="max-w-7xl mx-auto px-4 relative z-10">
         <div class="text-center mb-16">
@@ -327,7 +327,7 @@
     </div>
 </section>
 
-<section class="py-20 bg-white">
+<section id="activity" class="py-20 bg-white">
     <div class="max-w-6xl mx-auto px-4">
         <h2 class="text-center text-3xl font-bold text-blue-600 mb-12 uppercase tracking-wide">Kegiatan Terbaru</h2>
         <div class="grid gap-8 md:grid-cols-3">
