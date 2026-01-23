@@ -13,52 +13,57 @@ class LabActivityModel extends Model
      */
     public function getAllActivities()
     {
+        // Menggunakan LEFT JOIN agar jika user dihapus, berita tetap tampil
         $sql = "SELECT a.*, u.name as author_name 
-                FROM lab_activities a
-                JOIN users u ON a.created_by = u.id 
-                ORDER BY a.created_at DESC";
+                FROM {$this->table} a
+                LEFT JOIN users u ON a.created_by = u.id 
+                ORDER BY a.activity_date DESC, a.created_at DESC";
         return $this->query($sql);
     }
 
     /**
-     * Ambil kegiatan terbaru untuk Landing Page (Carousel/Grid Home)
-     * Digunakan di: LandingController@index
+     * Ambil kegiatan terbaru (Sidebar Detail & Home)
+     * FIXED: Menambahkan parameter $excludeId untuk menghindari duplikasi konten
      */
-    public function getRecentActivities($limit = 3)
+    public function getRecentActivities($limit = 3, $excludeId = null)
     {
-        $limit = (int)$limit; // Casting ke int untuk keamanan query
-        $sql = "SELECT * FROM lab_activities 
-                WHERE status = 'published' 
-                ORDER BY activity_date DESC, created_at DESC 
-                LIMIT $limit";
-        return $this->query($sql);
+        $sql = "SELECT * FROM {$this->table} ";
+        $params = [];
+
+        // Logic Exclude (Agar berita yang sedang dibuka tidak muncul di rekomendasi)
+        if ($excludeId) {
+            $sql .= "WHERE id != ? ";
+            $params[] = $excludeId;
+        }
+
+        // Limit
+        $sql .= "ORDER BY activity_date DESC, created_at DESC LIMIT " . (int)$limit;
+
+        return $this->query($sql, $params);
     }
 
     /**
      * Ambil kegiatan publik untuk halaman /activities
-     * Digunakan di: LandingController@labActivities
      */
     public function getPublicActivities($limit = 20)
     {
         $limit = (int)$limit;
+        // Hapus filter 'status' karena form input kita sederhana (langsung tayang)
         $sql = "SELECT a.*, u.name as author_name 
-                FROM lab_activities a
-                JOIN users u ON a.created_by = u.id 
-                WHERE a.status = 'published' 
+                FROM {$this->table} a
+                LEFT JOIN users u ON a.created_by = u.id 
                 ORDER BY a.activity_date DESC 
                 LIMIT $limit";
         return $this->query($sql);
     }
 
     /**
-     * Hitung kegiatan yang akan datang (Upcoming)
-     * Digunakan di: AdminController@dashboard
+     * Hitung kegiatan yang akan datang
      */
     public function countUpcoming()
     {
         $today = date('Y-m-d');
-        $sql = "SELECT COUNT(*) as total FROM lab_activities 
-                WHERE activity_date >= ? AND status = 'published'";
+        $sql = "SELECT COUNT(*) as total FROM {$this->table} WHERE activity_date >= ?";
         $result = $this->queryOne($sql, [$today]);
         return $result['total'];
     }
@@ -69,10 +74,11 @@ class LabActivityModel extends Model
 
     public function createActivity($data)
     {
-        // Set default created_by jika belum ada
-        if (!isset($data['created_by'])) {
+        // Otomatis isi created_by dengan ID admin yang login
+        if (!isset($data['created_by']) && function_exists('getUserId')) {
             $data['created_by'] = getUserId();
         }
+
         return $this->insert($data);
     }
 
@@ -83,6 +89,15 @@ class LabActivityModel extends Model
 
     public function deleteActivity($id)
     {
+        // Opsional: Hapus gambar fisik jika ada (Best Practice)
+        $item = $this->find($id);
+        if ($item && !empty($item['image_cover'])) {
+            $filePath = '../public/' . $item['image_cover'];
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+        }
+
         return $this->delete($id);
     }
 }
