@@ -88,7 +88,7 @@
                             <div class="mb-6">
                                 <label class="block mb-2 text-sm font-semibold text-slate-700">Set Status Awal <span class="text-rose-500">*</span></label>
                                 <div class="grid grid-cols-2 gap-4">
-                                    <label class="relative flex items-center justify-between p-4 bg-white border rounded-xl cursor-pointer hover:bg-slate-50 transition-all focus-within:ring-2 focus-within:ring-emerald-500 border-slate-200 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50/30 has-[:checked]:ring-1 has-[:checked]:ring-emerald-500">
+                                    <label class="group relative flex items-center justify-between p-4 bg-white border rounded-xl cursor-pointer hover:bg-slate-50 transition-all focus-within:ring-2 focus-within:ring-emerald-500 border-slate-200 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50/30 has-[:checked]:ring-1 has-[:checked]:ring-emerald-500">
                                         <div class="flex items-center gap-3">
                                             <div class="flex items-center justify-center w-5 h-5 border-2 rounded-full border-slate-300 group-has-[:checked]:border-emerald-500">
                                                 <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 hidden group-has-[:checked]:block"></div>
@@ -98,10 +98,10 @@
                                                 <span class="block text-xs text-slate-500">Hadir / Standby</span>
                                             </div>
                                         </div>
-                                        <input type="radio" name="status" value="active" class="hidden group" checked onclick="toggleReturnTime(false)">
+                                        <input type="radio" name="status" value="active" class="hidden" checked onclick="toggleReturnTime(false)">
                                     </label>
 
-                                    <label class="relative flex items-center justify-between p-4 bg-white border rounded-xl cursor-pointer hover:bg-slate-50 transition-all focus-within:ring-2 focus-within:ring-rose-500 border-slate-200 has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50/30 has-[:checked]:ring-1 has-[:checked]:ring-rose-500">
+                                    <label class="group relative flex items-center justify-between p-4 bg-white border rounded-xl cursor-pointer hover:bg-slate-50 transition-all focus-within:ring-2 focus-within:ring-rose-500 border-slate-200 has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50/30 has-[:checked]:ring-1 has-[:checked]:ring-rose-500">
                                         <div class="flex items-center gap-3">
                                             <div class="flex items-center justify-center w-5 h-5 border-2 rounded-full border-slate-300 group-has-[:checked]:border-rose-500">
                                                 <div class="w-2.5 h-2.5 rounded-full bg-rose-500 hidden group-has-[:checked]:block"></div>
@@ -111,7 +111,7 @@
                                                 <span class="block text-xs text-slate-500">Keluar / Izin</span>
                                             </div>
                                         </div>
-                                        <input type="radio" name="status" value="inactive" class="hidden group" onclick="toggleReturnTime(true)">
+                                        <input type="radio" name="status" value="inactive" class="hidden" onclick="toggleReturnTime(true)">
                                     </label>
                                 </div>
                             </div>
