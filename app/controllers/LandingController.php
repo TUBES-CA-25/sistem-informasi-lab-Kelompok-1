@@ -72,12 +72,54 @@ class LandingController extends Controller
     }
     public function labActivities()
     {
-        $this->view('landing/lab-activities', ['activities' => $this->model('LabActivityModel')->getPublicActivities(20)]);
+        $this->view('landing/activities', ['activities' => $this->model('LabActivityModel')->getPublicActivities(20)]);
     }
     public function scheduleDetail($id)
     {
         $s = $this->model('LabScheduleModel')->getScheduleDetail($id);
         if (!$s) header('Location: ' . BASE_URL . '/schedule');
         $this->view('landing/schedule-detail', ['schedule' => $s]);
+    }
+
+    // ==========================================
+    // HALAMAN LIST SEMUA KEGIATAN
+    // ==========================================
+    public function activities()
+    {
+        $activityModel = $this->model('LabActivityModel');
+
+        // Ambil semua kegiatan
+        $activities = $activityModel->getAllActivities();
+
+        $data = [
+            'activities' => $activities
+        ];
+
+        // PERBAIKAN: Pastikan ini 'landing/activities' (sesuai nama file)
+        $this->view('landing/activities', $data);
+    }
+
+    // ==========================================
+    // HALAMAN DETAIL KEGIATAN
+    // ==========================================
+    public function activityDetail($id)
+    {
+        $activityModel = $this->model('LabActivityModel');
+        $activity = $activityModel->find($id);
+
+        if (!$activity) {
+            // Jika berita tidak ditemukan, redirect ke halaman list
+            $this->redirect('/activities');
+        }
+
+        // Ambil berita lain untuk rekomendasi di sidebar (kecuali yang sedang dibuka)
+        $otherActivities = $activityModel->getRecentActivities(3, $id);
+
+        $data = [
+            'activity' => $activity,
+            'related' => $otherActivities
+        ];
+
+        $this->view('landing/activity-detail', $data);
     }
 }
