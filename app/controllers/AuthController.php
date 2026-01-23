@@ -9,6 +9,7 @@ class AuthController extends Controller
 
     public function loginForm()
     {
+        // 1. Cek jika user sudah login, langsung redirect
         if (isLoggedIn()) {
             $role = getUserRole();
             if ($role === 'admin') {
@@ -17,7 +18,22 @@ class AuthController extends Controller
                 $this->redirect('/');
             }
         }
-        $this->view('auth/login');
+
+        // 2. LOGIKA BARU: Ambil Data Foto Lab untuk Slideshow Login
+        $labModel = $this->model('LaboratoryModel');
+        $labs = $labModel->getAllLaboratories();
+
+        // Filter: Hanya ambil lab yang memiliki foto (kolom 'image' tidak kosong)
+        $labImages = array_filter($labs, function ($lab) {
+            return !empty($lab['image']);
+        });
+
+        // 3. Kirim data ke View
+        $data = [
+            'labImages' => $labImages
+        ];
+
+        $this->view('auth/login', $data);
     }
 
     public function login()
@@ -49,7 +65,7 @@ class AuthController extends Controller
         $_SESSION['role'] = $userWithRole['role_name'];
         $_SESSION['role_id'] = $user['role_id'];
 
-        // LOGIKA REDIRECT BARU
+        // LOGIKA REDIRECT
         $role = $userWithRole['role_name'];
 
         if ($role === 'admin') {
@@ -57,7 +73,6 @@ class AuthController extends Controller
             $this->redirect('/admin/dashboard');
         } else {
             // Koordinator & Asisten kembali ke halaman depan
-            // Menu mereka akan muncul di Navbar
             $this->redirect('/');
         }
     }
