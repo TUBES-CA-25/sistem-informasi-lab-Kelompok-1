@@ -117,7 +117,7 @@
                                 <?php endif; ?>
 
                                 <!-- Link -->
-                                <?php if ($activity['link_url']): ?>
+                                <?php if (isset($activity['link_url']) && !empty($activity['link_url'])): ?>
                                     <div class="flex items-center text-sm">
                                         <i class="bi bi-link-45deg mr-2 text-sky-600"></i>
                                         <a href="<?= htmlspecialchars($activity['link_url']) ?>" target="_blank" class="text-sky-600 hover:text-sky-700 hover:underline truncate">
@@ -139,7 +139,9 @@
                                 <a href="<?= url('/koordinator/activities/' . $activity['id'] . '/edit') ?>" class="flex-1 px-4 py-2 bg-sky-50 hover:bg-sky-100 text-sky-700 font-medium rounded-lg transition-colors text-center text-sm">
                                     <i class="bi bi-pencil mr-1"></i> Edit
                                 </a>
-                                <button onclick="confirmDelete(<?= $activity['id'] ?>, '<?= htmlspecialchars(addslashes($activity['title'])) ?>')" class="flex-1 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 font-medium rounded-lg transition-colors text-sm">
+                                <button type="button" 
+                                        onclick="confirmDelete('<?= url('/koordinator/activities/' . $activity['id'] . '/delete') ?>', '<?= htmlspecialchars($activity['title'], ENT_QUOTES) ?>')" 
+                                        class="flex-1 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 font-medium rounded-lg transition-colors text-sm">
                                     <i class="bi bi-trash mr-1"></i> Hapus
                                 </button>
                             </div>
@@ -153,37 +155,46 @@
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
-        <div class="flex items-center gap-4 mb-4">
-            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                <i class="bi bi-exclamation-triangle text-2xl text-red-600"></i>
+<div id="deleteModal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+
+    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+        <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+            <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <i class="bi bi-exclamation-triangle text-red-600 text-xl"></i>
+                    </div>
+                    <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                        <h3 class="text-base font-semibold leading-6 text-gray-900" id="modal-title">Hapus Kegiatan</h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">
+                                Apakah Anda yakin ingin menghapus kegiatan <strong id="activityTitle" class="text-gray-800"></strong>? 
+                                <br>Tindakan ini tidak dapat dibatalkan.
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div>
-                <h3 class="text-lg font-bold text-slate-800">Hapus Kegiatan</h3>
-                <p class="text-sm text-slate-600">Tindakan ini tidak dapat dibatalkan</p>
-            </div>
+            
+            <form id="deleteForm" method="POST" action="">
+                <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                    <button type="submit" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto">
+                        Ya, Hapus
+                    </button>
+                    <button type="button" onclick="closeDeleteModal()" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">
+                        Batal
+                    </button>
+                </div>
+            </form>
         </div>
-        
-        <p class="text-slate-700 mb-6">
-            Yakin ingin menghapus kegiatan <strong id="activityTitle"></strong>?
-        </p>
-        
-        <form id="deleteForm" method="POST" class="flex gap-3">
-            <button type="button" onclick="closeDeleteModal()" class="flex-1 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg transition-colors">
-                Batal
-            </button>
-            <button type="submit" class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors">
-                Ya, Hapus
-            </button>
-        </form>
     </div>
 </div>
 
 <script>
-function confirmDelete(id, title) {
+function confirmDelete(url, title) {
     document.getElementById('activityTitle').textContent = title;
-    document.getElementById('deleteForm').action = '<?= url('/koordinator/activities/') ?>' + id + '/delete';
+    document.getElementById('deleteForm').action = url;
     document.getElementById('deleteModal').classList.remove('hidden');
 }
 
@@ -191,12 +202,12 @@ function closeDeleteModal() {
     document.getElementById('deleteModal').classList.add('hidden');
 }
 
-// Close modal on outside click
-document.getElementById('deleteModal').addEventListener('click', function(e) {
-    if (e.target === this) {
+window.onclick = function(event) {
+    const modal = document.getElementById('deleteModal');
+    if (event.target.classList.contains('bg-opacity-75')) {
         closeDeleteModal();
     }
-});
+}
 </script>
 
 <?php include APP_PATH . '/views/layouts/footer.php'; ?>
