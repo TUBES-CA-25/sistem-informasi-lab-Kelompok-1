@@ -68,7 +68,8 @@
                     </p>
 
                     <div class="mt-auto pt-6 border-t border-slate-100 flex items-center justify-between">
-                        <a href="<?= url('/activity/' . $news['id']) ?>"
+                        <a href="<?= !empty($news['link_url']) ? e($news['link_url']) : url('/activity/' . $news['id']) ?>" 
+                            target="_blank" rel="noopener noreferrer"
                             class="inline-flex items-center text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors">
                             Baca Selengkapnya
                             <i class="bi bi-arrow-right ml-2 transition-transform group-hover:translate-x-1"></i>
