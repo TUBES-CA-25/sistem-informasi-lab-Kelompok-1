@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 21, 2026 at 05:55 AM
+-- Generation Time: Jan 24, 2026 at 12:51 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -80,7 +80,8 @@ CREATE TABLE `course_plans` (
 
 INSERT INTO `course_plans` (`id`, `laboratory_id`, `course_name`, `program_study`, `semester`, `class_code`, `lecturer_name`, `lecturer_photo`, `assistant_1_name`, `assistant_1_photo`, `assistant_2_name`, `assistant_2_photo`, `day`, `start_time`, `end_time`, `total_meetings`, `description`, `created_at`) VALUES
 (2, 14, 'ALGORITMA PEMROGRAMAN', 'TEKNIK INFORMATIKA', 4, 'A1', 'WINDA', 'http://localhost/iclabs/public/uploads/lecturers/69703714563f4_1768961812.jpg', 'FRANCO', 'http://localhost/iclabs/public/uploads/assistants/6970371456c81_1768961812.jpg', 'BASUDARA', 'http://localhost/iclabs/public/uploads/assistants/6970371457440_1768961812.jpg', 'Wednesday', '10:20:00', '00:00:00', 5, 'BAPAK', '2026-01-21 02:16:52'),
-(3, 15, 'Alpro bapak', 'ti', 1, 'b1', 'uceng', 'http://localhost/iclabs/public/uploads/lecturers/6970503a0e8f7_1768968250.jpg', 'basudara', 'http://localhost/iclabs/public/uploads/assistants/6970503a1027f_1768968250.jpg', 'windah', 'http://localhost/iclabs/public/uploads/assistants/6970503a10ef9_1768968250.jpg', 'Thursday', '09:40:00', '12:10:00', 6, 'bapak', '2026-01-21 04:04:10');
+(3, 15, 'Alpro bapak', 'ti', 1, 'b1', 'uceng', 'http://localhost/iclabs/public/uploads/lecturers/6970503a0e8f7_1768968250.jpg', 'basudara', 'http://localhost/iclabs/public/uploads/assistants/6970503a1027f_1768968250.jpg', 'windah', 'http://localhost/iclabs/public/uploads/assistants/6970503a10ef9_1768968250.jpg', 'Thursday', '09:40:00', '12:10:00', 6, 'bapak', '2026-01-21 04:04:10'),
+(4, 13, 'Machine Learning', 'Teknik Informatika', 8, 'A6', 'Ir. Huzain Azis, S.Kom., M.Cs., MTA.', NULL, 'Ahmad Mufly Ramadhan', 'http://localhost/iclabs/public/uploads/assistants/6973e53ebb47d_1769203006.png', 'Nahwa Kaka Saputra Anggareksa', 'http://localhost/iclabs/public/uploads/assistants/6973e53ebcf86_1769203006.png', 'Saturday', '07:00:00', '09:40:00', 10, 'Melajar Untuk mengolah data, dalam kalsifikasi data sederhana', '2026-01-23 21:16:46');
 
 -- --------------------------------------------------------
 
@@ -91,6 +92,7 @@ INSERT INTO `course_plans` (`id`, `laboratory_id`, `course_name`, `program_study
 CREATE TABLE `head_laboran` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
+  `phone` varchar(20) DEFAULT NULL,
   `position` varchar(100) DEFAULT 'Laboran',
   `photo` varchar(255) DEFAULT NULL,
   `status` enum('active','inactive') DEFAULT 'active',
@@ -105,11 +107,11 @@ CREATE TABLE `head_laboran` (
 -- Dumping data for table `head_laboran`
 --
 
-INSERT INTO `head_laboran` (`id`, `user_id`, `position`, `photo`, `status`, `location`, `return_time`, `notes`, `time_in`, `created_at`) VALUES
-(1, 2, 'Kepala Lab Komputer Dasar', '', 'active', 'Lab Komputer 1', NULL, 'Standby di ruangan A201', '08:00:00', '2026-01-16 03:50:50'),
-(2, 6, 'Kepala Lab Multimedia', NULL, 'inactive', 'Luar Kota', '2026-01-05 08:00:00', 'Sedang Dinas Luar di Jakarta', NULL, '2026-01-16 03:50:50'),
-(3, 7, 'Kepala Lab Jaringan', NULL, 'active', 'Lab Jaringan B1', NULL, 'Siap melayani konsultasi', '07:30:00', '2026-01-16 03:50:50'),
-(4, 8, 'Staff Laboran', NULL, 'active', 'Ruang Server', NULL, 'Maintenance Server Rutin', '08:00:00', '2026-01-16 03:50:50');
+INSERT INTO `head_laboran` (`id`, `user_id`, `phone`, `position`, `photo`, `status`, `location`, `return_time`, `notes`, `time_in`, `created_at`) VALUES
+(1, 2, NULL, 'Kepala Lab Komputer Dasar', '', 'active', 'Lab Komputer 1', NULL, 'Standby di ruangan A201', '08:00:00', '2026-01-16 03:50:50'),
+(2, 6, NULL, 'Kepala Lab Multimedia', NULL, 'inactive', 'Luar Kota', '2026-01-05 08:00:00', 'Sedang Dinas Luar di Jakarta', NULL, '2026-01-16 03:50:50'),
+(3, 7, NULL, 'Kepala Lab Jaringan', NULL, 'active', 'Lab Jaringan B1', NULL, 'Siap melayani konsultasi', '07:30:00', '2026-01-16 03:50:50'),
+(4, 8, NULL, 'Staff Laboran', NULL, 'active', 'Ruang Server', NULL, 'Maintenance Server Rutin', '08:00:00', '2026-01-16 03:50:50');
 
 -- --------------------------------------------------------
 
@@ -134,7 +136,8 @@ CREATE TABLE `laboratories` (
 INSERT INTO `laboratories` (`id`, `lab_name`, `image`, `description`, `pc_count`, `tv_count`, `location`) VALUES
 (13, 'Multimedia', 'http://localhost/iclabs/public/uploads/laboratories/69701d042bdf2_1768955140.jpg', '...', 24, 1, '2nd Floor'),
 (14, 'DS', 'http://localhost/iclabs/public/uploads/laboratories/6970369fe20b6_1768961695.jpg', 'BAPAK', 26, 1, 'FIKOM LT2'),
-(15, 'IoT', 'http://localhost/iclabs/public/uploads/laboratories/69704fb108e98_1768968113.jpg', 'bapak', 26, 2, '2nd floor');
+(15, 'IoT', 'http://localhost/iclabs/public/uploads/laboratories/69704fb108e98_1768968113.jpg', 'bapak', 26, 2, '2nd floor'),
+(16, 'Komputer Network', 'http://localhost/iclabs/public/uploads/laboratories/69741cd30283d_1769217235.png', '...', 14, 1, '2nd Floor Fikom');
 
 -- --------------------------------------------------------
 
@@ -150,6 +153,7 @@ CREATE TABLE `lab_activities` (
   `activity_date` date NOT NULL,
   `location` varchar(100) DEFAULT NULL,
   `description` text DEFAULT NULL,
+  `link_url` varchar(255) DEFAULT NULL,
   `status` enum('draft','published','cancelled') DEFAULT 'draft',
   `created_by` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
@@ -159,11 +163,11 @@ CREATE TABLE `lab_activities` (
 -- Dumping data for table `lab_activities`
 --
 
-INSERT INTO `lab_activities` (`id`, `title`, `image_cover`, `activity_type`, `activity_date`, `location`, `description`, `status`, `created_by`, `created_at`) VALUES
-(1, 'Workshop Python Programming', 'https://placehold.co/600x400/2563eb/FFF?text=Workshop+Python', 'workshop', '2025-01-15', 'Lab Komputer 1', 'Workshop pemrograman Python untuk pemula', 'published', 1, '2026-01-16 03:50:50'),
-(2, 'Maintenance Rutin Lab', 'https://placehold.co/600x400/10b981/FFF?text=Maintenance', 'maintenance', '2025-01-10', 'Semua Lab', 'Maintenance dan pembersihan rutin semua laboratorium', 'published', 1, '2026-01-16 03:50:50'),
-(3, 'Seminar Keamanan Siber', 'https://placehold.co/600x400/f59e0b/FFF?text=Seminar+Security', 'seminar', '2025-01-20', 'Lab Jaringan', 'Seminar tentang keamanan siber dan ethical hacking', 'published', 1, '2026-01-16 03:50:50'),
-(4, 'Praktikum Database Lanjut', 'https://placehold.co/600x400/ef4444/FFF?text=Database', 'praktikum', '2025-01-08', 'Lab Komputer 2', 'Praktikum database management sistem lanjutan', 'published', 1, '2026-01-16 03:50:50');
+INSERT INTO `lab_activities` (`id`, `title`, `image_cover`, `activity_type`, `activity_date`, `location`, `description`, `link_url`, `status`, `created_by`, `created_at`) VALUES
+(1, 'Workshop Python Programming', 'https://placehold.co/600x400/2563eb/FFF?text=Workshop+Python', 'workshop', '2025-01-15', 'Lab Komputer 1', 'Workshop pemrograman Python untuk pemula', NULL, 'published', 1, '2026-01-16 03:50:50'),
+(2, 'Maintenance Rutin Lab', 'https://placehold.co/600x400/10b981/FFF?text=Maintenance', 'maintenance', '2025-01-10', 'Semua Lab', 'Maintenance dan pembersihan rutin semua laboratorium', NULL, 'published', 1, '2026-01-16 03:50:50'),
+(3, 'Seminar Keamanan Siber', 'http://localhost/iclabs/public/uploads/activities/6974b16c3827c_1769255276.png', 'seminar', '2025-01-20', 'Lab Jaringan', 'Seminar tentang keamanan siber dan ethical hacking', 'https://komikindo.ch/', 'published', 1, '2026-01-16 03:50:50'),
+(4, 'Praktikum Database Lanjut', 'https://placehold.co/600x400/ef4444/FFF?text=Database', 'praktikum', '2025-01-08', 'Lab Komputer 2', 'Praktikum database management sistem lanjutan', NULL, 'published', 1, '2026-01-16 03:50:50');
 
 -- --------------------------------------------------------
 
@@ -295,7 +299,17 @@ INSERT INTO `schedule_sessions` (`id`, `course_plan_id`, `meeting_number`, `sess
 (10, 3, 3, '2026-02-05', '09:40:00', '12:10:00', NULL, 'scheduled', 0),
 (11, 3, 4, '2026-02-12', '09:40:00', '12:10:00', NULL, 'scheduled', 0),
 (12, 3, 5, '2026-02-19', '09:40:00', '12:10:00', NULL, 'scheduled', 0),
-(13, 3, 6, '2026-02-26', '09:40:00', '12:10:00', NULL, 'scheduled', 0);
+(13, 3, 6, '2026-02-26', '09:40:00', '12:10:00', NULL, 'scheduled', 0),
+(14, 4, 1, '2026-01-24', '07:00:00', '09:40:00', NULL, 'scheduled', 0),
+(15, 4, 2, '2026-01-31', '07:00:00', '09:40:00', NULL, 'scheduled', 0),
+(16, 4, 3, '2026-02-07', '07:00:00', '09:40:00', NULL, 'scheduled', 0),
+(17, 4, 4, '2026-02-14', '07:00:00', '09:40:00', NULL, 'scheduled', 0),
+(18, 4, 5, '2026-02-21', '07:00:00', '09:40:00', NULL, 'scheduled', 0),
+(19, 4, 6, '2026-02-28', '07:00:00', '09:40:00', NULL, 'scheduled', 0),
+(20, 4, 7, '2026-03-07', '07:00:00', '09:40:00', NULL, 'scheduled', 0),
+(21, 4, 8, '2026-03-14', '07:00:00', '09:40:00', NULL, 'scheduled', 0),
+(22, 4, 9, '2026-03-21', '07:00:00', '09:40:00', NULL, 'scheduled', 0),
+(23, 4, 10, '2026-03-28', '07:00:00', '09:40:00', NULL, 'scheduled', 0);
 
 -- --------------------------------------------------------
 
@@ -440,7 +454,7 @@ ALTER TABLE `assistant_schedules`
 -- AUTO_INCREMENT for table `course_plans`
 --
 ALTER TABLE `course_plans`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `head_laboran`
@@ -452,7 +466,7 @@ ALTER TABLE `head_laboran`
 -- AUTO_INCREMENT for table `laboratories`
 --
 ALTER TABLE `laboratories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `lab_activities`
@@ -494,7 +508,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `schedule_sessions`
 --
 ALTER TABLE `schedule_sessions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `users`
