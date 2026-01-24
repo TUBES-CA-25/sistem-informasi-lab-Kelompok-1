@@ -811,14 +811,15 @@ class AdminController extends Controller
         // 1. Handle Upload Foto Profil
         $photoPath = $this->handleFileUpload('photo_file', 'uploads/profiles/');
 
-        // 2. Ambil Input
+        // 2. Ambil Input (Termasuk Phone)
         $data = [
             'user_id' => sanitize($this->getPost('user_id')),
-            'position' => sanitize($this->getPost('position')), // Contoh: Kepala Lab Multimedia
-            'status' => sanitize($this->getPost('status')),     // active / inactive
+            'phone' => sanitize($this->getPost('phone')), // <--- DATA BARU
+            'position' => sanitize($this->getPost('position')),
+            'status' => sanitize($this->getPost('status')),
             'location' => sanitize($this->getPost('location')),
             'time_in' => sanitize($this->getPost('time_in')),
-            'return_time' => sanitize($this->getPost('return_time')), // Jika inactive
+            'return_time' => sanitize($this->getPost('return_time')),
             'notes' => sanitize($this->getPost('notes')),
             'photo' => $photoPath
         ];
@@ -831,16 +832,15 @@ class AdminController extends Controller
         ]);
 
         if (!empty($errors)) {
-            setFlash('danger', 'Mohon lengkapi data wajib (User, Jabatan, Status)');
+            setFlash('danger', 'Mohon lengkapi data wajib.');
             $this->redirect('/admin/head-laboran/create');
         }
 
-        // 4. Simpan
         $headLaboranModel = $this->model('HeadLaboranModel');
 
-        // Cek duplikasi (User ini sudah jadi staff belum?)
+        // Cek duplikasi
         if ($headLaboranModel->isHeadLaboran($data['user_id'])) {
-            setFlash('danger', 'User ini sudah terdaftar sebagai Staff/Kepala Lab.');
+            setFlash('danger', 'User ini sudah terdaftar.');
             $this->redirect('/admin/head-laboran/create');
         }
 
@@ -884,10 +884,10 @@ class AdminController extends Controller
         $headLaboranModel = $this->model('HeadLaboranModel');
         $oldData = $headLaboranModel->find($id);
 
-        // 1. Handle Upload Foto (Gunakan lama jika tidak ada baru)
         $photoPath = $this->handleFileUpload('photo_file', 'uploads/profiles/') ?? $oldData['photo'];
 
         $data = [
+            'phone' => sanitize($this->getPost('phone')), // <--- DATA BARU
             'position' => sanitize($this->getPost('position')),
             'status' => sanitize($this->getPost('status')),
             'location' => sanitize($this->getPost('location')),
@@ -898,7 +898,7 @@ class AdminController extends Controller
         ];
 
         if ($headLaboranModel->updateHeadLaboran($id, $data)) {
-            setFlash('success', 'Status & Data Staff berhasil diperbarui');
+            setFlash('success', 'Data Staff berhasil diperbarui');
             $this->redirect('/admin/head-laboran');
         } else {
             setFlash('danger', 'Gagal memperbarui data');

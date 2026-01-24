@@ -44,7 +44,7 @@
                                             class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block appearance-none">
                                             <option value="">-- Pilih Lab --</option>
                                             <?php foreach ($laboratories as $lab): ?>
-                                            <option value="<?= $lab['id'] ?>"><?= $lab['lab_name'] ?></option>
+                                                <option value="<?= $lab['id'] ?>"><?= $lab['lab_name'] ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                         <div
@@ -136,8 +136,9 @@
                                         class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block">
                                 </div>
                                 <div>
-                                    <label class="block mb-2 text-sm font-semibold text-slate-700">Kode Kelas</label>
-                                    <input type="text" name="class_code" required placeholder="A1 / B2"
+                                    <label class="block mb-2 text-sm font-semibold text-slate-700">Frekuensi (Kode
+                                        Kelas)</label>
+                                    <input type="text" name="class_code" required placeholder="TI_MICRO-6 (A5)"
                                         class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block">
                                 </div>
                                 <div>
@@ -244,27 +245,27 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const startDateInput = document.getElementById('start_date');
-    const daySelector = document.getElementById('day_selector');
+    document.addEventListener('DOMContentLoaded', function() {
+        const startDateInput = document.getElementById('start_date');
+        const daySelector = document.getElementById('day_selector');
 
-    // Mapping Hari JS (0-6) ke Value Option (English)
-    const daysMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        // Mapping Hari JS (0-6) ke Value Option (English)
+        const daysMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-    function updateDay() {
-        const dateVal = startDateInput.value;
-        if (dateVal) {
-            const date = new Date(dateVal);
-            const dayIndex = date.getDay(); // 0 = Sunday
-            const dayName = daysMap[dayIndex];
+        function updateDay() {
+            const dateVal = startDateInput.value;
+            if (dateVal) {
+                const date = new Date(dateVal);
+                const dayIndex = date.getDay(); // 0 = Sunday
+                const dayName = daysMap[dayIndex];
 
-            // Set value dropdown
-            daySelector.value = dayName;
+                // Set value dropdown
+                daySelector.value = dayName;
+            }
         }
-    }
 
-    // Jalankan saat load (jika ada prefill) dan saat berubah
-    updateDay();
-    startDateInput.addEventListener('change', updateDay);
-});
+        // Jalankan saat load (jika ada prefill) dan saat berubah
+        updateDay();
+        startDateInput.addEventListener('change', updateDay);
+    });
 </script>

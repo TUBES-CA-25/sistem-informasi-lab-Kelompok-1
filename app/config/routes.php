@@ -21,6 +21,7 @@ $router->get('/presence', 'LandingController@presence');
 
 // Activities (Blog style)
 $router->get('/activities', 'LandingController@labActivities');
+$router->get('/activity/{id}', 'LandingController@activityDetail');
 
 // ==========================================
 // AUTHENTICATION ROUTES

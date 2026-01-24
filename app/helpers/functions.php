@@ -150,16 +150,24 @@ function getProblemTypeLabel($type) {
 /**
  * Get activity type label
  */
-function getActivityTypeLabel($type) {
-    $types = [
+// app/helpers/functions.php (atau di bagian bawah index.php jika tidak pakai helper terpisah)
+
+// Di helper function (misal: app/helpers/functions.php)
+function getActivityTypeLabel($type)
+{
+    $labels = [
+        'news' => 'Berita',
+        'announcement' => 'Pengumuman',
+        'achievement' => 'Prestasi',
         'praktikum' => 'Praktikum',
-        'workshop' => 'Workshop',
-        'seminar' => 'Seminar',
-        'maintenance' => 'Maintenance',
-        'other' => 'Other',
+        'seminar' => 'Seminar/Workshop',
+        'lomba' => 'Kompetisi',
+        'event' => 'Event',
+        'recruitment' => 'Open Recruitment',
+        'collaboration' => 'Kerjasama',
+        'other' => 'Lainnya'
     ];
-    
-    return $types[$type] ?? ucfirst($type);
+    return $labels[$type] ?? 'Kegiatan';
 }
 
 /**
