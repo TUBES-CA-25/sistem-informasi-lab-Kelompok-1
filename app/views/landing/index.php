@@ -352,12 +352,12 @@
                     </div>
                     <h3
                         class="text-lg font-bold text-slate-800 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                        <a href="#"><?= e($news['title']) ?></a>
+                        <a href="<?= !empty($news['link_url']) ? e($news['link_url']) : '#' ?>" target="_blank" rel="noopener noreferrer"><?= e($news['title']) ?></a>
                     </h3>
                     <p class="text-slate-500 text-sm line-clamp-3 mb-4 flex-1">
                         <?= e($news['description']) ?>
                     </p>
-                    <a href="#" class="inline-flex items-center text-blue-600 font-bold text-sm hover:underline">
+                    <a href="<?= !empty($news['link_url']) ? e($news['link_url']) : '#' ?>" target="_blank" rel="noopener noreferrer" class="inline-flex items-center text-blue-600 font-bold text-sm hover:underline">
                         Baca Selengkapnya <i class="bi bi-arrow-right ml-1"></i>
                     </a>
                 </div>
