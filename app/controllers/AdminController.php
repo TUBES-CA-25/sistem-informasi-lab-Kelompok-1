@@ -696,8 +696,6 @@ class AdminController extends Controller
         $data = [
             'user_id' => sanitize($this->getPost('user_id')),
             'day' => sanitize($this->getPost('day')),
-            'start_time' => sanitize($this->getPost('start_time')),
-            'end_time' => sanitize($this->getPost('end_time')),
             'status' => sanitize($this->getPost('status', 'scheduled'))
         ];
 
@@ -741,8 +739,6 @@ class AdminController extends Controller
         $data = [
             'user_id' => sanitize($this->getPost('user_id')),
             'day' => sanitize($this->getPost('day')),
-            'start_time' => sanitize($this->getPost('start_time')),
-            'end_time' => sanitize($this->getPost('end_time')),
             'status' => sanitize($this->getPost('status'))
         ];
 
@@ -1008,7 +1004,8 @@ class AdminController extends Controller
             'description' => sanitize($this->getPost('description')), // Deskripsi Singkat
             'link_url' => trim($this->getPost('link_url')),         // NEW: Link ke Berita
             'activity_date' => sanitize($this->getPost('activity_date')),
-            'image_cover' => $coverPath
+            'image_cover' => $coverPath,
+            'status' => 'published'
         ];
 
         // 3. Validasi
