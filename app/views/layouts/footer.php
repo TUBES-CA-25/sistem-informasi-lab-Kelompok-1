@@ -18,7 +18,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="<?= url('/#activity') ?>" class="text-slate-600 hover:text-sky-600 font-medium text-base transition-colors">
+                        <a href="<?= url('/activities') ?>" class="text-slate-600 hover:text-sky-600 font-medium text-base transition-colors">
                             Laboratorium Activity
                         </a>
                     </li>
