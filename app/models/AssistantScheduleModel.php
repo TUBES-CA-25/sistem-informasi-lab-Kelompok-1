@@ -2,7 +2,7 @@
 
 /**
  * ICLABS - Assistant Schedule Model
- * Updated to support Admin & Koordinator features
+ * Updated: Menghapus referensi start_time/end_time sesuai struktur DB baru
  */
 
 class AssistantScheduleModel extends Model
@@ -15,10 +15,11 @@ class AssistantScheduleModel extends Model
      */
     public function getAllWithUser()
     {
+        // HAPUS: s.start_time dari ORDER BY
         $sql = "SELECT s.*, u.name as assistant_name, u.email 
                 FROM assistant_schedules s 
                 JOIN users u ON s.user_id = u.id 
-                ORDER BY FIELD(day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'), s.start_time";
+                ORDER BY FIELD(day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')";
         return $this->query($sql);
     }
 
@@ -37,22 +38,24 @@ class AssistantScheduleModel extends Model
      */
     public function getSchedulesByUser($userId)
     {
+        // HAPUS: s.start_time dari ORDER BY
         $sql = "SELECT s.* FROM assistant_schedules s 
                 WHERE s.user_id = ? 
-                ORDER BY FIELD(day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'), s.start_time";
+                ORDER BY FIELD(day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')";
         return $this->query($sql, [$userId]);
     }
-    
+
     /**
      * Get schedules by specific day
      */
     public function getSchedulesByDay($day)
     {
+        // GANTI ORDER BY: Dari start_time menjadi nama asisten (u.name)
         $sql = "SELECT s.*, u.name as assistant_name, u.email 
                 FROM assistant_schedules s 
                 JOIN users u ON s.user_id = u.id 
                 WHERE s.day = ?
-                ORDER BY s.start_time";
+                ORDER BY u.name ASC";
         return $this->query($sql, [$day]);
     }
 

@@ -696,8 +696,6 @@ class AdminController extends Controller
         $data = [
             'user_id' => sanitize($this->getPost('user_id')),
             'day' => sanitize($this->getPost('day')),
-            'start_time' => sanitize($this->getPost('start_time')),
-            'end_time' => sanitize($this->getPost('end_time')),
             'status' => sanitize($this->getPost('status', 'scheduled'))
         ];
 
@@ -741,8 +739,6 @@ class AdminController extends Controller
         $data = [
             'user_id' => sanitize($this->getPost('user_id')),
             'day' => sanitize($this->getPost('day')),
-            'start_time' => sanitize($this->getPost('start_time')),
-            'end_time' => sanitize($this->getPost('end_time')),
             'status' => sanitize($this->getPost('status'))
         ];
 
