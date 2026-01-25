@@ -493,7 +493,8 @@ class KoordinatorController extends Controller {
     {
         $laboratoryModel = $this->model('LaboratoryModel');
         
-        $lab = $laboratoryModel->getLaboratory($id);
+        // $lab = $laboratoryModel->getLaboratory($id);
+        $lab = $laboratoryModel->find($id);
         
         if (!$lab) {
             setFlash('danger', 'Laboratorium tidak ditemukan');
