@@ -62,17 +62,19 @@ if (!empty($presenceList)) {
         <div class="mb-16">
             <div class="flex items-center justify-center mb-8">
                 <span class="h-px w-12 bg-slate-300"></span>
-                <h2 class="px-4 text-lg font-bold text-slate-400 uppercase tracking-widest">Kepala Laboratorium</h2>
+                <h2 class="px-4 text-lg font-bold text-slate-400 uppercase tracking-widest text-center">Kepala Laboratorium</h2>
                 <span class="h-px w-12 bg-slate-300"></span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center">
+            <div class="flex flex-wrap justify-center -mx-4">
                 <?php if (!empty($leaders)): ?>
-                <?php foreach ($leaders as $person): renderPresenceCard($person, true);
-                    endforeach; ?>
+                    <?php foreach ($leaders as $person): ?>
+                        <div class="w-full md:w-1/2 lg:w-1/3 px-4 mb-8">
+                            <?php renderPresenceCard($person, true); ?>
+                        </div>
+                    <?php endforeach; ?>
                 <?php else: ?>
-                <div class="col-span-3 text-center text-slate-400 italic py-10">Data Kepala Lab belum diinput oleh
-                    Admin.</div>
+                    <div class="w-full text-center text-slate-400 italic py-10">Data Kepala Lab belum diinput oleh Admin.</div>
                 <?php endif; ?>
             </div>
         </div>
@@ -80,17 +82,19 @@ if (!empty($presenceList)) {
         <div>
             <div class="flex items-center justify-center mb-8">
                 <span class="h-px w-12 bg-slate-300"></span>
-                <h2 class="px-4 text-lg font-bold text-slate-400 uppercase tracking-widest">Staff & Laboran</h2>
+                <h2 class="px-4 text-lg font-bold text-slate-400 uppercase tracking-widest text-center">Staff & Laboran</h2>
                 <span class="h-px w-12 bg-slate-300"></span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 justify-center">
+            <div class="flex flex-wrap justify-center -mx-3">
                 <?php if (!empty($staff)): ?>
-                <?php foreach ($staff as $person): renderPresenceCard($person, false);
-                    endforeach; ?>
+                    <?php foreach ($staff as $person): ?>
+                        <div class="w-full md:w-1/2 lg:w-1/4 px-3 mb-6">
+                            <?php renderPresenceCard($person, false); ?>
+                        </div>
+                    <?php endforeach; ?>
                 <?php else: ?>
-                <div class="col-span-4 text-center text-slate-400 italic py-10">Data Staff belum diinput oleh Admin.
-                </div>
+                    <div class="w-full text-center text-slate-400 italic py-10">Data Staff belum diinput oleh Admin.</div>
                 <?php endif; ?>
             </div>
         </div>
@@ -99,7 +103,7 @@ if (!empty($presenceList)) {
 </div>
 
 <?php
-// FUNGSI RENDER CARD (DINAMIS DARI DB)
+// FUNGSI RENDER CARD (TAMPILAN TETAP SAMA SEPERTI ASLINYA)
 function renderPresenceCard($person, $isLeader)
 {
     $isAvailable = ($person['status'] === 'active');
@@ -118,23 +122,20 @@ function renderPresenceCard($person, $isLeader)
         ? "https://wa.me/" . $phone . "?text=" . urlencode("Assalamu'alaikum " . $person['name'] . ", saya ingin bertanya perihal Laboratorium.")
         : "#";
 
-    // Ukuran Avatar
+    // Ukuran Avatar (Sesuai kode asli)
     $avatarSize = $isLeader ? 'w-32 h-32 text-5xl' : 'w-24 h-24 text-3xl';
 ?>
-<div
-    class="group bg-white rounded-2xl border-t-4 <?= $cardBorder ?> shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col items-center relative">
+<div class="h-full group bg-white rounded-2xl border-t-4 <?= $cardBorder ?> shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col items-center relative">
 
     <div class="absolute top-0 right-0 z-10">
-        <div
-            class="bg-<?= $statusColor ?>-50 text-<?= $statusColor ?>-600 text-[10px] font-bold px-3 py-1 rounded-bl-xl border-l border-b border-<?= $statusColor ?>-100 uppercase tracking-wide flex items-center shadow-sm">
+        <div class="bg-<?= $statusColor ?>-50 text-<?= $statusColor ?>-600 text-[10px] font-bold px-3 py-1 rounded-bl-xl border-l border-b border-<?= $statusColor ?>-100 uppercase tracking-wide flex items-center shadow-sm">
             <i class="bi <?= $statusIcon ?> mr-1.5 text-xs"></i> <?= $statusText ?>
         </div>
     </div>
 
-    <div class="p-6 w-full text-center flex flex-col items-center">
+    <div class="p-6 w-full text-center flex flex-col items-center flex-1">
 
-        <div
-            class="<?= $avatarSize ?> rounded-full bg-slate-50 border-4 border-white shadow-lg flex items-center justify-center text-slate-300 font-bold mb-5 group-hover:scale-105 transition-transform duration-300 relative">
+        <div class="<?= $avatarSize ?> rounded-full bg-slate-50 border-4 border-white shadow-lg flex items-center justify-center text-slate-300 font-bold mb-5 group-hover:scale-105 transition-transform duration-300 relative">
             <?php if (!empty($person['photo'])): ?>
             <img src="<?= e($person['photo']) ?>" alt="<?= e($person['name']) ?>"
                 class="w-full h-full rounded-full object-cover">
@@ -143,23 +144,19 @@ function renderPresenceCard($person, $isLeader)
                 class="w-full h-full rounded-full object-cover">
             <?php endif; ?>
 
-            <div
-                class="absolute bottom-1 right-1 w-5 h-5 bg-<?= $statusColor ?>-500 border-4 border-white rounded-full">
-                <?php if ($isAvailable): ?><span
-                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><?php endif; ?>
+            <div class="absolute bottom-1 right-1 w-5 h-5 bg-<?= $statusColor ?>-500 border-4 border-white rounded-full">
+                <?php if ($isAvailable): ?><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><?php endif; ?>
             </div>
         </div>
 
-        <h3
-            class="text-lg font-bold text-slate-800 mb-1 leading-tight px-2 min-h-[50px] flex items-center justify-center">
+        <h3 class="text-lg font-bold text-slate-800 mb-1 leading-tight px-2 min-h-[50px] flex items-center justify-center line-clamp-2">
             <?= e($person['name']) ?>
         </h3>
-        <p
-            class="text-sm font-medium text-sky-600 mb-5 bg-sky-50 px-3 py-1 rounded-full inline-block border border-sky-100">
+        <p class="text-sm font-medium text-sky-600 mb-5 bg-sky-50 px-3 py-1 rounded-full inline-block border border-sky-100">
             <?= e($person['position']) ?>
         </p>
 
-        <div class="w-full space-y-3 text-left bg-slate-50 p-4 rounded-xl border border-slate-100 text-sm">
+        <div class="w-full space-y-3 text-left bg-slate-50 p-4 rounded-xl border border-slate-100 text-sm mt-auto">
             <div class="flex items-center justify-center text-center gap-2 text-slate-600 font-medium">
                 <i class="bi bi-geo-alt-fill text-slate-400"></i>
                 <?= e($person['location'] ?? '-') ?>
