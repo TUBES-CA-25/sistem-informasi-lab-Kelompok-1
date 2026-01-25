@@ -301,7 +301,7 @@ class KoordinatorController extends Controller {
             'currentFilter' => $filter
         ];
         
-        $this->view('koordinator/schedules/index', $data);
+        $this->view('koordinator/assistant-schedules/index', $data);
     }
     
     /**
@@ -337,7 +337,7 @@ class KoordinatorController extends Controller {
             'assistants' => $userModel->getUsersByRoleName('asisten')
         ];
         
-        $this->view('koordinator/schedules/create', $data);
+        $this->view('koordinator/assistant-schedules/create', $data);
     }
     
     /**
@@ -354,7 +354,7 @@ class KoordinatorController extends Controller {
             'day' => sanitize($this->getPost('day')),
             'start_time' => sanitize($this->getPost('start_time')),
             'end_time' => sanitize($this->getPost('end_time')),
-            'task_description' => sanitize($this->getPost('task_description'))
+            'status' => sanitize($this->getPost('status')) ?: 'scheduled'
         ];
         
         if (empty($data['user_id']) || empty($data['day']) || empty($data['start_time']) || empty($data['end_time'])) {
@@ -389,7 +389,7 @@ class KoordinatorController extends Controller {
             'assistants' => $userModel->getUsersByRoleName('asisten')
         ];
         
-        $this->view('koordinator/schedules/edit', $data);
+        $this->view('koordinator/assistant-schedules/edit', $data);
     }
     
     /**
@@ -406,7 +406,7 @@ class KoordinatorController extends Controller {
             'day' => sanitize($this->getPost('day')),
             'start_time' => sanitize($this->getPost('start_time')),
             'end_time' => sanitize($this->getPost('end_time')),
-            'task_description' => sanitize($this->getPost('task_description'))
+            'status' => sanitize($this->getPost('status'))
         ];
         
         $scheduleModel = $this->model('AssistantScheduleModel');
