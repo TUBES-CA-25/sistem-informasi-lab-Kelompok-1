@@ -89,12 +89,12 @@ class AsistenController extends Controller
     {
         $problemModel = $this->model('LabProblemModel');
         $laboratoryModel = $this->model('LaboratoryModel');
-        
+
         // Get filter parameters
         $statusFilter = $this->getQuery('status') ?? 'active';
         $search = $this->getQuery('search') ?? '';
         $page = (int)($this->getQuery('page') ?? 1);
-        
+
         // Validate
         $validStatuses = ['all', 'active', 'reported', 'in_progress', 'resolved'];
         if (!in_array($statusFilter, $validStatuses)) {
@@ -103,10 +103,10 @@ class AsistenController extends Controller
         if ($page < 1) {
             $page = 1;
         }
-        
+
         // Get filtered data
         $result = $problemModel->getFilteredProblems($statusFilter, $search, $page, 10);
-        
+
         $data = [
             'problems' => $result['data'],
             'pagination' => [
@@ -169,13 +169,41 @@ class AsistenController extends Controller
     public function listAssistantSchedules()
     {
         $scheduleModel = $this->model('AssistantScheduleModel');
-        $userId = getUserId();
+        $settingsModel = $this->model('SettingsModel');
 
-        $data = [
-            'allSchedules' => $scheduleModel->getAllWithDetails(), // Get all schedules for grid view
-            'mySchedules' => $scheduleModel->getSchedulesByUser($userId) // Keep for reference
+        // 1. Ambil Semua Data Jadwal
+        $rawSchedules = $scheduleModel->getAllWithUser();
+
+        // 2. Ambil Jobdesk Global (Read Only)
+        $masterJob = [
+            'Putri' => $settingsModel->get('job_putri', 'Belum diatur'),
+            'Putra' => $settingsModel->get('job_putra', 'Belum diatur')
         ];
 
+        // 3. Susun Data Matriks
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        $matrix = [
+            'Putri' => array_fill_keys($days, []),
+            'Putra' => array_fill_keys($days, [])
+        ];
+
+        foreach ($rawSchedules as $row) {
+            $role = $row['job_role'];
+            $day  = $row['day'];
+
+            if (isset($matrix[$role][$day])) {
+                $matrix[$role][$day][] = $row;
+            }
+        }
+
+        $data = [
+            'matrix' => $matrix,
+            'masterJob' => $masterJob,
+            'days' => $days,
+            'currentUserId' => $_SESSION['user_id'] ?? 0 // Untuk highlighting
+        ];
+
+        // Pastikan folder view sesuai: views/asisten/schedules/index.php
         $this->view('asisten/schedules/index', $data);
     }
 
