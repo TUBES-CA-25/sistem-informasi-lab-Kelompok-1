@@ -15,6 +15,8 @@ $router->get('/home', 'LandingController@index');
 // Schedule
 $router->get('/schedule', 'LandingController@schedule');
 $router->get('/schedule/:id', 'LandingController@scheduleDetail');
+// Route untuk Update Jobdesk (Popup)
+$router->post('/admin/assistant-schedules/update-job', 'AdminController@updateJobdesk');
 
 // Management Presence (Updated from head-laboran)
 $router->get('/presence', 'LandingController@presence');
@@ -82,12 +84,14 @@ $router->post('/koordinator/problems/:id/update-status', 'KoordinatorController@
 $router->post('/koordinator/problems/:id/assign', 'KoordinatorController@assignProblem');
 
 // Koordinator read-only views (using KoordinatorController)
-$router->get('/koordinator/assistant-schedules', 'KoordinatorController@listAssistantSchedules');
-$router->get('/koordinator/assistant-schedules/create', 'KoordinatorController@createScheduleForm');
-$router->post('/koordinator/assistant-schedules/create', 'KoordinatorController@createSchedule');
-$router->get('/koordinator/assistant-schedules/:id/edit', 'KoordinatorController@editScheduleForm');
-$router->post('/koordinator/assistant-schedules/:id/edit', 'KoordinatorController@updateSchedule');
-$router->post('/koordinator/assistant-schedules/:id/delete', 'KoordinatorController@deleteSchedule');
+// Route Koordinator Schedule
+$router->get('/koordinator/assistant-schedules', 'KoordinatorController@listAssistantSchedules'); // Perhatikan nama methodnya
+$router->get('/koordinator/assistant-schedules/create', 'KoordinatorController@createAssistantSchedule');
+$router->post('/koordinator/assistant-schedules/create', 'KoordinatorController@createAssistantSchedule');
+$router->get('/koordinator/assistant-schedules/{id}/edit', 'KoordinatorController@editAssistantSchedule');
+$router->post('/koordinator/assistant-schedules/{id}/edit', 'KoordinatorController@editAssistantSchedule');
+$router->post('/koordinator/assistant-schedules/{id}/delete', 'KoordinatorController@deleteAssistantSchedule');
+$router->post('/koordinator/assistant-schedules/update-job', 'KoordinatorController@updateJobdesk');
 
 $router->get('/koordinator/laboratories', 'KoordinatorController@listLaboratories');
 $router->get('/koordinator/laboratories/create', 'KoordinatorController@createLaboratoryForm');
