@@ -66,20 +66,54 @@ class AssistantScheduleModel extends Model
     {
         return $this->insert($data);
     }
-
     public function updateSchedule($id, $data)
     {
         return $this->update($id, $data);
     }
-
     public function deleteSchedule($id)
     {
         return $this->delete($id);
     }
-
     public function find($id)
     {
-        $sql = "SELECT * FROM {$this->table} WHERE id = ?";
-        return $this->queryOne($sql, [$id]);
+        return $this->queryOne("SELECT * FROM {$this->table} WHERE id = ?", [$id]);
+    }
+
+    // Ambil semua preset dikelompokkan (untuk dikirim ke View)
+    public function getAllPresets()
+    {
+        $sql = "SELECT * FROM job_presets ORDER BY task_name ASC";
+        $results = $this->query($sql);
+
+        $grouped = [
+            'Putra' => [],
+            'Putri' => []
+        ];
+
+        foreach ($results as $row) {
+            $grouped[$row['category']][] = $row['task_name'];
+        }
+
+        return $grouped;
+    }
+
+    // Fungsi Pintar: Cek apakah tugas sudah ada? Jika belum, simpan!
+    public function saveNewPresets($category, $jobRoleString)
+    {
+        // Pecah string "Sapu, Pel, Masak" menjadi array
+        $tasks = array_map('trim', explode(',', $jobRoleString));
+
+        foreach ($tasks as $task) {
+            if (empty($task)) continue;
+
+            // Cek apakah sudah ada di database?
+            $check = $this->queryOne("SELECT id FROM job_presets WHERE category = ? AND task_name = ?", [$category, $task]);
+
+            // Jika BELUM ADA, Simpan!
+            if (!$check) {
+                $this->db->prepare("INSERT INTO job_presets (category, task_name) VALUES (?, ?)")
+                    ->execute([$category, $task]);
+            }
+        }
     }
 }

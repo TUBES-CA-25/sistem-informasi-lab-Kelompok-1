@@ -328,7 +328,6 @@ class AdminController extends Controller
 
         $this->view('admin/schedules/index', $data);
     }
-
     public function createScheduleForm()
     {
         $laboratoryModel = $this->model('LaboratoryModel');
@@ -343,7 +342,6 @@ class AdminController extends Controller
 
         $this->view('admin/schedules/create', $data);
     }
-
     public function clearScheduleByDate()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -372,9 +370,6 @@ class AdminController extends Controller
         }
         exit;
     }
-
-
-
     private function handleFileUpload($fileInputName, $targetDir = 'uploads/schedules/')
     {
         if (isset($_FILES[$fileInputName]) && $_FILES[$fileInputName]['error'] === UPLOAD_ERR_OK) {
@@ -398,12 +393,6 @@ class AdminController extends Controller
         }
         return null;
     }
-
-
-
-
-    // ... kode AdminController lainnya ...
-
     public function createSchedule()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -506,11 +495,6 @@ class AdminController extends Controller
             $this->redirect('/admin/schedules'); // Redirect ke List (atau Kalender nanti)
         }
     }
-
-
-
-
-
     public function editScheduleForm($id)
     {
         $scheduleModel = $this->model('LabScheduleModel');
@@ -530,17 +514,6 @@ class AdminController extends Controller
 
         $this->view('admin/schedules/edit', $data);
     }
-
-
-
-
-
-
-
-
-
-
-
     public function editSchedule($id)
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -585,17 +558,6 @@ class AdminController extends Controller
             $this->redirect('/admin/schedules/' . $id . '/edit');
         }
     }
-
-
-
-
-
-
-
-
-
-
-
     public function viewSchedule($id)
     {
         $scheduleModel = $this->model('LabScheduleModel');
@@ -612,19 +574,6 @@ class AdminController extends Controller
 
         $this->view('admin/schedules/show', $data);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
     public function deleteSchedule($id)
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -660,28 +609,63 @@ class AdminController extends Controller
     // ASSISTANT SCHEDULES (PIKET) MANAGEMENT
     // ==========================================
 
+
     public function listAssistantSchedules()
     {
         $scheduleModel = $this->model('AssistantScheduleModel');
+        $settingsModel = $this->model('SettingsModel');
+
+        // 1. Ambil Data Jadwal Mentah
+        $rawSchedules = $scheduleModel->getAllWithUser();
+
+        // 2. Ambil Teks Jobdesk dari Settings
+        $masterJob = [
+            'Putri' => $settingsModel->get('job_putri', 'Belum diatur (Klik untuk edit)'),
+            'Putra' => $settingsModel->get('job_putra', 'Belum diatur (Klik untuk edit)')
+        ];
+
+        // 3. OLAH DATA MENJADI MATRIKS
+        // Struktur: $matrix['Putra']['Monday'] = [Data Asisten A, Data Asisten B]
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        $matrix = [
+            'Putri' => array_fill_keys($days, []),
+            'Putra' => array_fill_keys($days, [])
+        ];
+
+        foreach ($rawSchedules as $row) {
+            $role = $row['job_role']; // 'Putra' atau 'Putri'
+            $day  = $row['day'];
+
+            // Masukkan ke slot yang sesuai jika role valid
+            if (isset($matrix[$role][$day])) {
+                $matrix[$role][$day][] = $row;
+            }
+        }
 
         $data = [
-            'schedules' => $scheduleModel->getAllWithUser()
+            'matrix' => $matrix,
+            'masterJob' => $masterJob,
+            'days' => $days
         ];
 
         $this->view('admin/assistant-schedules/list', $data);
     }
-
     public function createAssistantScheduleForm()
     {
         $userModel = $this->model('UserModel');
         $roleModel = $this->model('RoleModel');
+        $scheduleModel = $this->model('AssistantScheduleModel');
 
         // Get asisten role
         $asistenRole = $roleModel->getByName('asisten');
         $assistants = $userModel->getActiveUsersByRole($asistenRole['id']);
 
+        // AMBIL PRESET UNTUK DIKIRIM KE VIEW (NEW)
+        $presets = $scheduleModel->getAllPresets();
+
         $data = [
-            'assistants' => $assistants
+            'assistants' => $assistants,
+            'presets' => $presets // Kirim data JSON ini
         ];
 
         $this->view('admin/assistant-schedules/create', $data);
@@ -689,21 +673,28 @@ class AdminController extends Controller
 
     public function createAssistantSchedule()
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->redirect('/admin/assistant-schedules/create');
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'user_id' => sanitize($this->getPost('user_id')),
+                'day' => sanitize($this->getPost('day')),
+                'job_role' => sanitize($this->getPost('job_role')) // Hanya simpan 'Putra' atau 'Putri'
+            ];
+
+            $this->model('AssistantScheduleModel')->createSchedule($data);
+            setFlash('success', 'Jadwal asisten berhasil ditambahkan.');
+            $this->redirect('/admin/assistant-schedules');
+            return;
         }
 
+        // Tampilkan Form
+        $userModel = $this->model('UserModel');
+        $roleModel = $this->model('RoleModel');
+        $asistenRole = $roleModel->getByName('asisten');
+
         $data = [
-            'user_id' => sanitize($this->getPost('user_id')),
-            'day' => sanitize($this->getPost('day')),
-            'status' => sanitize($this->getPost('status', 'scheduled'))
+            'assistants' => $userModel->getActiveUsersByRole($asistenRole['id'])
         ];
-
-        $scheduleModel = $this->model('AssistantScheduleModel');
-        $scheduleModel->createSchedule($data);
-
-        setFlash('success', 'Assistant schedule created successfully');
-        $this->redirect('/admin/assistant-schedules');
+        $this->view('admin/assistant-schedules/create', $data);
     }
 
     public function editAssistantScheduleForm($id)
@@ -732,21 +723,35 @@ class AdminController extends Controller
 
     public function editAssistantSchedule($id)
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->redirect('/admin/assistant-schedules/' . $id . '/edit');
+        $scheduleModel = $this->model('AssistantScheduleModel');
+        $schedule = $scheduleModel->find($id);
+
+        if (!$schedule) {
+            $this->redirect('/admin/assistant-schedules');
         }
 
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'user_id' => sanitize($this->getPost('user_id')),
+                'day' => sanitize($this->getPost('day')),
+                'job_role' => sanitize($this->getPost('job_role'))
+            ];
+
+            $scheduleModel->updateSchedule($id, $data);
+            setFlash('success', 'Jadwal berhasil diperbarui.');
+            $this->redirect('/admin/assistant-schedules');
+            return;
+        }
+
+        $userModel = $this->model('UserModel');
+        $roleModel = $this->model('RoleModel');
+        $asistenRole = $roleModel->getByName('asisten');
+
         $data = [
-            'user_id' => sanitize($this->getPost('user_id')),
-            'day' => sanitize($this->getPost('day')),
-            'status' => sanitize($this->getPost('status'))
+            'schedule' => $schedule,
+            'assistants' => $userModel->getActiveUsersByRole($asistenRole['id'])
         ];
-
-        $scheduleModel = $this->model('AssistantScheduleModel');
-        $scheduleModel->updateSchedule($id, $data);
-
-        setFlash('success', 'Assistant schedule updated successfully');
-        $this->redirect('/admin/assistant-schedules');
+        $this->view('admin/assistant-schedules/edit', $data);
     }
 
     public function deleteAssistantSchedule($id)
@@ -761,6 +766,25 @@ class AdminController extends Controller
         setFlash('success', 'Assistant schedule deleted successfully');
         $this->redirect('/admin/assistant-schedules');
     }
+
+    public function updateJobdesk()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $role = sanitize($this->getPost('role'));
+            $content = sanitize($this->getPost('content'));
+
+            $key = ($role == 'Putra') ? 'job_putra' : 'job_putri';
+
+            // Simpan ke SettingsModel
+            $this->model('SettingsModel')->save($key, $content);
+
+            setFlash('success', "Deskripsi tugas $role berhasil diperbarui.");
+            $this->redirect('/admin/assistant-schedules');
+        }
+    }
+
+
+
 
 
 
@@ -986,8 +1010,6 @@ class AdminController extends Controller
         $this->view('admin/activities/create');
     }
 
-
-
     public function createActivity()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -1029,8 +1051,6 @@ class AdminController extends Controller
             $this->redirect('/admin/activities/create');
         }
     }
-
-
 
     public function editActivityForm($id)
     {
@@ -1074,7 +1094,6 @@ class AdminController extends Controller
             $this->redirect('/admin/activities/' . $id . '/edit');
         }
     }
-
 
     public function deleteActivity($id)
     {
@@ -1239,10 +1258,6 @@ class AdminController extends Controller
         // View khusus di folder baru
         $this->view('admin/calendar/index', $data);
     }
-
-    /**
-     * API untuk FullCalendar (Returns JSON)
-     */
     public function getCalendarData()
     {
         $labId = $this->getQuery('lab_id'); // Filter jika ada
