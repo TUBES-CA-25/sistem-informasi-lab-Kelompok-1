@@ -277,16 +277,16 @@ class KoordinatorController extends Controller
         $scheduleModel = $this->model('AssistantScheduleModel');
         $settingsModel = $this->model('SettingsModel');
 
-        // 1. Ambil Data Jadwal Mentah
+        // 1. Ambil Data Jadwal
         $rawSchedules = $scheduleModel->getAllWithUser();
 
-        // 2. Ambil Teks Jobdesk dari Settings
+        // 2. Ambil Jobdesk Global
         $masterJob = [
-            'Putri' => $settingsModel->get('job_putri', 'Belum diatur (Klik untuk edit)'),
-            'Putra' => $settingsModel->get('job_putra', 'Belum diatur (Klik untuk edit)')
+            'Putri' => $settingsModel->get('job_putri', 'Belum diatur'),
+            'Putra' => $settingsModel->get('job_putra', 'Belum diatur')
         ];
 
-        // 3. OLAH DATA MENJADI MATRIKS
+        // 3. Buat Matriks Data
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
         $matrix = [
             'Putri' => array_fill_keys($days, []),
@@ -294,10 +294,8 @@ class KoordinatorController extends Controller
         ];
 
         foreach ($rawSchedules as $row) {
-            $role = $row['job_role']; // 'Putra' atau 'Putri'
+            $role = $row['job_role'];
             $day  = $row['day'];
-
-            // Masukkan ke slot yang sesuai jika role valid
             if (isset($matrix[$role][$day])) {
                 $matrix[$role][$day][] = $row;
             }
@@ -308,13 +306,10 @@ class KoordinatorController extends Controller
             'masterJob' => $masterJob,
             'days' => $days
         ];
-        
-        $this->view('koordinator/assistant-schedules/index', $data);
-    }
 
-    /**
-     * Transform schedules to grid format (tasks × days)
-     */
+        // PATH YANG BENAR: 'schedules' (bukan 'assistant-schedules')
+        $this->view('koordinator/schedules/index', $data);
+    }
 
 
     /**
@@ -790,9 +785,10 @@ class KoordinatorController extends Controller
 
         $data = ['assistants' => $userModel->getActiveUsersByRole($asistenRole['id'])];
 
-        // PERBAIKAN PATH: Mengarah ke folder 'schedules'
+        // PATH YANG BENAR
         $this->view('koordinator/schedules/create', $data);
     }
+
 
     public function editAssistantSchedule($id)
     {
@@ -822,7 +818,7 @@ class KoordinatorController extends Controller
             'assistants' => $userModel->getActiveUsersByRole($asistenRole['id'])
         ];
 
-        // PERBAIKAN PATH: Mengarah ke folder 'schedules'
+        // PATH YANG BENAR
         $this->view('koordinator/schedules/edit', $data);
     }
 
