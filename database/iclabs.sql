@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 24, 2026 at 12:51 PM
+-- Generation Time: Jan 26, 2026 at 12:04 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -24,28 +24,44 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `app_settings`
+--
+
+CREATE TABLE `app_settings` (
+  `setting_key` varchar(50) NOT NULL,
+  `setting_value` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `app_settings`
+--
+
+INSERT INTO `app_settings` (`setting_key`, `setting_value`) VALUES
+('job_putra', 'Angkat Galon, Buang Sampah, Beli Lauk'),
+('job_putri', 'Membersihkan Area Lab, Memasak, Cuci Piring');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `assistant_schedules`
 --
 
 CREATE TABLE `assistant_schedules` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
+  `group_type` enum('putra','putri') NOT NULL DEFAULT 'putra',
   `day` enum('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday') NOT NULL,
-  `start_time` time NOT NULL,
-  `end_time` time NOT NULL,
-  `status` enum('scheduled','completed','cancelled') DEFAULT 'scheduled'
+  `job_role` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `assistant_schedules`
 --
 
-INSERT INTO `assistant_schedules` (`id`, `user_id`, `day`, `start_time`, `end_time`, `status`) VALUES
-(1, 3, 'Monday', '08:00:00', '16:00:00', 'scheduled'),
-(2, 4, 'Tuesday', '08:00:00', '16:00:00', 'scheduled'),
-(3, 5, 'Wednesday', '08:00:00', '16:00:00', 'scheduled'),
-(4, 3, 'Thursday', '08:00:00', '16:00:00', 'scheduled'),
-(5, 4, 'Friday', '08:00:00', '16:00:00', 'scheduled');
+INSERT INTO `assistant_schedules` (`id`, `user_id`, `group_type`, `day`, `job_role`) VALUES
+(26, 3, 'putra', 'Monday', 'Putra'),
+(27, 3, 'putra', 'Tuesday', 'Putra'),
+(28, 4, 'putra', 'Monday', 'Putra');
 
 -- --------------------------------------------------------
 
@@ -116,6 +132,32 @@ INSERT INTO `head_laboran` (`id`, `user_id`, `phone`, `position`, `photo`, `stat
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `job_presets`
+--
+
+CREATE TABLE `job_presets` (
+  `id` int(11) NOT NULL,
+  `category` enum('Putra','Putri') NOT NULL,
+  `task_name` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `job_presets`
+--
+
+INSERT INTO `job_presets` (`id`, `category`, `task_name`) VALUES
+(1, 'Putri', 'Membersihkan Area Lab'),
+(2, 'Putri', 'Memasak Nasi & Lauk'),
+(3, 'Putri', 'Mencuci Piring & Gelas'),
+(4, 'Putra', 'Membuang Sampah'),
+(5, 'Putra', 'Membeli Lauk Pauk'),
+(6, 'Putra', 'Mengangkat Galon Air'),
+(7, 'Putra', 'Membeli Lauk Pauk, Membuang Sampah, Mengangkat Galon Air'),
+(8, 'Putra', 'Membeli Lauk Pauk, Membeli Lauk Pauk, Membuang Sampah, Mengangkat Galon Air, Membuang Sampah, Mengangkat Galon Air');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `laboratories`
 --
 
@@ -126,23 +168,18 @@ CREATE TABLE `laboratories` (
   `description` text DEFAULT NULL,
   `pc_count` int(11) DEFAULT 0,
   `tv_count` int(11) DEFAULT 0,
-  `location` varchar(100) DEFAULT NULL,
-  `capacity` int(11) DEFAULT 0,
-  `building` varchar(50) DEFAULT NULL,
-  `floor` varchar(20) DEFAULT NULL,
-  `room_number` varchar(20) DEFAULT NULL,
-  `status` enum('active','maintenance','inactive') DEFAULT 'active'
+  `location` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `laboratories`
 --
 
-INSERT INTO `laboratories` (`id`, `lab_name`, `image`, `description`, `pc_count`, `tv_count`, `location`, `capacity`, `building`, `floor`, `room_number`, `status`) VALUES
-(13, 'Multimedia', 'http://localhost/iclabs/public/uploads/laboratories/69701d042bdf2_1768955140.jpg', '...', 24, 1, '2nd Floor', 0, NULL, NULL, NULL, 'active'),
-(14, 'DS', 'http://localhost/iclabs/public/uploads/laboratories/6970369fe20b6_1768961695.jpg', 'BAPAK', 26, 1, 'FIKOM LT2', 0, NULL, NULL, NULL, 'active'),
-(15, 'IoT', 'http://localhost/iclabs/public/uploads/laboratories/69704fb108e98_1768968113.jpg', 'bapak', 26, 2, '2nd floor', 0, NULL, NULL, NULL, 'active'),
-(16, 'Komputer Network', 'http://localhost/iclabs/public/uploads/laboratories/69741cd30283d_1769217235.png', '...', 14, 1, '2nd Floor Fikom', 0, NULL, NULL, NULL, 'active');
+INSERT INTO `laboratories` (`id`, `lab_name`, `image`, `description`, `pc_count`, `tv_count`, `location`) VALUES
+(13, 'Multimedia', 'http://localhost/iclabs/public/uploads/laboratories/69701d042bdf2_1768955140.jpg', '...', 24, 1, '2nd Floor'),
+(14, 'DS', 'http://localhost/iclabs/public/uploads/laboratories/6970369fe20b6_1768961695.jpg', 'BAPAK', 26, 1, 'FIKOM LT2'),
+(15, 'IoT', 'http://localhost/iclabs/public/uploads/laboratories/69704fb108e98_1768968113.jpg', 'bapak', 26, 2, '2nd floor'),
+(16, 'Komputer Network', 'http://localhost/iclabs/public/uploads/laboratories/69741cd30283d_1769217235.png', '...', 14, 1, '2nd Floor Fikom');
 
 -- --------------------------------------------------------
 
@@ -353,6 +390,12 @@ INSERT INTO `users` (`id`, `name`, `email`, `phone`, `password`, `role_id`, `sta
 --
 
 --
+-- Indexes for table `app_settings`
+--
+ALTER TABLE `app_settings`
+  ADD PRIMARY KEY (`setting_key`);
+
+--
 -- Indexes for table `assistant_schedules`
 --
 ALTER TABLE `assistant_schedules`
@@ -372,6 +415,12 @@ ALTER TABLE `course_plans`
 ALTER TABLE `head_laboran`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `job_presets`
+--
+ALTER TABLE `job_presets`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `laboratories`
@@ -453,7 +502,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `assistant_schedules`
 --
 ALTER TABLE `assistant_schedules`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `course_plans`
@@ -466,6 +515,12 @@ ALTER TABLE `course_plans`
 --
 ALTER TABLE `head_laboran`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `job_presets`
+--
+ALTER TABLE `job_presets`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `laboratories`
