@@ -11,9 +11,9 @@
                 <h1 class="text-3xl font-extrabold text-slate-900">Permasalahan Laboratorium</h1>
                 <p class="text-slate-500 mt-1">Laporkan dan pantau kerusakan hardware/software</p>
             </div>
-            <button data-modal-target="addProblemModal" data-modal-toggle="addProblemModal" class="px-6 py-3 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-500/30 flex items-center gap-2">
+            <a href="<?= url('/asisten/problems/create') ?>" class="px-6 py-3 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-500/30 flex items-center gap-2">
                 <i class="bi bi-plus-lg"></i> Lapor Masalah Baru
-            </button>
+            </a>
         </div>
 
         <?php displayFlash(); ?>
@@ -213,23 +213,6 @@
             <?php endif; ?>
         </div>
 
-    </div>
-</div>
-
-<!-- Add Problem Modal -->
-<div id="addProblemModal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full backdrop-blur-sm bg-slate-900/50">
-    <div class="relative w-full max-w-2xl max-h-full">
-        <div class="relative bg-white rounded-2xl shadow-2xl">
-            <div class="flex items-center justify-between p-5 border-b">
-                <h3 class="text-xl font-bold text-slate-900">Lapor Masalah Baru</h3>
-                <button type="button" class="text-slate-400 hover:bg-slate-100 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center" data-modal-hide="addProblemModal">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </div>
-            <div class="p-6">
-                <?php include APP_PATH . '/views/asisten/report-problem-form.php'; ?>
-            </div>
-        </div>
     </div>
 </div>
 

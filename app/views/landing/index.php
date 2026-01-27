@@ -70,82 +70,119 @@
                             </div>
                         </div>
 
-                        <div
-                            class="w-full max-w-5xl mx-auto bg-white/40 backdrop-blur-md rounded-xl border border-white/60 shadow-sm overflow-hidden flex-1 mb-16 relative">
-                            <div class="overflow-y-auto h-full absolute inset-0">
-                                <table class="w-full text-sm text-left">
-                                    <thead
-                                        class="bg-white/60 text-slate-700 font-bold uppercase text-xs sticky top-0 z-10 backdrop-blur-md border-b border-white/50">
-                                        <tr>
-                                            <th class="px-6 py-4 text-center w-32">Waktu</th>
-                                            <th class="px-6 py-4">Mata Kuliah & Kelas</th>
-                                            <th class="px-6 py-4">Dosen Pengampu</th>
-                                            <th class="px-6 py-4 text-center w-32">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-slate-100/50">
-                                        <?php if (empty($slide['schedules'])): ?>
-                                        <tr>
-                                            <td colspan="4" class="px-6 py-24 text-center text-slate-500">
-                                                <div
-                                                    class="inline-flex items-center justify-center w-16 h-16 bg-white/50 rounded-full mb-3 shadow-sm">
-                                                    <i class="bi bi-calendar-x text-2xl"></i>
-                                                </div>
-                                                <p class="font-medium">Tidak ada jadwal praktikum di ruangan ini.</p>
-                                            </td>
-                                        </tr>
-                                        <?php else: ?>
-                                        <?php foreach ($slide['schedules'] as $sch): ?>
-                                        <tr class="transition-colors hover:bg-white/30 schedule-row"
-                                            data-start="<?= $sch['start_time'] ?>" data-end="<?= $sch['end_time'] ?>">
+                        <div class="w-full max-w-5xl mx-auto bg-white/40 backdrop-blur-md rounded-xl border border-white/60 shadow-sm overflow-hidden flex-1 mb-16 relative">
+    <div class="overflow-y-auto h-full absolute inset-0 custom-scrollbar">
+        
+        <table class="w-full text-sm text-left hidden md:table">
+            <thead class="bg-white/60 text-slate-700 font-bold uppercase text-xs sticky top-0 z-10 backdrop-blur-md border-b border-white/50">
+                <tr>
+                    <th class="px-6 py-4 text-center w-32">Waktu</th>
+                    <th class="px-6 py-4">Mata Kuliah & Kelas</th>
+                    <th class="px-6 py-4">Dosen Pengampu</th>
+                    <th class="px-6 py-4 text-center w-32">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100/50">
+                <?php if (empty($slide['schedules'])): ?>
+                <tr>
+                    <td colspan="4" class="px-6 py-24 text-center text-slate-500">
+                        <div class="inline-flex items-center justify-center w-16 h-16 bg-white/50 rounded-full mb-3 shadow-sm">
+                            <i class="bi bi-calendar-x text-2xl"></i>
+                        </div>
+                        <p class="font-medium">Tidak ada jadwal praktikum di ruangan ini.</p>
+                    </td>
+                </tr>
+                <?php else: ?>
+                <?php foreach ($slide['schedules'] as $sch): ?>
+                <tr class="transition-colors hover:bg-white/30 schedule-row"
+                    data-start="<?= $sch['start_time'] ?>" data-end="<?= $sch['end_time'] ?>">
 
-                                            <td
-                                                class="px-6 py-4 text-center whitespace-nowrap font-mono font-bold text-slate-600 bg-white/20">
-                                                <?= formatTime($sch['start_time']) ?><br>
-                                                <span class="text-slate-400 text-xs">s/d</span><br>
-                                                <?= formatTime($sch['end_time']) ?>
-                                            </td>
+                    <td class="px-6 py-4 text-center whitespace-nowrap font-mono font-bold text-slate-600 bg-white/20">
+                        <?= formatTime($sch['start_time']) ?><br>
+                        <span class="text-slate-400 text-xs">s/d</span><br>
+                        <?= formatTime($sch['end_time']) ?>
+                    </td>
 
-                                            <td class="px-6 py-4">
-                                                <div class="font-bold text-slate-900 text-lg mb-1">
-                                                    <?= e($sch['course_name']) ?></div>
-                                                <span
-                                                    class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-bold bg-sky-100/80 text-sky-700">
-                                                    <i class="bi bi-people-fill"></i> Kelas <?= e($sch['class_code']) ?>
-                                                </span>
-                                            </td>
+                    <td class="px-6 py-4">
+                        <div class="font-bold text-slate-900 text-lg mb-1">
+                            <?= e($sch['course_name']) ?></div>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-bold bg-sky-100/80 text-sky-700">
+                            <i class="bi bi-people-fill"></i> Kelas <?= e($sch['class_code']) ?>
+                        </span>
+                    </td>
 
-                                            <td class="px-6 py-4">
-                                                <div class="flex items-center gap-3">
-                                                    <?php if (!empty($sch['lecturer_photo'])): ?>
-                                                    <img src="<?= e($sch['lecturer_photo']) ?>"
-                                                        class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm">
-                                                    <?php else: ?>
-                                                    <div
-                                                        class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-500">
-                                                        DS</div>
-                                                    <?php endif; ?>
-                                                    <div>
-                                                        <div class="font-bold text-slate-800">
-                                                            <?= e($sch['lecturer_name']) ?></div>
-                                                        <div class="text-xs text-slate-500">Dosen Pengampu</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-
-                                            <td class="px-6 py-4 text-center align-middle">
-                                                <span
-                                                    class="status-badge px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200/50">
-                                                    Menunggu
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        <?php endforeach; ?>
-                                        <?php endif; ?>
-                                    </tbody>
-                                </table>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <?php if (!empty($sch['lecturer_photo'])): ?>
+                            <img src="<?= e($sch['lecturer_photo']) ?>" class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm">
+                            <?php else: ?>
+                            <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-500">
+                                DS</div>
+                            <?php endif; ?>
+                            <div>
+                                <div class="font-bold text-slate-800">
+                                    <?= e($sch['lecturer_name']) ?></div>
+                                <div class="text-xs text-slate-500">Dosen Pengampu</div>
                             </div>
                         </div>
+                    </td>
+
+                    <td class="px-6 py-4 text-center align-middle">
+                        <span class="status-badge px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200/50">
+                            Menunggu
+                        </span>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+
+        <div class="md:hidden flex flex-col">
+            <?php if (empty($slide['schedules'])): ?>
+                <div class="px-6 py-16 text-center text-slate-500">
+                    <div class="inline-flex items-center justify-center w-12 h-12 bg-white/50 rounded-full mb-3 shadow-sm">
+                        <i class="bi bi-calendar-x text-xl"></i>
+                    </div>
+                    <p class="font-medium text-sm">Tidak ada jadwal praktikum.</p>
+                </div>
+            <?php else: ?>
+                <?php foreach ($slide['schedules'] as $sch): ?>
+                <div class="p-4 border-b border-white/40 hover:bg-white/30 transition-colors schedule-row" 
+                     data-start="<?= $sch['start_time'] ?>" 
+                     data-end="<?= $sch['end_time'] ?>">
+                    
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold text-sky-700 bg-sky-100/80 px-2 py-1 rounded border border-sky-200 font-mono">
+                            <?= formatTime($sch['start_time']) ?> - <?= formatTime($sch['end_time']) ?>
+                        </span>
+                        <span class="status-badge px-2 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 shadow-sm">
+                            Menunggu
+                        </span>
+                    </div>
+
+                    <h3 class="font-bold text-slate-900 text-base mb-2 leading-tight">
+                        <?= e($sch['course_name']) ?>
+                    </h3>
+
+                    <div class="space-y-2">
+                        <div class="flex items-center text-xs text-slate-600">
+                            <i class="bi bi-people-fill w-5 text-slate-400 text-sm"></i>
+                            <span class="font-bold bg-white/60 px-2 py-0.5 rounded text-slate-700">Kelas <?= e($sch['class_code']) ?></span>
+                        </div>
+                        <div class="flex items-center text-xs text-slate-600">
+                            <i class="bi bi-person-badge-fill w-5 text-slate-400 text-sm"></i>
+                            <span class="truncate font-medium"><?= e($sch['lecturer_name']) ?></span>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+
+    </div>
+</div>
+
                     </div>
                 </div>
                 <?php endforeach; ?>
@@ -336,7 +373,7 @@
             <article
                 class="group bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
                 <div class="relative h-48 overflow-hidden">
-                    <img src="<?= $news['image_cover'] ?? 'https://placehold.co/600x400/e2e8f0/94a3b8?text=News' ?>"
+                    <img src="<?= !empty($news['image_cover']) ? BASE_URL . $news['image_cover'] : 'https://placehold.co/600x400/e2e8f0/94a3b8?text=News' ?>"
                         class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                         loading="lazy">
                     <div class="absolute top-3 left-3">

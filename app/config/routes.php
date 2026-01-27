@@ -35,6 +35,9 @@ $router->post('/auth/login', 'AuthController@login');
 $router->post('/auth/logout', 'AuthController@logout');
 $router->get('/logout', 'AuthController@logout');
 
+// Dashboard redirect (auto detect role)
+$router->get('/dashboard', 'AuthController@dashboard');
+
 // ==========================================
 // API ROUTES (JSON responses for AJAX/Modal)
 // ==========================================
@@ -53,11 +56,13 @@ $router->get('/asisten/dashboard', 'AsistenController@dashboard');
 
 // 1. Fitur Jobdesk (Baru)
 $router->get('/asisten/jobdesk', 'AsistenController@jobdesk');
-$router->post('/asisten/update-task-status/:id', 'AsistenController@updateTaskStatus');
+$router->get('/asisten/jobdesk/:id/edit', 'AsistenController@editTaskForm');
+$router->post('/asisten/jobdesk/:id/edit', 'AsistenController@updateTaskStatus');
 
 // 2. Fitur Permasalahan Lab (CRUD)
 $router->get('/asisten/problems', 'AsistenController@problems');
-$router->post('/asisten/create-problem', 'AsistenController@createProblem');
+$router->get('/asisten/problems/create', 'AsistenController@createProblemForm');
+$router->post('/asisten/problems/create', 'AsistenController@createProblem');
 $router->post('/asisten/delete-problem/:id', 'AsistenController@deleteProblem');
 
 // 3. Fitur Jadwal Piket
@@ -88,9 +93,9 @@ $router->post('/koordinator/problems/:id/assign', 'KoordinatorController@assignP
 $router->get('/koordinator/assistant-schedules', 'KoordinatorController@listAssistantSchedules'); // Perhatikan nama methodnya
 $router->get('/koordinator/assistant-schedules/create', 'KoordinatorController@createAssistantSchedule');
 $router->post('/koordinator/assistant-schedules/create', 'KoordinatorController@createAssistantSchedule');
-$router->get('/koordinator/assistant-schedules/{id}/edit', 'KoordinatorController@editAssistantSchedule');
-$router->post('/koordinator/assistant-schedules/{id}/edit', 'KoordinatorController@editAssistantSchedule');
-$router->post('/koordinator/assistant-schedules/{id}/delete', 'KoordinatorController@deleteAssistantSchedule');
+$router->get('/koordinator/assistant-schedules/:id/edit', 'KoordinatorController@editAssistantSchedule');
+$router->post('/koordinator/assistant-schedules/:id/edit', 'KoordinatorController@editAssistantSchedule');
+$router->post('/koordinator/assistant-schedules/:id/delete', 'KoordinatorController@deleteAssistantSchedule');
 $router->post('/koordinator/assistant-schedules/update-job', 'KoordinatorController@updateJobdesk');
 
 $router->get('/koordinator/laboratories', 'KoordinatorController@listLaboratories');

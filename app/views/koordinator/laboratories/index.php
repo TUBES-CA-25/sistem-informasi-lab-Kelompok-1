@@ -127,7 +127,7 @@
                             <a href="<?= url('/koordinator/laboratories/' . $lab['id'] . '/edit') ?>" class="flex-1 px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium rounded-lg transition-colors text-center text-sm">
                                 <i class="bi bi-pencil"></i> Edit
                             </a>
-                            <button onclick="confirmDelete(<?= $lab['id'] ?>, '<?= htmlspecialchars($lab['lab_name']) ?>')" class="flex-1 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 font-medium rounded-lg transition-colors text-sm">
+                            <button type="button" onclick="confirmDeleteLab(<?= $lab['id'] ?>, '<?= htmlspecialchars($lab['lab_name'], ENT_QUOTES) ?>'); return false;" class="flex-1 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 font-medium rounded-lg transition-colors text-sm">
                                 <i class="bi bi-trash"></i> Hapus
                             </button>
                         </div>
@@ -167,24 +167,47 @@
 </div>
 
 <script>
-function confirmDelete(labId, labName) {
+function confirmDeleteLab(labId, labName) {
+    console.log('confirmDeleteLab called', labId, labName);
+    
     const modal = document.getElementById('deleteModal');
     const form = document.getElementById('deleteForm');
     const message = document.getElementById('deleteMessage');
     
-    form.action = '<?= url('/koordinator/laboratories/') ?>' + labId + '/delete';
+    console.log('Modal elements:', { modal, form, message });
+    
+    if (!modal || !form || !message) {
+        console.error('Modal elements not found!');
+        alert('Error: Modal elements not found. Please refresh the page.');
+        return false;
+    }
+    
+    const deleteUrl = '<?= url('/koordinator/laboratories/') ?>' + labId + '/delete';
+    console.log('Delete URL:', deleteUrl);
+    
+    form.action = deleteUrl;
     message.textContent = `Apakah Anda yakin ingin menghapus "${labName}"? Tindakan ini tidak dapat dibatalkan.`;
     
     modal.classList.remove('hidden');
+    return false;
 }
 
 function closeDeleteModal() {
-    document.getElementById('deleteModal').classList.add('hidden');
+    const modal = document.getElementById('deleteModal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
 }
 
-document.getElementById('deleteModal')?.addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeDeleteModal();
+// Close modal when clicking outside
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('deleteModal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteModal();
+            }
+        });
     }
 });
 </script>

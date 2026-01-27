@@ -95,12 +95,12 @@ class KoordinatorController extends Controller
         $data = [
             'laboratory_id' => sanitize($this->getPost('laboratory_id')),
             'pc_number' => sanitize($this->getPost('pc_number')),
-            'reporter_name' => sanitize($this->getPost('reporter_name')),
             'problem_type' => sanitize($this->getPost('problem_type')),
-            'description' => sanitize($this->getPost('description'))
+            'description' => sanitize($this->getPost('description')),
+            'reported_by' => getUserId()
         ];
 
-        if (empty($data['laboratory_id']) || empty($data['description']) || empty($data['reporter_name'])) {
+        if (empty($data['laboratory_id']) || empty($data['description'])) {
             setFlash('danger', 'Mohon lengkapi data laporan.');
             $this->redirect('/koordinator/problems/create');
         }
@@ -760,7 +760,7 @@ class KoordinatorController extends Controller
             'days' => $days
         ];
 
-        // PERBAIKAN PATH: Mengarah ke folder 'schedules' sesuai gambar
+        // PATH: koordinator/schedules (file yang match dengan database)
         $this->view('koordinator/schedules/index', $data);
     }
 
@@ -785,7 +785,7 @@ class KoordinatorController extends Controller
 
         $data = ['assistants' => $userModel->getActiveUsersByRole($asistenRole['id'])];
 
-        // PATH YANG BENAR
+        // PATH: koordinator/schedules (file yang match dengan database)
         $this->view('koordinator/schedules/create', $data);
     }
 
@@ -818,7 +818,7 @@ class KoordinatorController extends Controller
             'assistants' => $userModel->getActiveUsersByRole($asistenRole['id'])
         ];
 
-        // PATH YANG BENAR
+        // PATH: koordinator/schedules (file yang match dengan database)
         $this->view('koordinator/schedules/edit', $data);
     }
 
