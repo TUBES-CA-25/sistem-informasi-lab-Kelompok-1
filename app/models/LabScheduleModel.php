@@ -43,10 +43,20 @@ class LabScheduleModel extends Model
     // Ambil semua jadwal (untuk halaman Admin List Schedule)
     public function getAllWithLaboratory()
     {
-        $sql = "SELECT cp.*, l.lab_name, l.location 
-                FROM course_plans cp 
-                JOIN laboratories l ON cp.laboratory_id = l.id 
-                ORDER BY cp.created_at DESC";
+        // Kita ambil data dari tabel SESSION, lalu join ke PLAN dan LAB
+        // ss.id kita pakai sebagai ID utama baris
+        // cp.id kita ambil sebagai 'plan_id' untuk keperluan Edit Master
+        $sql = "SELECT ss.id, ss.session_date, ss.start_time, ss.end_time, 
+                       cp.id as plan_id, cp.course_name, cp.class_code, cp.semester, cp.program_study,
+                       cp.lecturer_name, cp.lecturer_photo,
+                       cp.assistant_1_name, cp.assistant_1_photo,
+                       cp.assistant_2_name, cp.assistant_2_photo,
+                       l.lab_name, l.location
+                FROM schedule_sessions ss
+                JOIN course_plans cp ON ss.course_plan_id = cp.id
+                JOIN laboratories l ON cp.laboratory_id = l.id
+                WHERE ss.status != 'cancelled'
+                ORDER BY ss.session_date ASC, ss.start_time ASC";
         return $this->query($sql);
     }
 
@@ -114,5 +124,73 @@ class LabScheduleModel extends Model
             $params[] = $labId;
         }
         return $this->query($sql, $params);
+    }
+
+    public function deleteSession($id)
+    {
+        $this->table = 'schedule_sessions';
+        return $this->delete($id);
+    }
+
+    public function getFilteredSchedules($filters = [], $limit = 20, $offset = 0)
+    {
+        $params = [];
+        $sql = "SELECT ss.id, ss.session_date, ss.start_time, ss.end_time, 
+                       cp.id as plan_id, cp.course_name, cp.class_code, cp.semester, cp.program_study,
+                       cp.lecturer_name, cp.lecturer_photo,
+                       cp.assistant_1_name, cp.assistant_1_photo,
+                       cp.assistant_2_name, cp.assistant_2_photo,
+                       l.lab_name, l.location
+                FROM schedule_sessions ss
+                JOIN course_plans cp ON ss.course_plan_id = cp.id
+                JOIN laboratories l ON cp.laboratory_id = l.id
+                WHERE ss.status != 'cancelled'";
+
+        // 1. Filter Search (Matkul, Dosen, Kelas)
+        if (!empty($filters['search'])) {
+            $sql .= " AND (cp.course_name LIKE ? OR cp.lecturer_name LIKE ? OR cp.class_code LIKE ?)";
+            $searchTerm = "%" . $filters['search'] . "%";
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+        }
+
+        // 2. Filter Laboratorium
+        if (!empty($filters['lab_id'])) {
+            $sql .= " AND cp.laboratory_id = ?";
+            $params[] = $filters['lab_id'];
+        }
+
+        // Order & Limit
+        $sql .= " ORDER BY ss.session_date ASC, ss.start_time ASC LIMIT ? OFFSET ?";
+        $params[] = (int)$limit;
+        $params[] = (int)$offset;
+
+        return $this->query($sql, $params);
+    }
+
+    public function countFilteredSchedules($filters = [])
+    {
+        $params = [];
+        $sql = "SELECT COUNT(*) as total 
+                FROM schedule_sessions ss
+                JOIN course_plans cp ON ss.course_plan_id = cp.id
+                WHERE ss.status != 'cancelled'";
+
+        if (!empty($filters['search'])) {
+            $sql .= " AND (cp.course_name LIKE ? OR cp.lecturer_name LIKE ? OR cp.class_code LIKE ?)";
+            $searchTerm = "%" . $filters['search'] . "%";
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+        }
+
+        if (!empty($filters['lab_id'])) {
+            $sql .= " AND cp.laboratory_id = ?";
+            $params[] = $filters['lab_id'];
+        }
+
+        $result = $this->queryOne($sql, $params);
+        return $result['total'];
     }
 }
