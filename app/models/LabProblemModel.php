@@ -11,10 +11,9 @@ class LabProblemModel extends Model
     // Cari method getAllWithDetails
     public function getAllWithDetails()
     {
-        // Gunakan COALESCE: Jika p.reporter_name ada isinya pakai itu, jika kosong pakai u.name (nama akun)
         $sql = "SELECT p.*, 
                        l.lab_name, 
-                       COALESCE(p.reporter_name, u.name) as reporter_name,
+                       u.name as reporter_name,
                        u.email as reporter_email,
                        pj.name as pj_name
                 FROM lab_problems p 
