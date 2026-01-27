@@ -184,7 +184,13 @@ $title = 'Jadwal Praktikum';
                                 <?= formatTime($schedule['start_time']) ?> - <?= formatTime($schedule['end_time']) ?>
                             </span>
                             <?php if ($view != 'day'): ?>
-                            <span class="text-xs text-slate-400 ml-2"><?= getDayName($schedule['day']) ?></span>
+                                <?php 
+                                $dayRaw = $schedule['day'] ?? ''; 
+                                if (empty($dayRaw) && !empty($schedule['session_date'])) {
+                                    $dayRaw = date('l', strtotime($schedule['session_date']));
+                                }
+                                ?>
+                                <span class="text-xs text-slate-400 ml-2"><?= getDayName($dayRaw) ?></span>
                             <?php endif; ?>
                         </div>
                         <a href="<?= url('/schedule/' . $schedule['id']) ?>" class="text-slate-400 hover:text-sky-600">
