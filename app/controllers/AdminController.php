@@ -555,32 +555,39 @@ class AdminController extends Controller
         $scheduleModel = $this->model('LabScheduleModel');
         $oldData = $scheduleModel->getScheduleDetail($id);
 
-        // 1. Handle Uploads (Cek jika ada file baru, jika tidak pakai yang lama)
-        $lecturerPhoto = $this->handleFileUpload('lecturer_photo_file') ?? $oldData['lecturer_photo'];
-        $assistantPhoto = $this->handleFileUpload('assistant_photo_file') ?? $oldData['assistant_photo'];
-        $assistant2Photo = $this->handleFileUpload('assistant2_photo_file') ?? $oldData['assistant2_photo'];
+        // 1. Handle Uploads (Cek file baru, jika tidak ada pakai yang lama)
+        // Perbaikan: Folder upload disesuaikan dengan createSchedule
+        $lecturerPhoto = $this->handleFileUpload('lecturer_photo_file', 'uploads/lecturers/') ?? $oldData['lecturer_photo'];
+        $assistant1Photo = $this->handleFileUpload('assistant_photo_file', 'uploads/assistants/') ?? $oldData['assistant_1_photo'];
+        $assistant2Photo = $this->handleFileUpload('assistant2_photo_file', 'uploads/assistants/') ?? $oldData['assistant_2_photo'];
 
+        // 2. Siapkan Data Update (Sesuaikan Key dengan Nama Kolom Database!)
         $data = [
-            'laboratory_id' => sanitize($this->getPost('laboratory_id')),
-            'day' => sanitize($this->getPost('day')),
-            'start_time' => sanitize($this->getPost('start_time')),
-            'end_time' => sanitize($this->getPost('end_time')),
-            'course' => sanitize($this->getPost('course')),
-            'program_study' => sanitize($this->getPost('program_study')),
-            'semester' => sanitize($this->getPost('semester')),
-            'class_code' => sanitize($this->getPost('class_code')),
-            'frequency' => sanitize($this->getPost('frequency')),
-            'lecturer' => sanitize($this->getPost('lecturer')),
-            'assistant' => sanitize($this->getPost('assistant')),
-            'assistant_2' => sanitize($this->getPost('assistant_2')),
-            'participant_count' => sanitize($this->getPost('participant_count')),
-            'description' => sanitize($this->getPost('description')),
+            'laboratory_id'   => sanitize($this->getPost('laboratory_id')),
+            'day'             => sanitize($this->getPost('day')),
+            'start_time'      => sanitize($this->getPost('start_time')),
+            'end_time'        => sanitize($this->getPost('end_time')),
+
+            // Perbaikan Key Database
+            'course_name'     => sanitize($this->getPost('course')),        // Form: course -> DB: course_name
+            'program_study'   => sanitize($this->getPost('program_study')),
+            'semester'        => sanitize($this->getPost('semester')),
+            'class_code'      => sanitize($this->getPost('class_code')),
+
+            'lecturer_name'   => sanitize($this->getPost('lecturer')),      // Form: lecturer -> DB: lecturer_name
+            'assistant_1_name' => sanitize($this->getPost('assistant')),     // Form: assistant -> DB: assistant_1_name
+            'assistant_2_name' => sanitize($this->getPost('assistant_2')),   // Form: assistant_2 -> DB: assistant_2_name
+
+            'description'     => sanitize($this->getPost('description')),
 
             // Path Foto
-            'lecturer_photo' => $lecturerPhoto,
-            'assistant_photo' => $assistantPhoto,
-            'assistant2_photo' => $assistant2Photo,
+            'lecturer_photo'    => $lecturerPhoto,
+            'assistant_1_photo' => $assistant1Photo, // DB: assistant_1_photo
+            'assistant_2_photo' => $assistant2Photo  // DB: assistant_2_photo
         ];
+
+        // Hapus field yang tidak ada di tabel agar aman
+        // (frequency dan participant_count dihapus karena tidak ada di course_plans)
 
         if ($scheduleModel->updateSchedule($id, $data)) {
             setFlash('success', 'Jadwal berhasil diperbarui.');
