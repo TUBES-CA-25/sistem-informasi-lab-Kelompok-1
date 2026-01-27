@@ -8,11 +8,13 @@ class LabProblemModel extends Model
     protected $table = 'lab_problems';
 
     // 1. Ambil semua masalah dengan detail lengkap (Admin & Koordinator)
+    // Cari method getAllWithDetails
     public function getAllWithDetails()
     {
+        // Gunakan COALESCE: Jika p.reporter_name ada isinya pakai itu, jika kosong pakai u.name (nama akun)
         $sql = "SELECT p.*, 
                        l.lab_name, 
-                       u.name as reporter_name,
+                       COALESCE(p.reporter_name, u.name) as reporter_name,
                        u.email as reporter_email,
                        pj.name as pj_name
                 FROM lab_problems p 
@@ -155,7 +157,7 @@ class LabProblemModel extends Model
 
         // Build WHERE clause and params
         list($whereStatus, $statusParams) = $this->buildStatusFilter($statusFilter);
-        
+
         // Build search WHERE clause - use 3 different placeholders
         $searchWhere = '';
         $searchParams = [];
@@ -165,17 +167,17 @@ class LabProblemModel extends Model
             $searchParams[':searchPC'] = $searchTerm;
             $searchParams[':searchLab'] = $searchTerm;
         }
-        
+
         // Merge all params
         $countParams = array_merge($statusParams, $searchParams);
-        
+
         // Count total records
         $countSql = "SELECT COUNT(*) as total
                      FROM lab_problems p
                      JOIN laboratories l ON p.laboratory_id = l.id
                      JOIN users u ON p.reported_by = u.id
                      WHERE {$whereStatus}{$searchWhere}";
-        
+
         $countResult = $this->queryOne($countSql, $countParams);
         $total = $countResult['total'];
 
@@ -201,11 +203,11 @@ class LabProblemModel extends Model
                     WHERE {$whereStatus}{$searchWhere}
                     ORDER BY p.reported_at DESC
                     LIMIT :limit OFFSET :offset";
-        
+
         $dataParams = array_merge($statusParams, $searchParams);
         $dataParams[':limit'] = (int)$perPage;
         $dataParams[':offset'] = (int)$offset;
-        
+
         $data = $this->query($dataSql, $dataParams);
 
         return [
