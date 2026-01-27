@@ -158,7 +158,6 @@ class AsistenController extends Controller
     public function deleteProblem($id)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Optional: Tambahkan pengecekan apakah laporan ini milik user yg login
             $this->model('LabProblemModel')->deleteProblem($id);
             setFlash('success', 'Laporan masalah dihapus.');
             $this->redirect('/asisten/problems');
