@@ -16,7 +16,8 @@ if ($view == 'lab') {
     ksort($groupedSchedules);
 } elseif ($view == 'day') {
     foreach ($schedules as $s) {
-        $groupedSchedules[$s['day']][] = $s;
+        $dayKey = $s['day'] ?? date('l', strtotime($s['session_date'] ?? 'now'));
+        $groupedSchedules[$dayKey][] = $s;
     }
     uksort($groupedSchedules, function ($a, $b) use ($dayOrder) {
         return $dayOrder[$a] - $dayOrder[$b];
@@ -116,7 +117,13 @@ $title = 'Jadwal Praktikum';
                         <?php foreach ($items as $schedule): ?>
                         <tr class="hover:bg-slate-50 transition-colors search-item">
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="font-bold text-slate-900"><?= getDayName($schedule['day']) ?></div>
+                                <?php
+                                $dayRaw = $schedule['day'] ?? ''; 
+                                if (empty($dayRaw) && !empty($schedule['session_date'])) {
+                                    $dayRaw = date('l', strtotime($schedule['session_date']));
+                                }
+                                ?>
+                                <div class="font-bold text-slate-900"><?= getDayName($dayRaw) ?></div>
                                 <div class="text-sky-600 font-medium">
                                     <?= formatTime($schedule['start_time']) ?> -
                                     <?= formatTime($schedule['end_time']) ?>
