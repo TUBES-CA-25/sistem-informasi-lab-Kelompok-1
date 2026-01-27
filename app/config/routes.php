@@ -140,10 +140,14 @@ $router->post('/admin/laboratories/:id/delete', 'AdminController@deleteLaborator
 $router->get('/admin/schedules', 'AdminController@listSchedules');
 $router->get('/admin/schedules/create', 'AdminController@createScheduleForm');
 $router->post('/admin/schedules/create', 'AdminController@createSchedule');
+$router->get('/admin/schedules/:id/sessions', 'AdminController@listScheduleSessions');
+$router->get('/admin/sessions/:id', 'AdminController@viewSession');
+$router->post('/admin/sessions/:id/delete', 'AdminController@deleteSession');
 $router->get('/admin/schedules/:id/edit', 'AdminController@editScheduleForm');
 $router->post('/admin/schedules/:id/edit', 'AdminController@editSchedule');
 $router->post('/admin/schedules/:id/delete', 'AdminController@deleteSchedule');
-$router->get('/admin/schedules/:id', 'AdminController@viewSchedule');
+$router->get('/admin/sessions/:id/edit', 'AdminController@editSessionForm');
+$router->post('/admin/sessions/:id/edit', 'AdminController@updateSession');
 
 
 
