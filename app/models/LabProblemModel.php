@@ -122,19 +122,13 @@ class LabProblemModel extends Model
         return $this->delete($id);
     }
 
-    public function updateTaskProgress($id, $status, $photoEvidence = null, $solutionNotes = null)
+    public function updateTaskProgress($id, $status)
     {
         $data = ['status' => $status];
         if ($status == 'in_progress') {
             $data['started_at'] = date('Y-m-d H:i:s');
         } elseif ($status == 'resolved') {
             $data['completed_at'] = date('Y-m-d H:i:s');
-            if ($photoEvidence) {
-                $data['photo_evidence'] = $photoEvidence;
-            }
-        }
-        if ($solutionNotes) {
-            $data['solution_notes'] = $solutionNotes;
         }
         return $this->update($id, $data);
     }
