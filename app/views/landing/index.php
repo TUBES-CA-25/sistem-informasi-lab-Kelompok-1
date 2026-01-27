@@ -336,7 +336,7 @@
             <article
                 class="group bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
                 <div class="relative h-48 overflow-hidden">
-                    <img src="<?= $news['image_cover'] ?? 'https://placehold.co/600x400/e2e8f0/94a3b8?text=News' ?>"
+                    <img src="<?= !empty($news['image_cover']) ? BASE_URL . $news['image_cover'] : 'https://placehold.co/600x400/e2e8f0/94a3b8?text=News' ?>"
                         class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                         loading="lazy">
                     <div class="absolute top-3 left-3">
