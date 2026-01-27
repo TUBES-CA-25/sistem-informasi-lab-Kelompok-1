@@ -320,14 +320,46 @@ class AdminController extends Controller
     public function listSchedules()
     {
         $scheduleModel = $this->model('LabScheduleModel');
-        $schedules = $scheduleModel->getAllWithLaboratory();
+        $laboratoryModel = $this->model('LaboratoryModel');
+
+        // 1. Ambil Parameter Filter dari URL
+        $search = sanitize($this->getQuery('search'));
+        $labId  = sanitize($this->getQuery('lab_id'));
+        $page   = (int) ($this->getQuery('page') ?? 1);
+        if ($page < 1) $page = 1;
+
+        $limit  = 20; // Tampilkan 20 data per halaman
+        $offset = ($page - 1) * $limit;
+
+        $filters = [
+            'search' => $search,
+            'lab_id' => $labId
+        ];
+
+        // 2. Ambil Data
+        $schedules = $scheduleModel->getFilteredSchedules($filters, $limit, $offset);
+        $totalRows = $scheduleModel->countFilteredSchedules($filters);
+        $totalPages = ceil($totalRows / $limit);
+
+        // 3. Ambil Daftar Lab (Untuk Dropdown Filter)
+        $laboratories = $laboratoryModel->getAllLaboratories();
 
         $data = [
-            'schedules' => $schedules
+            'schedules' => $schedules,
+            'laboratories' => $laboratories,
+            'filters' => $filters,
+            'pagination' => [
+                'current_page' => $page,
+                'total_pages' => $totalPages,
+                'total_rows' => $totalRows,
+                'start_entry' => ($totalRows > 0) ? $offset + 1 : 0,
+                'end_entry' => min($offset + $limit, $totalRows)
+            ]
         ];
 
         $this->view('admin/schedules/index', $data);
     }
+
     public function createScheduleForm()
     {
         $laboratoryModel = $this->model('LaboratoryModel');
@@ -581,10 +613,13 @@ class AdminController extends Controller
         }
 
         $scheduleModel = $this->model('LabScheduleModel');
-        if ($scheduleModel->deleteSchedule($id)) {
-            setFlash('success', 'Schedule deleted successfully');
+
+        // Perbaikan: Hapus SESI, bukan RENCANA
+        // Agar jika user menghapus tanggal tertentu, tanggal lain tetap aman
+        if ($scheduleModel->deleteSession($id)) {
+            setFlash('success', 'Sesi jadwal berhasil dihapus.');
         } else {
-            setFlash('danger', 'Failed to delete schedule');
+            setFlash('danger', 'Gagal menghapus jadwal.');
         }
 
         $this->redirect('/admin/schedules');

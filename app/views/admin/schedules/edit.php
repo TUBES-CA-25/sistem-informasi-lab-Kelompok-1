@@ -1,4 +1,4 @@
-<?php $title = 'Edit Jadwal'; ?>
+<?php $title = 'Edit Jadwal Kuliah'; ?>
 <?php include APP_PATH . '/views/layouts/header.php'; ?>
 
 <div class="antialiased bg-slate-50 min-h-screen">
@@ -7,25 +7,27 @@
     <main class="p-4 sm:ml-64 pt-8 transition-all duration-300">
         <div class="max-w-6xl mx-auto">
 
-            <div class="flex items-center gap-4 mb-8">
-                <a href="<?= url('/admin/schedules') ?>"
-                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-primary-600 hover:border-primary-200 shadow-sm transition-all"
-                    title="Kembali">
-                    <i class="bi bi-arrow-left text-lg"></i>
-                </a>
-                <div>
-                    <h1 class="text-2xl font-bold tracking-tight text-slate-900">Edit Jadwal Praktikum</h1>
-                    <div class="flex items-center gap-2 text-sm text-slate-500 mt-1">
-                        <span>Manajemen Jadwal</span>
-                        <i class="bi bi-chevron-right text-xs"></i>
-                        <span class="text-primary-600 font-medium">Edit #<?= $schedule['id'] ?></span>
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center gap-4">
+                    <a href="<?= url('/admin/schedules') ?>"
+                        class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-primary-600 hover:border-primary-200 shadow-sm transition-all"
+                        title="Kembali">
+                        <i class="bi bi-arrow-left text-lg"></i>
+                    </a>
+                    <div>
+                        <h1 class="text-2xl font-bold tracking-tight text-slate-900">Edit Jadwal</h1>
+                        <div class="flex items-center gap-2 text-sm text-slate-500 mt-1">
+                            <span>Manajemen Jadwal</span>
+                            <i class="bi bi-chevron-right text-xs"></i>
+                            <span class="text-primary-600 font-medium">Edit #<?= $schedule['id'] ?></span>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <?php displayFlash(); ?>
 
-            <form method="POST" action="<?= url('/admin/schedules/' . $schedule['id'] . '/edit') ?>"
+            <form action="<?= url('/admin/schedules/' . $schedule['id'] . '/edit') ?>" method="POST"
                 enctype="multipart/form-data">
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -43,13 +45,12 @@
                                     <label class="block mb-2 text-sm font-semibold text-slate-700">Laboratorium <span
                                             class="text-rose-500">*</span></label>
                                     <div class="relative">
-                                        <select name="laboratory_id"
-                                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block appearance-none"
-                                            required>
+                                        <select name="laboratory_id" required
+                                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block appearance-none">
                                             <?php foreach ($laboratories as $lab): ?>
                                             <option value="<?= $lab['id'] ?>"
                                                 <?= $lab['id'] == $schedule['laboratory_id'] ? 'selected' : '' ?>>
-                                                <?= e($lab['lab_name']) ?>
+                                                <?= $lab['lab_name'] ?>
                                             </option>
                                             <?php endforeach; ?>
                                         </select>
@@ -59,15 +60,15 @@
                                         </div>
                                     </div>
                                 </div>
+
                                 <div>
                                     <label class="block mb-2 text-sm font-semibold text-slate-700">Hari <span
                                             class="text-rose-500">*</span></label>
                                     <div class="relative">
-                                        <select name="day"
-                                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block appearance-none"
-                                            required>
+                                        <select name="day" required
+                                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block appearance-none">
                                             <?php
-                                            $days = ['Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu'];
+                                            $days = ['Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu', 'Sunday' => 'Minggu'];
                                             foreach ($days as $en => $id):
                                             ?>
                                             <option value="<?= $en ?>" <?= $schedule['day'] == $en ? 'selected' : '' ?>>
@@ -86,14 +87,13 @@
                                 <div>
                                     <label class="block mb-2 text-sm font-semibold text-slate-700">Jam Mulai</label>
                                     <input type="time" name="start_time" value="<?= e($schedule['start_time']) ?>"
-                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block"
-                                        required>
+                                        required
+                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block">
                                 </div>
                                 <div>
                                     <label class="block mb-2 text-sm font-semibold text-slate-700">Jam Selesai</label>
-                                    <input type="time" name="end_time" value="<?= e($schedule['end_time']) ?>"
-                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block"
-                                        required>
+                                    <input type="time" name="end_time" value="<?= e($schedule['end_time']) ?>" required
+                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block">
                                 </div>
                             </div>
                         </div>
@@ -107,36 +107,39 @@
                             <div class="mb-6">
                                 <label class="block mb-2 text-sm font-semibold text-slate-700">Mata Kuliah <span
                                         class="text-rose-500">*</span></label>
-                                <input type="text" name="course" value="<?= e($schedule['course_name']) ?>"
-                                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block font-medium"
-                                    required>
+                                <input type="text" name="course" value="<?= e($schedule['course_name']) ?>" required
+                                    placeholder="Contoh: Algoritma Pemrograman"
+                                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block">
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                                 <div>
                                     <label class="block mb-2 text-sm font-semibold text-slate-700">Program Studi</label>
                                     <input type="text" name="program_study" value="<?= e($schedule['program_study']) ?>"
+                                        placeholder="Teknik Informatika"
+                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block">
+                                </div>
+                                <div>
+                                    <label class="block mb-2 text-sm font-semibold text-slate-700">Frekuensi (Kode
+                                        Kelas)</label>
+                                    <input type="text" name="class_code" value="<?= e($schedule['class_code']) ?>"
+                                        required placeholder="TI_MICRO-6 (A5)"
                                         class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block">
                                 </div>
                                 <div>
                                     <label class="block mb-2 text-sm font-semibold text-slate-700">Semester</label>
                                     <input type="number" name="semester" value="<?= e($schedule['semester']) ?>"
-                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block"
-                                        required>
-                                </div>
-                                <div>
-                                    <label class="block mb-2 text-sm font-semibold text-slate-700">Kode Kelas</label>
-                                    <input type="text" name="class_code" value="<?= e($schedule['class_code']) ?>"
-                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block"
-                                        required>
+                                        placeholder="1-8"
+                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block">
                                 </div>
                             </div>
 
                             <div>
                                 <label class="block mb-2 text-sm font-semibold text-slate-700">Deskripsi
                                     Tambahan</label>
-                                <textarea name="description" rows="3"
-                                    class="w-full p-4 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block resize-none"><?= e($schedule['description']) ?></textarea>
+                                <textarea name="description" rows="2"
+                                    class="w-full p-4 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block resize-none"
+                                    placeholder="Catatan..."><?= e($schedule['description']) ?></textarea>
                             </div>
                         </div>
 
@@ -150,78 +153,94 @@
                                 <i class="bi bi-people-fill text-emerald-500"></i> Tim Pengajar
                             </h2>
 
-                            <div class="mb-6 p-4 bg-primary-50/50 rounded-xl border border-primary-100">
+                            <div
+                                class="mb-6 p-4 bg-primary-50/50 rounded-xl border border-primary-100 group hover:border-primary-300 transition-colors">
                                 <label class="block mb-2 text-xs font-bold text-primary-700 uppercase">Dosen Pengampu
                                     *</label>
-                                <div class="flex items-center gap-4 mb-3">
+                                <input type="text" name="lecturer" value="<?= e($schedule['lecturer_name']) ?>" required
+                                    placeholder="Nama Lengkap & Gelar"
+                                    class="w-full px-3 py-2 bg-white border border-slate-200 text-slate-900 text-sm rounded-lg mb-3 focus:ring-2 focus:ring-primary-100 block">
+
+                                <label class="flex items-center gap-3 cursor-pointer">
                                     <div
-                                        class="w-12 h-12 rounded-full overflow-hidden bg-white border border-slate-200 shrink-0">
-                                        <img src="<?= !empty($schedule['lecturer_photo']) ? e($schedule['lecturer_photo']) : '#' ?>"
+                                        class="w-12 h-12 rounded-full bg-white border border-dashed border-primary-300 flex items-center justify-center text-primary-400 group-hover:text-primary-600 group-hover:border-primary-500 transition-all overflow-hidden relative">
+                                        <?php if (!empty($schedule['lecturer_photo'])): ?>
+                                        <img src="<?= e($schedule['lecturer_photo']) ?>"
                                             class="w-full h-full object-cover">
+                                        <?php else: ?>
+                                        <i class="bi bi-camera text-lg"></i>
+                                        <?php endif; ?>
                                     </div>
-                                    <div class="w-full">
-                                        <input type="text" name="lecturer" value="<?= e($schedule['lecturer_name']) ?>"
-                                            class="w-full px-3 py-2 bg-white border border-slate-200 text-slate-900 text-sm rounded-lg focus:ring-2 focus:ring-primary-100 block"
-                                            required>
+                                    <div class="flex-1">
+                                        <span class="text-xs font-medium text-slate-600 block">Ganti Foto Dosen</span>
+                                        <input type="file" name="lecturer_photo_file" accept="image/*"
+                                            class="text-[10px] text-slate-400 file:hidden">
+                                        <span class="text-[10px] text-slate-400">Klik lingkaran untuk upload</span>
                                     </div>
-                                </div>
-                                <input
-                                    class="block w-full text-xs text-slate-500 border border-slate-200 rounded-lg cursor-pointer bg-white"
-                                    type="file" name="lecturer_photo_file" accept="image/*">
+                                </label>
                             </div>
 
-                            <div class="mb-6 p-4 bg-emerald-50/50 rounded-xl border border-emerald-100">
+                            <div
+                                class="mb-6 p-4 bg-emerald-50/50 rounded-xl border border-emerald-100 group hover:border-emerald-300 transition-colors">
                                 <label class="block mb-2 text-xs font-bold text-emerald-700 uppercase">Asisten 1
                                     (Utama)</label>
-                                <div class="flex items-center gap-4 mb-3">
+                                <input type="text" name="assistant" value="<?= e($schedule['assistant_1_name']) ?>"
+                                    placeholder="Nama Asisten 1"
+                                    class="w-full px-3 py-2 bg-white border border-slate-200 text-slate-900 text-sm rounded-lg mb-3 focus:ring-2 focus:ring-emerald-100 block">
+
+                                <label class="flex items-center gap-3 cursor-pointer">
                                     <div
-                                        class="w-12 h-12 rounded-full overflow-hidden bg-white border border-slate-200 shrink-0">
-                                        <img src="<?= !empty($schedule['assistant_1_photo']) ? e($schedule['assistant_1_photo']) : '#' ?>"
+                                        class="w-12 h-12 rounded-full bg-white border border-dashed border-emerald-300 flex items-center justify-center text-emerald-400 group-hover:text-emerald-600 group-hover:border-emerald-500 transition-all overflow-hidden relative">
+                                        <?php if (!empty($schedule['assistant_1_photo'])): ?>
+                                        <img src="<?= e($schedule['assistant_1_photo']) ?>"
                                             class="w-full h-full object-cover">
+                                        <?php else: ?>
+                                        <i class="bi bi-camera text-lg"></i>
+                                        <?php endif; ?>
                                     </div>
-                                    <div class="w-full">
-                                        <input type="text" name="assistant"
-                                            value="<?= e($schedule['assistant_1_name']) ?>"
-                                            class="w-full px-3 py-2 bg-white border border-slate-200 text-slate-900 text-sm rounded-lg focus:ring-2 focus:ring-emerald-100 block"
-                                            required>
+                                    <div class="flex-1">
+                                        <span class="text-xs font-medium text-slate-600 block">Ganti Foto Asisten
+                                            1</span>
+                                        <input type="file" name="assistant_photo_file" accept="image/*"
+                                            class="text-[10px] text-slate-400 file:hidden">
+                                        <span class="text-[10px] text-slate-400">Klik lingkaran untuk upload</span>
                                     </div>
-                                </div>
-                                <input
-                                    class="block w-full text-xs text-slate-500 border border-slate-200 rounded-lg cursor-pointer bg-white"
-                                    type="file" name="assistant_photo_file" accept="image/*">
+                                </label>
                             </div>
 
-                            <div class="mb-8 p-4 bg-violet-50/50 rounded-xl border border-violet-100">
+                            <div
+                                class="mb-8 p-4 bg-violet-50/50 rounded-xl border border-violet-100 group hover:border-violet-300 transition-colors">
                                 <label class="block mb-2 text-xs font-bold text-violet-700 uppercase">Asisten 2
                                     (Opsional)</label>
-                                <div class="flex items-center gap-4 mb-3">
+                                <input type="text" name="assistant_2" value="<?= e($schedule['assistant_2_name']) ?>"
+                                    placeholder="Nama Asisten 2"
+                                    class="w-full px-3 py-2 bg-white border border-slate-200 text-slate-900 text-sm rounded-lg mb-3 focus:ring-2 focus:ring-violet-100 block">
+
+                                <label class="flex items-center gap-3 cursor-pointer">
                                     <div
-                                        class="w-12 h-12 rounded-full overflow-hidden bg-white border border-slate-200 shrink-0">
-                                        <img src="<?= !empty($schedule['assistant_2_photo']) ? e($schedule['assistant_2_photo']) : '#' ?>"
+                                        class="w-12 h-12 rounded-full bg-white border border-dashed border-violet-300 flex items-center justify-center text-violet-400 group-hover:text-violet-600 group-hover:border-violet-500 transition-all overflow-hidden relative">
+                                        <?php if (!empty($schedule['assistant_2_photo'])): ?>
+                                        <img src="<?= e($schedule['assistant_2_photo']) ?>"
                                             class="w-full h-full object-cover">
+                                        <?php else: ?>
+                                        <i class="bi bi-camera text-lg"></i>
+                                        <?php endif; ?>
                                     </div>
-                                    <div class="w-full">
-                                        <input type="text" name="assistant_2"
-                                            value="<?= e($schedule['assistant_2_name']) ?>"
-                                            class="w-full px-3 py-2 bg-white border border-slate-200 text-slate-900 text-sm rounded-lg focus:ring-2 focus:ring-violet-100 block">
+                                    <div class="flex-1">
+                                        <span class="text-xs font-medium text-slate-600 block">Ganti Foto Asisten
+                                            2</span>
+                                        <input type="file" name="assistant2_photo_file" accept="image/*"
+                                            class="text-[10px] text-slate-400 file:hidden">
+                                        <span class="text-[10px] text-slate-400">Klik lingkaran untuk upload</span>
                                     </div>
-                                </div>
-                                <input
-                                    class="block w-full text-xs text-slate-500 border border-slate-200 rounded-lg cursor-pointer bg-white"
-                                    type="file" name="assistant2_photo_file" accept="image/*">
+                                </label>
                             </div>
 
-                            <div class="flex flex-col gap-3">
-                                <button type="submit"
-                                    class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-semibold rounded-xl text-sm px-5 py-3 transition-all shadow-lg shadow-primary-500/30 flex justify-center items-center gap-2">
-                                    <i class="bi bi-check-lg"></i>
-                                    Update Jadwal
-                                </button>
-                                <a href="<?= url('/admin/schedules') ?>"
-                                    class="w-full text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 hover:text-slate-900 font-medium rounded-xl text-sm px-5 py-3 text-center transition-all">
-                                    Batal
-                                </a>
-                            </div>
+                            <button type="submit"
+                                class="w-full py-3.5 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-xl shadow-lg shadow-primary-500/30 transition-all flex items-center justify-center gap-2 transform active:scale-95">
+                                <i class="bi bi-check-lg"></i>
+                                Simpan Perubahan
+                            </button>
 
                         </div>
                     </div>
