@@ -42,17 +42,17 @@
                 </div>
 
                 <?php if (!empty($activity['link_url']) && $activity['link_url'] != '#'): ?>
-                <div
-                    class="mt-10 p-6 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div>
-                        <h4 class="font-bold text-slate-900 text-lg">Tautan Terkait</h4>
-                        <p class="text-sm text-slate-500">Lihat informasi selengkapnya atau sumber asli berita ini.</p>
+                    <div
+                        class="mt-10 p-6 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-lg">Tautan Terkait</h4>
+                            <p class="text-sm text-slate-500">Lihat informasi selengkapnya atau sumber asli berita ini.</p>
+                        </div>
+                        <a href="<?= e($activity['link_url']) ?>" target="_blank"
+                            class="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all shadow-md shadow-blue-500/30 flex items-center gap-2">
+                            Kunjungi Tautan <i class="bi bi-box-arrow-up-right"></i>
+                        </a>
                     </div>
-                    <a href="<?= e($activity['link_url']) ?>" target="_blank"
-                        class="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all shadow-md shadow-blue-500/30 flex items-center gap-2">
-                        Kunjungi Tautan <i class="bi bi-box-arrow-up-right"></i>
-                    </a>
-                </div>
                 <?php endif; ?>
             </div>
 
@@ -84,25 +84,25 @@
 
                     <div class="space-y-6">
                         <?php if (!empty($related)): ?>
-                        <?php foreach ($related as $item): ?>
-                        <a href="<?= url('/activity/' . $item['id']) ?>" class="group flex gap-4 items-start">
-                            <div class="w-24 h-24 rounded-lg overflow-hidden shrink-0">
-                                <img src="<?= !empty($item['image_cover']) ? $item['image_cover'] : '#' ?>"
-                                    class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
-                            </div>
-                            <div>
-                                <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">
-                                    <?= date('d M Y', strtotime($item['activity_date'])) ?>
-                                </span>
-                                <h4
-                                    class="font-bold text-slate-800 text-sm leading-snug group-hover:text-blue-600 transition-colors line-clamp-3">
-                                    <?= e($item['title']) ?>
-                                </h4>
-                            </div>
-                        </a>
-                        <?php endforeach; ?>
+                            <?php foreach ($related as $item): ?>
+                                <a href="<?= url('/activity/' . $item['id']) ?>" class="group flex gap-4 items-start">
+                                    <div class="w-24 h-24 rounded-lg overflow-hidden shrink-0 border border-slate-100">
+                                        <img src="<?= !empty($item['image_cover']) ? $item['image_cover'] : 'https://placehold.co/150x150/e2e8f0/94a3b8?text=img' ?>"
+                                            class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
+                                    </div>
+                                    <div>
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">
+                                            <?= date('d M Y', strtotime($item['activity_date'])) ?>
+                                        </span>
+                                        <h4
+                                            class="font-bold text-slate-800 text-sm leading-snug group-hover:text-blue-600 transition-colors line-clamp-3">
+                                            <?= e($item['title']) ?>
+                                        </h4>
+                                    </div>
+                                </a>
+                            <?php endforeach; ?>
                         <?php else: ?>
-                        <p class="text-sm text-slate-400 italic">Tidak ada kegiatan lain.</p>
+                            <p class="text-sm text-slate-400 italic">Tidak ada kegiatan lain.</p>
                         <?php endif; ?>
                     </div>
                 </div>
