@@ -62,52 +62,9 @@
                                     </td>
 
                                     <td class="px-6 py-4 align-top text-center">
-                                        <button data-modal-target="updateModal-<?= $task['id'] ?>" data-modal-toggle="updateModal-<?= $task['id'] ?>" class="text-sky-600 hover:text-white border border-sky-600 hover:bg-sky-600 focus:ring-4 focus:outline-none focus:ring-sky-300 font-medium rounded-full text-sm px-5 py-2.5 text-center transition-all">
+                                        <a href="<?= url('/asisten/jobdesk/' . $task['id'] . '/edit') ?>" class="inline-block text-sky-600 hover:text-white border border-sky-600 hover:bg-sky-600 focus:ring-4 focus:outline-none focus:ring-sky-300 font-medium rounded-full text-sm px-5 py-2.5 text-center transition-all">
                                             <i class="bi bi-pencil-square mr-1"></i> Update
-                                        </button>
-
-                                        <div id="updateModal-<?= $task['id'] ?>" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full backdrop-blur-sm bg-slate-900/50">
-                                            <div class="relative w-full max-w-md max-h-full">
-                                                <div class="relative bg-white rounded-2xl shadow-2xl">
-                                                    <div class="flex items-start justify-between p-5 border-b rounded-t">
-                                                        <h3 class="text-lg font-bold text-slate-900">Update Progress</h3>
-                                                        <button type="button" class="text-slate-400 bg-transparent hover:bg-slate-100 hover:text-slate-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center" data-modal-hide="updateModal-<?= $task['id'] ?>">
-                                                            <i class="bi bi-x-lg"></i>
-                                                        </button>
-                                                    </div>
-                                                    <div class="p-6 text-left">
-                                                        <form action="<?= url('/asisten/update-task-status/' . $task['id']) ?>" method="POST" enctype="multipart/form-data">
-                                                            <div class="mb-4">
-                                                                <label class="block mb-2 text-sm font-bold text-slate-700">Status Terbaru</label>
-                                                                <select name="status" id="status-<?= $task['id'] ?>" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5" onchange="toggleCompletionFields(<?= $task['id'] ?>)">
-                                                                    <option value="in_progress" <?= $task['status'] == 'in_progress' ? 'selected' : '' ?>>Sedang Dikerjakan</option>
-                                                                    <option value="resolved" <?= $task['status'] == 'resolved' ? 'selected' : '' ?>>Selesai (Resolved)</option>
-                                                                    <option value="reported" <?= $task['status'] == 'reported' ? 'selected' : '' ?>>Pending</option>
-                                                                </select>
-                                                            </div>
-                                                            <div class="mb-4">
-                                                                <label class="block mb-2 text-sm font-bold text-slate-700">Catatan Pengerjaan</label>
-                                                                <textarea name="note" rows="2" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5" placeholder="Apa yang sudah Anda lakukan?"></textarea>
-                                                            </div>
-                                                            <div id="completion-fields-<?= $task['id'] ?>" class="hidden">
-                                                                <div class="mb-4">
-                                                                    <label class="block mb-2 text-sm font-bold text-slate-700">Keterangan Perbaikan</label>
-                                                                    <textarea name="solution_notes" rows="2" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5" placeholder="Jelaskan solusi/penyebab masalah..."></textarea>
-                                                                </div>
-                                                                <div class="mb-4">
-                                                                    <label class="block mb-2 text-sm font-bold text-slate-700">
-                                                                        Foto Bukti Penyelesaian <span class="text-xs text-slate-400 font-normal">(Opsional)</span>
-                                                                    </label>
-                                                                    <input type="file" name="completion_photo" accept="image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 transition-all">
-                                                                    <p class="text-xs text-slate-400 mt-1"><i class="bi bi-info-circle"></i> Format: JPG, PNG, GIF (Max 2MB)</p>
-                                                                </div>
-                                                            </div>
-                                                            <button type="submit" class="w-full text-white bg-sky-600 hover:bg-sky-700 font-bold rounded-lg text-sm px-5 py-3 text-center transition-all">Simpan Perubahan</button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        </a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

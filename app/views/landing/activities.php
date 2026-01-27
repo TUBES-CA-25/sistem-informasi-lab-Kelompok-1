@@ -38,7 +38,7 @@
                 class="flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group h-full">
 
                 <a href="<?= url('/activity/' . $news['id']) ?>" class="relative h-56 overflow-hidden block">
-                    <img src="<?= !empty($news['image_cover']) ? $news['image_cover'] : 'https://placehold.co/600x400/e2e8f0/94a3b8?text=No+Image' ?>"
+                    <img src="<?= !empty($news['image_cover']) ? BASE_URL . $news['image_cover'] : 'https://placehold.co/600x400/e2e8f0/94a3b8?text=No+Image' ?>"
                         class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                         alt="<?= e($news['title']) ?>">
 

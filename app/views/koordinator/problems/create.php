@@ -44,14 +44,6 @@
                     <p class="mt-1 text-sm text-slate-500">Kosongkan jika masalah bukan pada PC tertentu</p>
                 </div>
 
-                <!-- Reporter Name -->
-                <div>
-                    <label for="reporter_name" class="block text-sm font-medium text-slate-700 mb-2">
-                        Nama Pelapor <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" id="reporter_name" name="reporter_name" required placeholder="Masukkan nama pelapor" class="block w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
-                </div>
-
                 <!-- Problem Type -->
                 <div>
                     <label for="problem_type" class="block text-sm font-medium text-slate-700 mb-2">

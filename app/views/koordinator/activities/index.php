@@ -39,7 +39,7 @@
                         <!-- Image Cover -->
                         <?php if ($activity['image_cover']): ?>
                             <div class="relative h-48 bg-gradient-to-br from-slate-100 to-slate-200">
-                                <img src="<?= url($activity['image_cover']) ?>" alt="<?= htmlspecialchars($activity['title']) ?>" class="w-full h-full object-cover">
+                                <img src="<?= BASE_URL . $activity['image_cover'] ?>" alt="<?= htmlspecialchars($activity['title']) ?>" class="w-full h-full object-cover">
                                 <!-- Status Badge on Image -->
                                 <div class="absolute top-3 right-3">
                                     <?php
