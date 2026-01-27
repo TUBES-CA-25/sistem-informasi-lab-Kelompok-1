@@ -1203,6 +1203,7 @@ class AdminController extends Controller
     {
         $problemModel = $this->model('LabProblemModel');
         $historyModel = $this->model('ProblemHistoryModel');
+        $userModel = $this->model('UserModel'); // Load User Model
 
         $problem = $problemModel->getProblemWithDetails($id);
 
@@ -1213,7 +1214,8 @@ class AdminController extends Controller
 
         $data = [
             'problem' => $problem,
-            'histories' => $historyModel->getHistoryByProblem($id)
+            'histories' => $historyModel->getHistoryByProblem($id),
+            'assistants' => $userModel->getUsersByRoleName('asisten') // Kirim data asisten untuk dropdown assign
         ];
 
         $this->view('admin/problems/detail', $data);
@@ -1260,6 +1262,106 @@ class AdminController extends Controller
         setFlash('success', 'Problem deleted successfully');
         $this->redirect('/admin/problems');
     }
+
+    public function createProblem()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/problems/create');
+        }
+
+        $data = [
+            'laboratory_id' => sanitize($this->getPost('laboratory_id')),
+            'pc_number' => sanitize($this->getPost('pc_number')),
+            'problem_type' => sanitize($this->getPost('problem_type')),
+            'description' => sanitize($this->getPost('description')),
+            // // Admin bisa input nama pelapor manual atau otomatis diri sendiri
+            // 'reporter_name' => sanitize($this->getPost('reporter_name'))
+        ];
+
+        if (empty($data['laboratory_id']) || empty($data['description'])) {
+            setFlash('danger', 'Mohon lengkapi data wajib.');
+            $this->redirect('/admin/problems/create');
+        }
+
+        $problemModel = $this->model('LabProblemModel');
+        $problemId = $problemModel->createProblem($data);
+
+        // Catat History
+        $this->model('ProblemHistoryModel')->addHistory($problemId, 'reported', 'Laporan dibuat oleh Admin');
+
+        setFlash('success', 'Laporan masalah berhasil dibuat.');
+        $this->redirect('/admin/problems');
+    }
+    public function editProblemForm($id)
+    {
+        $problemModel = $this->model('LabProblemModel');
+        $laboratoryModel = $this->model('LaboratoryModel');
+
+        $problem = $problemModel->find($id);
+        if (!$problem) {
+            setFlash('danger', 'Masalah tidak ditemukan.');
+            $this->redirect('/admin/problems');
+        }
+
+        $data = [
+            'problem' => $problem,
+            'laboratories' => $laboratoryModel->getAllLaboratories()
+        ];
+        $this->view('admin/problems/edit', $data);
+    }
+
+    public function updateProblem($id)
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/problems/' . $id . '/edit');
+        }
+
+        $data = [
+            'laboratory_id' => sanitize($this->getPost('laboratory_id')),
+            'pc_number' => sanitize($this->getPost('pc_number')),
+            'problem_type' => sanitize($this->getPost('problem_type')),
+            'description' => sanitize($this->getPost('description'))
+        ];
+
+        $this->model('LabProblemModel')->updateProblem($id, $data);
+        $this->model('ProblemHistoryModel')->addHistory($id, 'reported', 'Detail masalah diupdate oleh Admin');
+
+        setFlash('success', 'Data masalah berhasil diperbarui.');
+        $this->redirect('/admin/problems/' . $id);
+    }
+
+    public function assignProblem($id)
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') $this->redirect('/admin/problems/' . $id);
+
+        $assignedTo = sanitize($this->getPost('assigned_to'));
+
+        // Update assigned_to
+        $this->model('LabProblemModel')->updateProblem($id, ['assigned_to' => $assignedTo]);
+
+        // Ambil nama asisten untuk history
+        $assignee = $this->model('UserModel')->find($assignedTo);
+        $this->model('ProblemHistoryModel')->addHistory($id, 'reported', 'Admin menugaskan ke: ' . $assignee['name']);
+
+        setFlash('success', 'Tugas berhasil diberikan.');
+        $this->redirect('/admin/problems/' . $id);
+    }
+
+    public function createProblemForm()
+    {
+        $laboratoryModel = $this->model('LaboratoryModel');
+
+        $data = [
+            'laboratories' => $laboratoryModel->getAllLaboratories()
+        ];
+
+        $this->view('admin/problems/create', $data);
+    }
+
+
+
+
+
 
 
 
