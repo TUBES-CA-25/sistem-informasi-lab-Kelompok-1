@@ -50,9 +50,9 @@
                         Jenis Masalah <span class="text-red-500">*</span>
                     </label>
                     <div class="grid grid-cols-2 gap-3">
-                        <label class="relative flex items-center p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-sky-500 transition-colors">
+                        <label class="relative flex items-center p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-emerald-500 transition-colors">
                             <input type="radio" name="problem_type" value="hardware" class="sr-only peer" required>
-                            <div class="flex items-center gap-3 peer-checked:text-sky-600">
+                            <div class="flex items-center gap-3 peer-checked:text-emerald-600">
                                 <div class="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center peer-checked:bg-red-100">
                                     <i class="bi bi-cpu text-xl text-red-600"></i>
                                 </div>
@@ -61,12 +61,12 @@
                                     <div class="text-xs text-slate-500">Kerusakan fisik</div>
                                 </div>
                             </div>
-                            <div class="absolute top-2 right-2 w-5 h-5 bg-white border-2 border-slate-300 rounded-full peer-checked:border-sky-500 peer-checked:bg-sky-500"></div>
+                            <div class="absolute top-2 right-2 w-5 h-5 bg-white border-2 border-slate-300 rounded-full peer-checked:border-emerald-500 peer-checked:bg-emerald-500"></div>
                         </label>
 
-                        <label class="relative flex items-center p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-sky-500 transition-colors">
+                        <label class="relative flex items-center p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-emerald-500 transition-colors">
                             <input type="radio" name="problem_type" value="software" class="sr-only peer" required>
-                            <div class="flex items-center gap-3 peer-checked:text-sky-600">
+                            <div class="flex items-center gap-3 peer-checked:text-emerald-600">
                                 <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center peer-checked:bg-blue-100">
                                     <i class="bi bi-code-slash text-xl text-blue-600"></i>
                                 </div>
@@ -75,7 +75,35 @@
                                     <div class="text-xs text-slate-500">Aplikasi/sistem</div>
                                 </div>
                             </div>
-                            <div class="absolute top-2 right-2 w-5 h-5 bg-white border-2 border-slate-300 rounded-full peer-checked:border-sky-500 peer-checked:bg-sky-500"></div>
+                            <div class="absolute top-2 right-2 w-5 h-5 bg-white border-2 border-slate-300 rounded-full peer-checked:border-emerald-500 peer-checked:bg-emerald-500"></div>
+                        </label>
+
+                        <label class="relative flex items-center p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-emerald-500 transition-colors">
+                            <input type="radio" name="problem_type" value="network" class="sr-only peer">
+                            <div class="flex items-center gap-3 peer-checked:text-emerald-600">
+                                <div class="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center peer-checked:bg-purple-100">
+                                    <i class="bi bi-wifi text-xl text-purple-600"></i>
+                                </div>
+                                <div>
+                                    <div class="font-medium">Network</div>
+                                    <div class="text-xs text-slate-500">Koneksi/jaringan</div>
+                                </div>
+                            </div>
+                            <div class="absolute top-2 right-2 w-5 h-5 bg-white border-2 border-slate-300 rounded-full peer-checked:border-emerald-500 peer-checked:bg-emerald-500"></div>
+                        </label>
+
+                        <label class="relative flex items-center p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-emerald-500 transition-colors">
+                            <input type="radio" name="problem_type" value="other" class="sr-only peer">
+                            <div class="flex items-center gap-3 peer-checked:text-emerald-600">
+                                <div class="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center peer-checked:bg-slate-100">
+                                    <i class="bi bi-three-dots text-xl text-slate-600"></i>
+                                </div>
+                                <div>
+                                    <div class="font-medium">Lainnya</div>
+                                    <div class="text-xs text-slate-500">Masalah lain</div>
+                                </div>
+                            </div>
+                            <div class="absolute top-2 right-2 w-5 h-5 bg-white border-2 border-slate-300 rounded-full peer-checked:border-emerald-500 peer-checked:bg-emerald-500"></div>
                         </label>
                     </div>
                 </div>
