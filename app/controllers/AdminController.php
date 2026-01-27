@@ -322,32 +322,21 @@ class AdminController extends Controller
         $scheduleModel = $this->model('LabScheduleModel');
         $laboratoryModel = $this->model('LaboratoryModel');
 
-        // 1. Ambil Parameter Filter dari URL
         $search = sanitize($this->getQuery('search'));
-        $labId  = sanitize($this->getQuery('lab_id'));
         $page   = (int) ($this->getQuery('page') ?? 1);
         if ($page < 1) $page = 1;
-
-        $limit  = 20; // Tampilkan 20 data per halaman
+        $limit  = 10;
         $offset = ($page - 1) * $limit;
 
-        $filters = [
-            'search' => $search,
-            'lab_id' => $labId
-        ];
-
-        // 2. Ambil Data
-        $schedules = $scheduleModel->getFilteredSchedules($filters, $limit, $offset);
-        $totalRows = $scheduleModel->countFilteredSchedules($filters);
+        // Ambil Data Master (Grouped by Plan)
+        $schedules = $scheduleModel->getMasterPlans($limit, $offset, $search);
+        $totalRows = $scheduleModel->countMasterPlans($search);
         $totalPages = ceil($totalRows / $limit);
-
-        // 3. Ambil Daftar Lab (Untuk Dropdown Filter)
-        $laboratories = $laboratoryModel->getAllLaboratories();
 
         $data = [
             'schedules' => $schedules,
-            'laboratories' => $laboratories,
-            'filters' => $filters,
+            'laboratories' => $laboratoryModel->getAllLaboratories(),
+            'filters' => ['search' => $search],
             'pagination' => [
                 'current_page' => $page,
                 'total_pages' => $totalPages,
@@ -532,15 +521,19 @@ class AdminController extends Controller
         $scheduleModel = $this->model('LabScheduleModel');
         $laboratoryModel = $this->model('LaboratoryModel');
 
-        $schedule = $scheduleModel->getScheduleDetail($id); // Pakai method getScheduleDetail yg baru
+        $schedule = $scheduleModel->getScheduleDetail($id);
 
         if (!$schedule) {
-            setFlash('danger', 'Schedule not found');
+            setFlash('danger', 'Jadwal tidak ditemukan');
             $this->redirect('/admin/schedules');
         }
 
+        // AMBIL JUMLAH SESI SAAT INI
+        $totalSessions = $scheduleModel->countSessions($id);
+
         $data = [
             'schedule' => $schedule,
+            'totalSessions' => $totalSessions, // Kirim ke View
             'laboratories' => $laboratoryModel->getAllLaboratories()
         ];
 
@@ -555,47 +548,82 @@ class AdminController extends Controller
         $scheduleModel = $this->model('LabScheduleModel');
         $oldData = $scheduleModel->getScheduleDetail($id);
 
-        // 1. Handle Uploads (Cek file baru, jika tidak ada pakai yang lama)
-        // Perbaikan: Folder upload disesuaikan dengan createSchedule
+        // 1. Handle Uploads
         $lecturerPhoto = $this->handleFileUpload('lecturer_photo_file', 'uploads/lecturers/') ?? $oldData['lecturer_photo'];
-        $assistant1Photo = $this->handleFileUpload('assistant_photo_file', 'uploads/assistants/') ?? $oldData['assistant_1_photo'];
+        $assistantPhoto = $this->handleFileUpload('assistant_photo_file', 'uploads/assistants/') ?? $oldData['assistant_1_photo'];
         $assistant2Photo = $this->handleFileUpload('assistant2_photo_file', 'uploads/assistants/') ?? $oldData['assistant_2_photo'];
 
-        // 2. Siapkan Data Update (Sesuaikan Key dengan Nama Kolom Database!)
+        // 2. Data Update Master
         $data = [
             'laboratory_id'   => sanitize($this->getPost('laboratory_id')),
             'day'             => sanitize($this->getPost('day')),
             'start_time'      => sanitize($this->getPost('start_time')),
             'end_time'        => sanitize($this->getPost('end_time')),
-
-            // Perbaikan Key Database
-            'course_name'     => sanitize($this->getPost('course')),        // Form: course -> DB: course_name
+            'course_name'     => sanitize($this->getPost('course_name')),
             'program_study'   => sanitize($this->getPost('program_study')),
             'semester'        => sanitize($this->getPost('semester')),
             'class_code'      => sanitize($this->getPost('class_code')),
-
-            'lecturer_name'   => sanitize($this->getPost('lecturer')),      // Form: lecturer -> DB: lecturer_name
-            'assistant_1_name' => sanitize($this->getPost('assistant')),     // Form: assistant -> DB: assistant_1_name
-            'assistant_2_name' => sanitize($this->getPost('assistant_2')),   // Form: assistant_2 -> DB: assistant_2_name
-
+            'lecturer_name'   => sanitize($this->getPost('lecturer_name')),
+            'assistant_1_name' => sanitize($this->getPost('assistant_1_name')),
+            'assistant_2_name' => sanitize($this->getPost('assistant_2_name')),
             'description'     => sanitize($this->getPost('description')),
-
-            // Path Foto
             'lecturer_photo'    => $lecturerPhoto,
-            'assistant_1_photo' => $assistant1Photo, // DB: assistant_1_photo
-            'assistant_2_photo' => $assistant2Photo  // DB: assistant_2_photo
+            'assistant_1_photo' => $assistantPhoto,
+            'assistant_2_photo' => $assistant2Photo
         ];
 
-        // Hapus field yang tidak ada di tabel agar aman
-        // (frequency dan participant_count dihapus karena tidak ada di course_plans)
+        // Update Master Plan
+        $scheduleModel->updateSchedule($id, $data);
 
-        if ($scheduleModel->updateSchedule($id, $data)) {
-            setFlash('success', 'Jadwal berhasil diperbarui.');
-            $this->redirect('/admin/schedules');
+        // 3. UPDATE JAM SEMUA SESI (Opsional, agar sinkron)
+        // Jika user mengubah jam di master, update juga semua sesi anak yang belum selesai
+        $scheduleModel->updateAllSessionsTime($id, $data['start_time'], $data['end_time']);
+
+        // 4. LOGIKA UBAH TOTAL PERTEMUAN (LOOPING)
+        $newTotal = (int) $this->getPost('total_meetings');
+        $currentTotal = $scheduleModel->countSessions($id);
+
+        if ($newTotal > $currentTotal) {
+            // CASE A: NAMBAH PERTEMUAN
+            // Ambil tanggal sesi terakhir
+            $lastSession = $scheduleModel->getLastSessionDate($id);
+            if ($lastSession) {
+                $lastDate = new DateTime($lastSession['session_date']);
+                $lastMeetingNum = $lastSession['meeting_number'];
+            } else {
+                // Fallback jika anehnya kosong, pakai hari ini
+                $lastDate = new DateTime();
+                $lastMeetingNum = 0;
+            }
+
+            $diff = $newTotal - $currentTotal;
+            for ($i = 1; $i <= $diff; $i++) {
+                $lastDate->modify('+7 days'); // Tambah 1 minggu dari sesi terakhir
+                $meetingNum = $lastMeetingNum + $i;
+
+                $sessionData = [
+                    'course_plan_id' => $id,
+                    'meeting_number' => $meetingNum,
+                    'session_date' => $lastDate->format('Y-m-d'),
+                    'start_time' => $data['start_time'],
+                    'end_time' => $data['end_time'],
+                    'status' => 'scheduled'
+                ];
+                $scheduleModel->createSession($sessionData);
+            }
+            setFlash('success', "Jadwal diperbarui. $diff sesi baru berhasil ditambahkan.");
+        } elseif ($newTotal < $currentTotal) {
+            // CASE B: KURANGI PERTEMUAN
+            // Hapus sesi dari yang paling belakang
+            $diff = $currentTotal - $newTotal;
+            $scheduleModel->deleteSessionsFromEnd($id, $diff);
+            setFlash('warning', "Jadwal diperbarui. $diff sesi terakhir telah dihapus.");
         } else {
-            setFlash('danger', 'Gagal memperbarui jadwal.');
-            $this->redirect('/admin/schedules/' . $id . '/edit');
+            // Tidak ada perubahan jumlah
+            setFlash('success', 'Data Master Jadwal berhasil diperbarui.');
         }
+
+        $this->redirect('/admin/schedules');
     }
     public function viewSchedule($id)
     {
@@ -631,6 +659,135 @@ class AdminController extends Controller
 
         $this->redirect('/admin/schedules');
     }
+    public function listScheduleSessions($id)
+    {
+        $scheduleModel = $this->model('LabScheduleModel');
+
+        // Ambil Info Master Plan
+        // Gunakan getScheduleDetail yang mengambil data dari course_plans
+        $plan = $scheduleModel->getScheduleDetail($id);
+
+        if (!$plan) {
+            setFlash('danger', 'Data Matakuliah tidak ditemukan.');
+            $this->redirect('/admin/schedules');
+        }
+
+        // Ambil Daftar Sesi (Anak)
+        $sessions = $scheduleModel->getSessionsByPlanId($id);
+
+        $data = [
+            'plan' => $plan,
+            'sessions' => $sessions
+        ];
+
+        $this->view('admin/schedules/sessions', $data);
+    }
+    public function viewSession($id)
+    {
+        $scheduleModel = $this->model('LabScheduleModel');
+        $session = $scheduleModel->getSessionDetail($id);
+
+        if (!$session) {
+            setFlash('danger', 'Sesi tidak ditemukan.');
+            $this->redirect('/admin/schedules');
+        }
+
+        $this->view('admin/schedules/session_detail', ['session' => $session]);
+    }
+    public function deleteSession($id)
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') $this->redirect('/admin/schedules');
+
+        $scheduleModel = $this->model('LabScheduleModel');
+
+        // Ambil detail dulu untuk redirect balik ke list sesi
+        $session = $scheduleModel->getSessionDetail($id);
+        $planId = $session['course_plan_id'] ?? null;
+
+        if ($scheduleModel->deleteSession($id)) {
+            setFlash('success', 'Sesi berhasil dihapus.');
+        } else {
+            setFlash('danger', 'Gagal menghapus sesi.');
+        }
+
+        if ($planId) {
+            $this->redirect('/admin/schedules/' . $planId . '/sessions');
+        } else {
+            $this->redirect('/admin/schedules');
+        }
+    }
+    public function editSessionForm($id)
+    {
+        $scheduleModel = $this->model('LabScheduleModel');
+
+        // Ambil detail sesi (termasuk info lab dari parent plan)
+        $session = $scheduleModel->getSessionDetail($id);
+
+        if (!$session) {
+            setFlash('danger', 'Sesi tidak ditemukan.');
+            $this->redirect('/admin/schedules');
+        }
+
+        $data = [
+            'session' => $session
+        ];
+
+        $this->view('admin/schedules/session_edit', $data);
+    }
+    public function updateSession($id)
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/sessions/' . $id . '/edit');
+        }
+
+        $scheduleModel = $this->model('LabScheduleModel');
+        $session = $scheduleModel->getSessionDetail($id);
+
+        // 1. Ambil Input Baru
+        $newDate = sanitize($this->getPost('session_date'));
+        $newStart = sanitize($this->getPost('start_time'));
+        $newEnd = sanitize($this->getPost('end_time'));
+        $newStatus = sanitize($this->getPost('status'));
+
+        // 2. Validasi Bentrok (Hanya jika Status != cancelled)
+        if ($newStatus != 'cancelled') {
+            // Kita butuh ID Lab dari master plan untuk cek bentrok
+            $labId = $session['laboratory_id'] ?? null; // Pastikan getSessionDetail return laboratory_id dari join
+
+            // Jika Lab ID tidak ada di session array, ambil ulang dari course_plans via query terpisah atau pastikan join benar
+            if (!$labId) {
+                // Fallback: Ambil Plan ID
+                $plan = $scheduleModel->getScheduleDetail($session['course_plan_id']);
+                $labId = $plan['laboratory_id'];
+            }
+
+            $isOccupied = $scheduleModel->isSlotOccupiedForEdit($labId, $newDate, $newStart, $newEnd, $id);
+
+            if ($isOccupied) {
+                setFlash('danger', '<b>Gagal Reschedule:</b> Waktu dan Laboratorium tersebut sudah terisi jadwal lain.');
+                $this->redirect('/admin/sessions/' . $id . '/edit');
+                return;
+            }
+        }
+
+        // 3. Update Data
+        $data = [
+            'session_date' => $newDate,
+            'start_time' => $newStart,
+            'end_time' => $newEnd,
+            'status' => $newStatus
+        ];
+
+        if ($scheduleModel->updateSession($id, $data)) {
+            setFlash('success', 'Sesi Pertemuan berhasil di-reschedule.');
+            $this->redirect('/admin/schedules/' . $session['course_plan_id'] . '/sessions');
+        } else {
+            setFlash('danger', 'Gagal update sesi.');
+            $this->redirect('/admin/sessions/' . $id . '/edit');
+        }
+    }
+
+
 
 
 
@@ -1418,13 +1575,16 @@ class AdminController extends Controller
             $colorIndex = ($event['laboratory_id'] ?? 0) % count($colors);
 
             $calendarEvents[] = [
-                'id' => $event['id'],
+                'id' => $event['id'], // ID Sesi (tetap ada)
                 'title' => $event['course_name'],
                 'start' => $event['session_date'] . 'T' . $event['start_time'],
                 'end' => $event['session_date'] . 'T' . $event['end_time'],
                 'backgroundColor' => $colors[$colorIndex],
                 'borderColor' => $colors[$colorIndex],
+
+                // DATA TAMBAHAN UNTUK JS
                 'extendedProps' => [
+                    'plan_id' => $event['course_plan_id'], // <--- INI KUNCINYA
                     'lecturer' => $event['lecturer_name'],
                     'lab_name' => $event['lab_name'],
                     'class_code' => $event['class_code']

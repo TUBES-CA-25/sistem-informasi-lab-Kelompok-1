@@ -64,8 +64,37 @@ class LandingController extends Controller
     // ... (Biarkan method schedule, presence, dll tetap ada seperti sebelumnya) ...
     public function schedule()
     {
-        $this->view('landing/schedule', ['schedules' => $this->model('LabScheduleModel')->getAllWithLaboratory()]);
+        $scheduleModel = $this->model('LabScheduleModel');
+
+        // 1. Ambil Parameter
+        $page = (int) ($this->getQuery('page') ?? 1);
+        if ($page < 1) $page = 1;
+
+        $limit = 20; // Limit data per halaman
+        $offset = ($page - 1) * $limit;
+
+        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+
+        // 2. Ambil Data dari Model
+        $schedules = $scheduleModel->getPublicSchedules($limit, $offset, $search);
+        $totalRows = $scheduleModel->countPublicSchedules($search);
+        $totalPages = ceil($totalRows / $limit);
+
+        // 3. Susun Data untuk View
+        $data = [
+            'schedules' => $schedules,
+            'search' => $search,
+            'pagination' => [
+                'current' => $page,
+                'total_pages' => $totalPages,
+                'total_rows' => $totalRows
+            ]
+        ];
+
+        // Load View
+        $this->view('landing/schedule', $data);
     }
+
     public function presence()
     {
         $this->view('landing/presence', ['presenceList' => $this->model('HeadLaboranModel')->getAllPresence()]);
@@ -76,9 +105,21 @@ class LandingController extends Controller
     }
     public function scheduleDetail($id)
     {
-        $s = $this->model('LabScheduleModel')->getScheduleDetail($id);
-        if (!$s) header('Location: ' . BASE_URL . '/schedule');
-        $this->view('landing/schedule-detail', ['schedule' => $s]);
+        $scheduleModel = $this->model('LabScheduleModel');
+
+        // Gunakan method yang sudah ada di model: getScheduleDetail($id)
+        $schedule = $scheduleModel->getScheduleDetail($id);
+
+        if (!$schedule) {
+            // Jika ID tidak ditemukan, kembalikan ke halaman jadwal
+            $this->redirect('/schedule');
+        }
+
+        $data = [
+            'schedule' => $schedule
+        ];
+
+        $this->view('landing/schedule-detail', $data);
     }
 
     // ==========================================
