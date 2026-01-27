@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 26, 2026 at 12:04 PM
+-- Generation Time: Jan 27, 2026 at 05:45 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -236,6 +236,7 @@ CREATE TABLE `lab_problems` (
   `pc_number` varchar(50) DEFAULT NULL,
   `problem_type` enum('hardware','software','network','other') NOT NULL,
   `description` text NOT NULL,
+  `reporter_name` varchar(100) DEFAULT NULL,
   `status` enum('reported','in_progress','resolved') DEFAULT 'reported',
   `reported_by` int(11) NOT NULL,
   `assigned_to` int(11) DEFAULT NULL,
@@ -243,6 +244,13 @@ CREATE TABLE `lab_problems` (
   `started_at` datetime DEFAULT NULL,
   `completed_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `lab_problems`
+--
+
+INSERT INTO `lab_problems` (`id`, `laboratory_id`, `pc_number`, `problem_type`, `description`, `reporter_name`, `status`, `reported_by`, `assigned_to`, `reported_at`, `started_at`, `completed_at`) VALUES
+(5, 13, 'pc no 5', 'hardware', 'bapak e', NULL, 'reported', 1, NULL, '2026-01-27 04:42:27', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -286,6 +294,13 @@ CREATE TABLE `problem_histories` (
   `updated_by` int(11) NOT NULL,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `problem_histories`
+--
+
+INSERT INTO `problem_histories` (`id`, `problem_id`, `status`, `note`, `updated_by`, `updated_at`) VALUES
+(14, 5, 'reported', 'Laporan dibuat oleh Admin', 1, '2026-01-27 04:42:27');
 
 -- --------------------------------------------------------
 
@@ -544,7 +559,7 @@ ALTER TABLE `lab_photos`
 -- AUTO_INCREMENT for table `lab_problems`
 --
 ALTER TABLE `lab_problems`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `lab_schedules_old`
@@ -556,7 +571,7 @@ ALTER TABLE `lab_schedules_old`
 -- AUTO_INCREMENT for table `problem_histories`
 --
 ALTER TABLE `problem_histories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `roles`

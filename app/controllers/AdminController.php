@@ -320,14 +320,46 @@ class AdminController extends Controller
     public function listSchedules()
     {
         $scheduleModel = $this->model('LabScheduleModel');
-        $schedules = $scheduleModel->getAllWithLaboratory();
+        $laboratoryModel = $this->model('LaboratoryModel');
+
+        // 1. Ambil Parameter Filter dari URL
+        $search = sanitize($this->getQuery('search'));
+        $labId  = sanitize($this->getQuery('lab_id'));
+        $page   = (int) ($this->getQuery('page') ?? 1);
+        if ($page < 1) $page = 1;
+
+        $limit  = 20; // Tampilkan 20 data per halaman
+        $offset = ($page - 1) * $limit;
+
+        $filters = [
+            'search' => $search,
+            'lab_id' => $labId
+        ];
+
+        // 2. Ambil Data
+        $schedules = $scheduleModel->getFilteredSchedules($filters, $limit, $offset);
+        $totalRows = $scheduleModel->countFilteredSchedules($filters);
+        $totalPages = ceil($totalRows / $limit);
+
+        // 3. Ambil Daftar Lab (Untuk Dropdown Filter)
+        $laboratories = $laboratoryModel->getAllLaboratories();
 
         $data = [
-            'schedules' => $schedules
+            'schedules' => $schedules,
+            'laboratories' => $laboratories,
+            'filters' => $filters,
+            'pagination' => [
+                'current_page' => $page,
+                'total_pages' => $totalPages,
+                'total_rows' => $totalRows,
+                'start_entry' => ($totalRows > 0) ? $offset + 1 : 0,
+                'end_entry' => min($offset + $limit, $totalRows)
+            ]
         ];
 
         $this->view('admin/schedules/index', $data);
     }
+
     public function createScheduleForm()
     {
         $laboratoryModel = $this->model('LaboratoryModel');
@@ -523,32 +555,39 @@ class AdminController extends Controller
         $scheduleModel = $this->model('LabScheduleModel');
         $oldData = $scheduleModel->getScheduleDetail($id);
 
-        // 1. Handle Uploads (Cek jika ada file baru, jika tidak pakai yang lama)
-        $lecturerPhoto = $this->handleFileUpload('lecturer_photo_file') ?? $oldData['lecturer_photo'];
-        $assistantPhoto = $this->handleFileUpload('assistant_photo_file') ?? $oldData['assistant_photo'];
-        $assistant2Photo = $this->handleFileUpload('assistant2_photo_file') ?? $oldData['assistant2_photo'];
+        // 1. Handle Uploads (Cek file baru, jika tidak ada pakai yang lama)
+        // Perbaikan: Folder upload disesuaikan dengan createSchedule
+        $lecturerPhoto = $this->handleFileUpload('lecturer_photo_file', 'uploads/lecturers/') ?? $oldData['lecturer_photo'];
+        $assistant1Photo = $this->handleFileUpload('assistant_photo_file', 'uploads/assistants/') ?? $oldData['assistant_1_photo'];
+        $assistant2Photo = $this->handleFileUpload('assistant2_photo_file', 'uploads/assistants/') ?? $oldData['assistant_2_photo'];
 
+        // 2. Siapkan Data Update (Sesuaikan Key dengan Nama Kolom Database!)
         $data = [
-            'laboratory_id' => sanitize($this->getPost('laboratory_id')),
-            'day' => sanitize($this->getPost('day')),
-            'start_time' => sanitize($this->getPost('start_time')),
-            'end_time' => sanitize($this->getPost('end_time')),
-            'course' => sanitize($this->getPost('course')),
-            'program_study' => sanitize($this->getPost('program_study')),
-            'semester' => sanitize($this->getPost('semester')),
-            'class_code' => sanitize($this->getPost('class_code')),
-            'frequency' => sanitize($this->getPost('frequency')),
-            'lecturer' => sanitize($this->getPost('lecturer')),
-            'assistant' => sanitize($this->getPost('assistant')),
-            'assistant_2' => sanitize($this->getPost('assistant_2')),
-            'participant_count' => sanitize($this->getPost('participant_count')),
-            'description' => sanitize($this->getPost('description')),
+            'laboratory_id'   => sanitize($this->getPost('laboratory_id')),
+            'day'             => sanitize($this->getPost('day')),
+            'start_time'      => sanitize($this->getPost('start_time')),
+            'end_time'        => sanitize($this->getPost('end_time')),
+
+            // Perbaikan Key Database
+            'course_name'     => sanitize($this->getPost('course')),        // Form: course -> DB: course_name
+            'program_study'   => sanitize($this->getPost('program_study')),
+            'semester'        => sanitize($this->getPost('semester')),
+            'class_code'      => sanitize($this->getPost('class_code')),
+
+            'lecturer_name'   => sanitize($this->getPost('lecturer')),      // Form: lecturer -> DB: lecturer_name
+            'assistant_1_name' => sanitize($this->getPost('assistant')),     // Form: assistant -> DB: assistant_1_name
+            'assistant_2_name' => sanitize($this->getPost('assistant_2')),   // Form: assistant_2 -> DB: assistant_2_name
+
+            'description'     => sanitize($this->getPost('description')),
 
             // Path Foto
-            'lecturer_photo' => $lecturerPhoto,
-            'assistant_photo' => $assistantPhoto,
-            'assistant2_photo' => $assistant2Photo,
+            'lecturer_photo'    => $lecturerPhoto,
+            'assistant_1_photo' => $assistant1Photo, // DB: assistant_1_photo
+            'assistant_2_photo' => $assistant2Photo  // DB: assistant_2_photo
         ];
+
+        // Hapus field yang tidak ada di tabel agar aman
+        // (frequency dan participant_count dihapus karena tidak ada di course_plans)
 
         if ($scheduleModel->updateSchedule($id, $data)) {
             setFlash('success', 'Jadwal berhasil diperbarui.');
@@ -581,10 +620,13 @@ class AdminController extends Controller
         }
 
         $scheduleModel = $this->model('LabScheduleModel');
-        if ($scheduleModel->deleteSchedule($id)) {
-            setFlash('success', 'Schedule deleted successfully');
+
+        // Perbaikan: Hapus SESI, bukan RENCANA
+        // Agar jika user menghapus tanggal tertentu, tanggal lain tetap aman
+        if ($scheduleModel->deleteSession($id)) {
+            setFlash('success', 'Sesi jadwal berhasil dihapus.');
         } else {
-            setFlash('danger', 'Failed to delete schedule');
+            setFlash('danger', 'Gagal menghapus jadwal.');
         }
 
         $this->redirect('/admin/schedules');
@@ -1168,6 +1210,7 @@ class AdminController extends Controller
     {
         $problemModel = $this->model('LabProblemModel');
         $historyModel = $this->model('ProblemHistoryModel');
+        $userModel = $this->model('UserModel'); // Load User Model
 
         $problem = $problemModel->getProblemWithDetails($id);
 
@@ -1178,7 +1221,8 @@ class AdminController extends Controller
 
         $data = [
             'problem' => $problem,
-            'histories' => $historyModel->getHistoryByProblem($id)
+            'histories' => $historyModel->getHistoryByProblem($id),
+            'assistants' => $userModel->getUsersByRoleName('asisten') // Kirim data asisten untuk dropdown assign
         ];
 
         $this->view('admin/problems/detail', $data);
@@ -1225,6 +1269,106 @@ class AdminController extends Controller
         setFlash('success', 'Problem deleted successfully');
         $this->redirect('/admin/problems');
     }
+
+    public function createProblem()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/problems/create');
+        }
+
+        $data = [
+            'laboratory_id' => sanitize($this->getPost('laboratory_id')),
+            'pc_number' => sanitize($this->getPost('pc_number')),
+            'problem_type' => sanitize($this->getPost('problem_type')),
+            'description' => sanitize($this->getPost('description')),
+            // // Admin bisa input nama pelapor manual atau otomatis diri sendiri
+            // 'reporter_name' => sanitize($this->getPost('reporter_name'))
+        ];
+
+        if (empty($data['laboratory_id']) || empty($data['description'])) {
+            setFlash('danger', 'Mohon lengkapi data wajib.');
+            $this->redirect('/admin/problems/create');
+        }
+
+        $problemModel = $this->model('LabProblemModel');
+        $problemId = $problemModel->createProblem($data);
+
+        // Catat History
+        $this->model('ProblemHistoryModel')->addHistory($problemId, 'reported', 'Laporan dibuat oleh Admin');
+
+        setFlash('success', 'Laporan masalah berhasil dibuat.');
+        $this->redirect('/admin/problems');
+    }
+    public function editProblemForm($id)
+    {
+        $problemModel = $this->model('LabProblemModel');
+        $laboratoryModel = $this->model('LaboratoryModel');
+
+        $problem = $problemModel->find($id);
+        if (!$problem) {
+            setFlash('danger', 'Masalah tidak ditemukan.');
+            $this->redirect('/admin/problems');
+        }
+
+        $data = [
+            'problem' => $problem,
+            'laboratories' => $laboratoryModel->getAllLaboratories()
+        ];
+        $this->view('admin/problems/edit', $data);
+    }
+
+    public function updateProblem($id)
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/problems/' . $id . '/edit');
+        }
+
+        $data = [
+            'laboratory_id' => sanitize($this->getPost('laboratory_id')),
+            'pc_number' => sanitize($this->getPost('pc_number')),
+            'problem_type' => sanitize($this->getPost('problem_type')),
+            'description' => sanitize($this->getPost('description'))
+        ];
+
+        $this->model('LabProblemModel')->updateProblem($id, $data);
+        $this->model('ProblemHistoryModel')->addHistory($id, 'reported', 'Detail masalah diupdate oleh Admin');
+
+        setFlash('success', 'Data masalah berhasil diperbarui.');
+        $this->redirect('/admin/problems/' . $id);
+    }
+
+    public function assignProblem($id)
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') $this->redirect('/admin/problems/' . $id);
+
+        $assignedTo = sanitize($this->getPost('assigned_to'));
+
+        // Update assigned_to
+        $this->model('LabProblemModel')->updateProblem($id, ['assigned_to' => $assignedTo]);
+
+        // Ambil nama asisten untuk history
+        $assignee = $this->model('UserModel')->find($assignedTo);
+        $this->model('ProblemHistoryModel')->addHistory($id, 'reported', 'Admin menugaskan ke: ' . $assignee['name']);
+
+        setFlash('success', 'Tugas berhasil diberikan.');
+        $this->redirect('/admin/problems/' . $id);
+    }
+
+    public function createProblemForm()
+    {
+        $laboratoryModel = $this->model('LaboratoryModel');
+
+        $data = [
+            'laboratories' => $laboratoryModel->getAllLaboratories()
+        ];
+
+        $this->view('admin/problems/create', $data);
+    }
+
+
+
+
+
 
 
 

@@ -183,14 +183,21 @@ $router->post('/admin/activities/:id/delete', 'AdminController@deleteActivity');
 
 
 
+
 // Problems Management
 $router->get('/admin/problems', 'AdminController@listProblems');
+$router->get('/admin/problems/create', 'AdminController@createProblemForm');
+$router->post('/admin/problems/create', 'AdminController@createProblem');
 $router->get('/admin/problems/:id', 'AdminController@viewProblem');
+$router->get('/admin/problems/:id/edit', 'AdminController@editProblemForm');
+$router->post('/admin/problems/:id/edit', 'AdminController@updateProblem');
+$router->post('/admin/problems/:id/assign', 'AdminController@assignProblem');
 $router->post('/admin/problems/:id/update-status', 'AdminController@updateProblemStatus');
 $router->post('/admin/problems/:id/delete', 'AdminController@deleteProblem');
 
-// Route Kalender Admin
+
+
+//Calender Jadwal Praktikum
 $router->get('/admin/calendar', 'AdminController@calendar');
 $router->get('/admin/calendar/data', 'AdminController@getCalendarData');
-// Tambahkan di grup route Admin
 $router->post('/admin/calendar/clear', 'AdminController@clearScheduleByDate'); // Route untuk Hapus Harian
