@@ -694,21 +694,25 @@ class KoordinatorController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/koordinator/activities');
+            return;
         }
 
         $activityModel = $this->model('LabActivityModel');
         $activity = $activityModel->find($id);
 
-        if ($activity) {
-            // Delete image file if exists
-            if ($activity['image_cover'] && file_exists(PUBLIC_PATH . $activity['image_cover'])) {
-                unlink(PUBLIC_PATH . $activity['image_cover']);
-            }
-
-            $activityModel->deleteActivity($id);
-            setFlash('success', '🗑️ Kegiatan berhasil dihapus dari sistem!');
-        } else {
+        if (!$activity) {
             setFlash('danger', '❌ Kegiatan tidak ditemukan!');
+            $this->redirect('/koordinator/activities');
+            return;
+        }
+
+        // Delete via model (akan hapus file juga jika ada)
+        $result = $activityModel->deleteActivity($id);
+        
+        if ($result) {
+            setFlash('success', '🗑️ Kegiatan "' . $activity['title'] . '" berhasil dihapus!');
+        } else {
+            setFlash('danger', '❌ Gagal menghapus kegiatan!');
         }
 
         $this->redirect('/koordinator/activities');

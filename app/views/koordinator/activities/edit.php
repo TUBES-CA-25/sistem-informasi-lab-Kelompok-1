@@ -40,7 +40,14 @@
                     <?php if ($activity['image_cover']): ?>
                         <div id="currentImage" class="mb-4">
                             <div class="relative inline-block">
-                                <img src="<?= url($activity['image_cover']) ?>" alt="Current" class="w-full max-w-md h-64 object-cover rounded-lg border-2 border-slate-200">
+                                <?php 
+                                // Jika path dimulai dengan http/https, gunakan langsung (URL eksternal)
+                                // Jika path dimulai dengan /, gunakan BASE_URL (relative path)
+                                $imageSrc = (strpos($activity['image_cover'], 'http') === 0) 
+                                    ? $activity['image_cover'] 
+                                    : BASE_URL . $activity['image_cover'];
+                                ?>
+                                <img src="<?= $imageSrc ?>" alt="Current" class="w-full max-w-md h-64 object-cover rounded-lg border-2 border-slate-200">
                                 <div class="mt-2 text-sm text-slate-600">
                                     <i class="bi bi-info-circle"></i> Gambar saat ini
                                 </div>
