@@ -38,8 +38,44 @@
                     <textarea id="description" name="description" rows="3" class="block w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"><?= htmlspecialchars($laboratory['description'] ?? '') ?></textarea>
                 </div>
 
+                <!-- Location Details Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="building" class="block text-sm font-medium text-slate-700 mb-2">
+                            Gedung
+                        </label>
+                        <input type="text" id="building" name="building" value="<?= htmlspecialchars($laboratory['building'] ?? '') ?>" placeholder="Contoh: Gedung A" class="block w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                    </div>
+                    <div>
+                        <label for="floor" class="block text-sm font-medium text-slate-700 mb-2">
+                            Lantai
+                        </label>
+                        <input type="text" id="floor" name="floor" value="<?= htmlspecialchars($laboratory['floor'] ?? '') ?>" placeholder="Contoh: 2" class="block w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                    </div>
+                    <div>
+                        <label for="room_number" class="block text-sm font-medium text-slate-700 mb-2">
+                            Nomor Ruang
+                        </label>
+                        <input type="text" id="room_number" name="room_number" value="<?= htmlspecialchars($laboratory['room_number'] ?? '') ?>" placeholder="Contoh: R201" class="block w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                    </div>
+                </div>
+
+                <!-- Location Summary -->
+                <div>
+                    <label for="location" class="block text-sm font-medium text-slate-700 mb-2">
+                        Lokasi Lengkap
+                    </label>
+                    <input type="text" id="location" name="location" value="<?= htmlspecialchars($laboratory['location'] ?? '') ?>" placeholder="Contoh: Gedung A Lantai 2 Ruang 201" class="block w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                </div>
+
                 <!-- Stats Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="capacity" class="block text-sm font-medium text-slate-700 mb-2">
+                            Kapasitas
+                        </label>
+                        <input type="number" id="capacity" name="capacity" min="0" value="<?= htmlspecialchars($laboratory['capacity'] ?? 0) ?>" class="block w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                    </div>
                     <div>
                         <label for="pc_count" class="block text-sm font-medium text-slate-700 mb-2">
                             Jumlah PC
@@ -47,45 +83,10 @@
                         <input type="number" id="pc_count" name="pc_count" min="0" value="<?= htmlspecialchars($laboratory['pc_count'] ?? 0) ?>" class="block w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
                     </div>
                     <div>
-                        <label for="capacity" class="block text-sm font-medium text-slate-700 mb-2">
-                            Kapasitas Mahasiswa
+                        <label for="tv_count" class="block text-sm font-medium text-slate-700 mb-2">
+                            Jumlah TV
                         </label>
-                        <input type="number" id="capacity" name="capacity" min="0" value="<?= htmlspecialchars($laboratory['capacity'] ?? 0) ?>" class="block w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
-                    </div>
-                </div>
-
-                <!-- Location Section -->
-                <div class="border-t border-slate-200 pt-6">
-                    <h3 class="text-lg font-semibold text-slate-800 mb-4">Informasi Lokasi</h3>
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <label for="location" class="block text-sm font-medium text-slate-700 mb-2">
-                                Lokasi Umum
-                            </label>
-                            <input type="text" id="location" name="location" value="<?= htmlspecialchars($laboratory['location'] ?? '') ?>" class="block w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label for="building" class="block text-sm font-medium text-slate-700 mb-2">
-                                    Gedung
-                                </label>
-                                <input type="text" id="building" name="building" value="<?= htmlspecialchars($laboratory['building'] ?? '') ?>" class="block w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
-                            </div>
-                            <div>
-                                <label for="floor" class="block text-sm font-medium text-slate-700 mb-2">
-                                    Lantai
-                                </label>
-                                <input type="text" id="floor" name="floor" value="<?= htmlspecialchars($laboratory['floor'] ?? '') ?>" class="block w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
-                            </div>
-                            <div>
-                                <label for="room_number" class="block text-sm font-medium text-slate-700 mb-2">
-                                    Nomor Ruang
-                                </label>
-                                <input type="text" id="room_number" name="room_number" value="<?= htmlspecialchars($laboratory['room_number'] ?? '') ?>" class="block w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
-                            </div>
-                        </div>
+                        <input type="number" id="tv_count" name="tv_count" min="0" value="<?= htmlspecialchars($laboratory['tv_count'] ?? 0) ?>" class="block w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
                     </div>
                 </div>
 
@@ -95,9 +96,9 @@
                         Status
                     </label>
                     <select id="status" name="status" class="block w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
-                        <option value="active" <?= ($laboratory['status'] ?? 'active') == 'active' ? 'selected' : '' ?>>Aktif</option>
+                        <option value="active" <?= ($laboratory['status'] ?? 'active') == 'active' ? 'selected' : '' ?>>Active</option>
                         <option value="maintenance" <?= ($laboratory['status'] ?? '') == 'maintenance' ? 'selected' : '' ?>>Maintenance</option>
-                        <option value="inactive" <?= ($laboratory['status'] ?? '') == 'inactive' ? 'selected' : '' ?>>Tidak Aktif</option>
+                        <option value="inactive" <?= ($laboratory['status'] ?? '') == 'inactive' ? 'selected' : '' ?>>Inactive</option>
                     </select>
                 </div>
 

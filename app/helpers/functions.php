@@ -267,7 +267,92 @@ function displayFlash() {
     if ($flash) {
         $type = $flash['type'];
         $message = $flash['message'];
-        echo "<div class='alert alert-{$type}'>{$message}</div>";
+        
+        // Map alert types to Tailwind colors and icons
+        $config = [
+            'success' => [
+                'bg' => 'bg-green-50',
+                'border' => 'border-green-200',
+                'text' => 'text-green-800',
+                'icon' => 'bi-check-circle-fill',
+                'iconColor' => 'text-green-500'
+            ],
+            'danger' => [
+                'bg' => 'bg-red-50',
+                'border' => 'border-red-200',
+                'text' => 'text-red-800',
+                'icon' => 'bi-exclamation-circle-fill',
+                'iconColor' => 'text-red-500'
+            ],
+            'warning' => [
+                'bg' => 'bg-yellow-50',
+                'border' => 'border-yellow-200',
+                'text' => 'text-yellow-800',
+                'icon' => 'bi-exclamation-triangle-fill',
+                'iconColor' => 'text-yellow-500'
+            ],
+            'info' => [
+                'bg' => 'bg-blue-50',
+                'border' => 'border-blue-200',
+                'text' => 'text-blue-800',
+                'icon' => 'bi-info-circle-fill',
+                'iconColor' => 'text-blue-500'
+            ],
+            'error' => [
+                'bg' => 'bg-red-50',
+                'border' => 'border-red-200',
+                'text' => 'text-red-800',
+                'icon' => 'bi-x-circle-fill',
+                'iconColor' => 'text-red-500'
+            ]
+        ];
+        
+        $style = $config[$type] ?? $config['info'];
+        
+        echo "
+        <div id='toast-notification' class='fixed top-6 right-6 z-50 transform translate-x-0 transition-all duration-500 ease-out'>
+            <div class='flex items-center w-full max-w-sm p-4 {$style['bg']} border {$style['border']} rounded-lg shadow-xl backdrop-blur-sm'>
+                <div class='inline-flex items-center justify-center flex-shrink-0 w-10 h-10 {$style['iconColor']}'>
+                    <i class='bi {$style['icon']} text-2xl'></i>
+                </div>
+                <div class='ml-3 text-sm font-medium {$style['text']} flex-1'>
+                    {$message}
+                </div>
+                <button type='button' onclick='closeToast()' class='ml-3 -mx-1.5 -my-1.5 {$style['bg']} {$style['text']} hover:bg-opacity-80 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 inline-flex items-center justify-center h-8 w-8 transition-colors'>
+                    <i class='bi bi-x-lg'></i>
+                </button>
+            </div>
+        </div>
+        
+        <script>
+            // Auto hide after 5 seconds
+            setTimeout(function() {
+                closeToast();
+            }, 5000);
+            
+            function closeToast() {
+                const toast = document.getElementById('toast-notification');
+                if (toast) {
+                    toast.classList.add('translate-x-full', 'opacity-0');
+                    setTimeout(function() {
+                        toast.remove();
+                    }, 300);
+                }
+            }
+            
+            // Slide in animation on load
+            window.addEventListener('DOMContentLoaded', function() {
+                const toast = document.getElementById('toast-notification');
+                if (toast) {
+                    toast.classList.add('-translate-x-full');
+                    setTimeout(function() {
+                        toast.classList.remove('-translate-x-full');
+                        toast.classList.add('translate-x-0');
+                    }, 100);
+                }
+            });
+        </script>
+        ";
     }
 }
 
