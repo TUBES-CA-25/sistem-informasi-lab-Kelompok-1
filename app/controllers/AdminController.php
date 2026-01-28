@@ -649,12 +649,13 @@ class AdminController extends Controller
 
         $scheduleModel = $this->model('LabScheduleModel');
 
-        // Perbaikan: Hapus SESI, bukan RENCANA
-        // Agar jika user menghapus tanggal tertentu, tanggal lain tetap aman
-        if ($scheduleModel->deleteSession($id)) {
-            setFlash('success', 'Sesi jadwal berhasil dihapus.');
+        // PERBAIKAN: Gunakan deleteSchedule (bukan deleteSession)
+        // Karena kita ingin menghapus Master Plan (Induk)
+        // Cascade Delete di database akan otomatis menghapus semua sesi anaknya
+        if ($scheduleModel->deleteSchedule($id)) {
+            setFlash('success', 'Master Jadwal dan seluruh sesinya berhasil dihapus.');
         } else {
-            setFlash('danger', 'Gagal menghapus jadwal.');
+            setFlash('danger', 'Gagal menghapus jadwal master.');
         }
 
         $this->redirect('/admin/schedules');
