@@ -346,7 +346,7 @@ CREATE TABLE `laboratories` (
 
 LOCK TABLES `laboratories` WRITE;
 /*!40000 ALTER TABLE `laboratories` DISABLE KEYS */;
-INSERT INTO `laboratories` VALUES (13,'Multimedia','http://localhost/iclabs/public/uploads/laboratories/69701d042bdf2_1768955140.jpg','...',26,1,25,'active','2nd Floor','afag','',''),(14,'DS','http://localhost/iclabs/public/uploads/laboratories/6970369fe20b6_1768961695.jpg','BAPAK',26,1,0,'active','FIKOM LT2',NULL,NULL,NULL),(15,'IoT','http://localhost/iclabs/public/uploads/laboratories/69704fb108e98_1768968113.jpg','bapak',26,2,0,'active','2nd floor',NULL,NULL,NULL),(18,'da[ddava',NULL,'.dsmfaldLL',213,0,23,'active','','','','');
+INSERT INTO `laboratories` VALUES (13,'Multimedia','http://localhost/iclabs/public/uploads/laboratories/69701d042bdf2_1768955140.jpg','...',21,1,25,'active','2nd Floor','afag','',''),(14,'DS','http://localhost/iclabs/public/uploads/laboratories/6970369fe20b6_1768961695.jpg','BAPAK',26,1,0,'active','FIKOM LT2',NULL,NULL,NULL),(15,'IoT','http://localhost/iclabs/public/uploads/laboratories/69704fb108e98_1768968113.jpg','bapak',26,2,0,'active','2nd floor',NULL,NULL,NULL),(18,'da[ddava',NULL,'.dsmfaldLL',213,0,23,'active','','','','');
 /*!40000 ALTER TABLE `laboratories` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -486,4 +486,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-01-27 18:26:51
+-- Dump completed on 2026-01-28 18:21:38
