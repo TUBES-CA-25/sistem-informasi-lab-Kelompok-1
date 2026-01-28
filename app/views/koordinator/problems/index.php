@@ -161,7 +161,7 @@
                                             <a href="<?= url('/koordinator/problems/' . $problem['id'] . '/edit') ?>" class="text-blue-600 hover:text-blue-800 font-medium" title="Edit">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-                                            <button onclick="confirmDelete(<?= $problem['id'] ?>)" class="text-red-600 hover:text-red-800 font-medium" title="Hapus">
+                                            <button type="button" class="btn-delete text-red-600 hover:text-red-800 font-medium" title="Hapus" data-problem-id="<?= $problem['id'] ?>" data-description="<?= htmlspecialchars($problem['description']) ?>">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
@@ -211,26 +211,26 @@
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
-<div id="deleteModal" class="hidden fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-        <div class="flex items-start gap-4">
-            <div class="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                <i class="bi bi-exclamation-triangle text-2xl text-red-600"></i>
+<!-- Delete Confirmation Modal v2.0 -->
+<div id="deleteModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 animate-scale">
+        <div class="flex items-start gap-4 mb-6">
+            <div class="flex-shrink-0 w-14 h-14 bg-red-100 rounded-full flex items-center justify-center">
+                <i class="bi bi-exclamation-triangle text-3xl text-red-600"></i>
             </div>
             <div class="flex-1">
-                <h3 class="text-lg font-semibold text-slate-900 mb-2">Hapus Laporan?</h3>
-                <p class="text-slate-600 text-sm">
+                <h3 class="text-xl font-bold text-slate-900 mb-2">Hapus Laboratorium?</h3>
+                <p class="text-slate-600 text-sm leading-relaxed" id="deleteMessage">
                     Apakah Anda yakin ingin menghapus laporan ini? Tindakan ini tidak dapat dibatalkan.
                 </p>
             </div>
         </div>
-        <div class="flex gap-3 mt-6">
-            <button onclick="closeDeleteModal()" class="flex-1 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-colors">
+        <div class="flex gap-3">
+            <button type="button" onclick="closeDeleteModal()" class="flex-1 px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition-all duration-200">
                 Batal
             </button>
             <form id="deleteForm" method="POST" class="flex-1">
-                <button type="submit" class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors">
+                <button type="submit" class="w-full px-5 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-red-500/30">
                     Hapus
                 </button>
             </form>
@@ -238,23 +238,84 @@
     </div>
 </div>
 
+<style>
+@keyframes scaleIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+.animate-scale {
+    animation: scaleIn 0.2s ease-out;
+}
+#deleteModal:not(.hidden) {
+    display: flex !important;
+}
+</style>
+
 <script>
-function confirmDelete(problemId) {
+console.log('🔧 Delete script loaded - Version 3.0 (Data Attributes)');
+
+// Close modal function
+function closeDeleteModal() {
+    console.log('🚪 Closing modal...');
+    const modal = document.getElementById('deleteModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        console.log('✅ Modal closed');
+    }
+}
+
+// Setup event listeners when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('📱 DOM Content Loaded - Version 3.0');
+    
     const modal = document.getElementById('deleteModal');
     const form = document.getElementById('deleteForm');
-    form.action = '<?= url('/koordinator/problems/') ?>' + problemId + '/delete';
-    modal.classList.remove('hidden');
-}
-
-function closeDeleteModal() {
-    document.getElementById('deleteModal').classList.add('hidden');
-}
-
-// Close modal when clicking outside
-document.getElementById('deleteModal')?.addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeDeleteModal();
+    const message = document.getElementById('deleteMessage');
+    
+    // Verify modal elements exist
+    console.log('📋 Modal elements check:');
+    console.log('   - Modal:', modal ? '✅ Found' : '❌ Not found');
+    console.log('   - Form:', form ? '✅ Found' : '❌ Not found');
+    console.log('   - Message:', message ? '✅ Found' : '❌ Not found');
+    
+    if (!modal || !form || !message) {
+        console.error('❌ ERROR: Modal elements missing!');
+        return;
     }
+    
+    // Add click listener to all delete buttons using event delegation
+    document.body.addEventListener('click', function(e) {
+        const deleteBtn = e.target.closest('.btn-delete');
+        if (deleteBtn) {
+            e.preventDefault();
+            
+            const problemId = deleteBtn.dataset.problemId;
+            const description = deleteBtn.dataset.description;
+            
+            console.log('🗑️ Delete button clicked');
+            console.log('   - Problem ID:', problemId);
+            console.log('   - Description:', description);
+            
+            const deleteUrl = '<?= url('/koordinator/problems/') ?>' + problemId + '/delete';
+            console.log('🔗 Delete URL:', deleteUrl);
+            
+            form.action = deleteUrl;
+            message.textContent = `Apakah Anda yakin ingin menghapus "${description}"? Tindakan ini tidak dapat dibatalkan.`;
+            
+            console.log('✅ Opening modal...');
+            modal.classList.remove('hidden');
+        }
+    });
+    
+    // Close modal when clicking outside
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            console.log('🖱️ Clicked outside modal, closing...');
+            closeDeleteModal();
+        }
+    });
+    
+    console.log('✅ All event listeners attached successfully');
 });
 </script>
 

@@ -230,10 +230,41 @@ class KoordinatorController extends Controller
             $this->redirect('/koordinator/problems');
         }
 
-        $problemModel = $this->model('LabProblemModel');
-        $problemModel->deleteProblem($id);
+        // Validasi ID
+        if (empty($id) || !is_numeric($id)) {
+            setFlash('danger', '❌ ID permasalahan tidak valid!');
+            $this->redirect('/koordinator/problems');
+        }
 
-        setFlash('success', '🗑️ Data masalah berhasil dihapus!');
+        $problemModel = $this->model('LabProblemModel');
+        
+        // Cek apakah problem exists
+        $problem = $problemModel->find($id);
+        if (!$problem) {
+            setFlash('danger', '❌ Data masalah tidak ditemukan!');
+            $this->redirect('/koordinator/problems');
+        }
+
+        // Delete histories jika tabel ada
+        try {
+            $historyModel = $this->model('ProblemHistoryModel');
+            $histories = $historyModel->getHistoryByProblem($id);
+            foreach ($histories as $history) {
+                $historyModel->delete($history['id']);
+            }
+        } catch (Exception $e) {
+            // Tabel history tidak ada atau error, skip
+        }
+
+        // Delete problem
+        $result = $problemModel->deleteProblem($id);
+        
+        if ($result) {
+            setFlash('success', '🗑️ Data masalah berhasil dihapus!');
+        } else {
+            setFlash('danger', '❌ Gagal menghapus data masalah!');
+        }
+        
         $this->redirect('/koordinator/problems');
     }
 
