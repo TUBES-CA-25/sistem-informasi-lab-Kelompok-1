@@ -24,13 +24,18 @@ class HeadLaboranModel extends Model
      * Get all data for Presence Page (Sorted by Status)
      * [NEW METHOD] Mengambil data lengkap untuk halaman Management Presence
      */
+    /**
+     * Get all data for Presence Page (Sorted by Category then Status)
+     */
     public function getAllPresence()
     {
         $sql = "SELECT h.*, u.name, u.email 
                 FROM head_laboran h 
                 JOIN users u ON h.user_id = u.id 
                 ORDER BY 
-                    CASE WHEN h.status = 'active' THEN 1 ELSE 2 END, -- Yang hadir di atas
+                    -- LOGIKA PENGURUTAN BARU:
+                    CASE WHEN h.category = 'head' THEN 1 ELSE 2 END, -- 1. Kepala Lab Paling Atas
+                    CASE WHEN h.status = 'active' THEN 1 ELSE 2 END, -- 2. Yang Hadir (Active) di atas yang Inactive
                     h.position ASC";
         return $this->query($sql);
     }

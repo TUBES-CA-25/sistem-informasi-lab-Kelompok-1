@@ -69,36 +69,56 @@
                                 <i class="bi bi-sliders mr-2 text-primary-600"></i>Pengaturan
                             </h2>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
                                 <div>
                                     <label class="block mb-2 text-sm font-semibold text-slate-700">Kategori</label>
                                     <div class="relative">
                                         <select name="activity_type"
                                             class="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block appearance-none transition-all cursor-pointer">
                                             <optgroup label="Publikasi Umum">
-                                                <option value="news">📰 Berita & Informasi</option>
-                                                <option value="announcement">📢 Pengumuman Penting</option>
-                                                <option value="achievement">🥇 Prestasi & Penghargaan</option>
+                                                <option value="news">Berita & Informasi</option>
+                                                <option value="announcement">Pengumuman Penting</option>
+                                                <option value="achievement">Prestasi & Penghargaan</option>
                                             </optgroup>
 
                                             <optgroup label="Akademik & Kegiatan">
-                                                <option value="praktikum">🔬 Praktikum</option>
-                                                <option value="seminar">🎓 Seminar / Workshop</option>
-                                                <option value="lomba">🏆 Lomba / Kompetisi</option>
-                                                <option value="event">📅 Event / Acara Lab</option>
+                                                <option value="praktikum">Praktikum</option>
+                                                <option value="seminar">Seminar / Workshop</option>
+                                                <option value="lomba">Lomba / Kompetisi</option>
+                                                <option value="event">Event / Acara Lab</option>
                                             </optgroup>
 
                                             <optgroup label="Administrasi">
-                                                <option value="recruitment">🤝 Open Recruitment (Oprec)</option>
-                                                <option value="collaboration">🏢 Kunjungan / Kerjasama</option>
-                                                <option value="other">✨ Lainnya</option>
+                                                <option value="recruitment">Open Recruitment</option>
+                                                <option value="collaboration">Kerjasama</option>
+                                                <option value="other">Lainnya</option>
                                             </optgroup>
                                         </select>
                                         <div
                                             class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-500">
+                                            <i class="bi bi-chevron-down"></i>
                                         </div>
                                     </div>
                                 </div>
+
+                                <div>
+                                    <label class="block mb-2 text-sm font-semibold text-slate-700">Status Publikasi
+                                        <span class="text-rose-500">*</span></label>
+                                    <div class="relative">
+                                        <select name="status"
+                                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block appearance-none transition-all cursor-pointer">
+                                            <option value="published" selected>Published (Tayang)</option>
+                                            <option value="draft">Draft (Simpan Dulu)</option>
+                                            <option value="cancelled">Cancelled (Batal)</option>
+                                        </select>
+                                        <div
+                                            class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-500">
+                                            <i class="bi bi-chevron-down"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div>
                                     <label class="block mb-2 text-sm font-semibold text-slate-700">Tanggal
                                         Posting</label>
@@ -113,7 +133,8 @@
                     <div class="lg:col-span-1 space-y-6">
 
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Media Gambar</h2>
+                            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Media Gambar
+                            </h2>
 
                             <div class="mb-2">
                                 <label
@@ -127,7 +148,8 @@
                                             <i class="bi bi-cloud-arrow-up text-2xl"></i>
                                         </div>
                                         <p class="mb-1 text-sm font-semibold text-slate-700">Upload Thumbnail</p>
-                                        <p class="text-xs text-slate-500">Klik untuk memilih atau drag gambar ke sini.
+                                        <p class="text-xs text-slate-500">Klik untuk memilih atau drag gambar ke
+                                            sini.
                                         </p>
                                     </div>
 
@@ -142,7 +164,8 @@
                         </div>
 
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 sticky top-4">
-                            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Publikasi</h2>
+                            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Publikasi
+                            </h2>
 
                             <div class="flex flex-col gap-3">
                                 <button type="submit"
@@ -166,20 +189,20 @@
 </div>
 
 <script>
-function previewImage(input) {
-    const preview = document.getElementById('image-preview');
-    const placeholder = document.getElementById('placeholder-content');
+    function previewImage(input) {
+        const preview = document.getElementById('image-preview');
+        const placeholder = document.getElementById('placeholder-content');
 
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
 
-        reader.onload = function(e) {
-            preview.src = e.target.result;
-            preview.classList.remove('hidden');
-            placeholder.classList.add('opacity-0'); // Sembunyikan text placeholder
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+                placeholder.classList.add('opacity-0'); // Sembunyikan text placeholder
+            }
+
+            reader.readAsDataURL(input.files[0]);
         }
-
-        reader.readAsDataURL(input.files[0]);
     }
-}
 </script>

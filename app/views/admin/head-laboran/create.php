@@ -73,9 +73,34 @@
                                     </div>
                                 </div>
 
+
                                 <div>
-                                    <label class="block mb-2 text-xs font-semibold text-slate-700 uppercase">Jabatan
-                                        <span class="text-rose-500">*</span></label>
+                                    <label class="block mb-2 text-xs font-semibold text-slate-700 uppercase">Kategori
+                                        Jabatan <span class="text-rose-500">*</span></label>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="category" value="head" class="peer sr-only">
+                                            <div
+                                                class="p-3 rounded-xl border border-slate-200 bg-slate-50 peer-checked:bg-primary-50 peer-checked:border-primary-500 peer-checked:text-primary-700 transition-all text-center">
+                                                <i class="bi bi-star-fill mb-1 block text-lg"></i>
+                                                <span class="text-sm font-bold">Kepala Lab</span>
+                                            </div>
+                                        </label>
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="category" value="staff" class="peer sr-only"
+                                                checked>
+                                            <div
+                                                class="p-3 rounded-xl border border-slate-200 bg-slate-50 peer-checked:bg-slate-200 peer-checked:border-slate-400 peer-checked:text-slate-800 transition-all text-center">
+                                                <i class="bi bi-people-fill mb-1 block text-lg"></i>
+                                                <span class="text-sm font-bold">Staff / Laboran</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4">
+                                    <label class="block mb-2 text-xs font-semibold text-slate-700 uppercase">Nama
+                                        Jabatan Spesifik <span class="text-rose-500">*</span></label>
                                     <input type="text" name="position"
                                         class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block transition-all"
                                         placeholder="Contoh: Kepala Lab Multimedia" required>

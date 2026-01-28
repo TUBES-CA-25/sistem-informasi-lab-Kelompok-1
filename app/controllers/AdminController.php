@@ -1036,6 +1036,7 @@ class AdminController extends Controller
             'user_id' => sanitize($this->getPost('user_id')),
             'phone' => sanitize($this->getPost('phone')), // <--- DATA BARU
             'position' => sanitize($this->getPost('position')),
+            'category' => sanitize($this->getPost('category')),
             'status' => sanitize($this->getPost('status')),
             'location' => sanitize($this->getPost('location')),
             'time_in' => sanitize($this->getPost('time_in')),
@@ -1048,6 +1049,7 @@ class AdminController extends Controller
         $errors = $this->validate($data, [
             'user_id' => 'required',
             'position' => 'required',
+            'category' => 'required',
             'status' => 'required'
         ]);
 
@@ -1107,8 +1109,9 @@ class AdminController extends Controller
         $photoPath = $this->handleFileUpload('photo_file', 'uploads/profiles/') ?? $oldData['photo'];
 
         $data = [
-            'phone' => sanitize($this->getPost('phone')), // <--- DATA BARU
+            'phone' => sanitize($this->getPost('phone')),
             'position' => sanitize($this->getPost('position')),
+            'category' => sanitize($this->getPost('category')),
             'status' => sanitize($this->getPost('status')),
             'location' => sanitize($this->getPost('location')),
             'time_in' => sanitize($this->getPost('time_in')),
@@ -1219,39 +1222,43 @@ class AdminController extends Controller
         // 1. Handle Upload Cover
         $coverPath = $this->handleFileUpload('image_cover_file', 'uploads/activities/');
 
-        // 2. Ambil Input (Termasuk Link URL)
+        // 2. Ambil Input (Termasuk Status)
         $data = [
             'title' => sanitize($this->getPost('title')),
             'activity_type' => sanitize($this->getPost('activity_type')),
-            'description' => sanitize($this->getPost('description')), // Deskripsi Singkat
-            'link_url' => trim($this->getPost('link_url')),         // NEW: Link ke Berita
+            'description' => sanitize($this->getPost('description')),
+            'link_url' => trim($this->getPost('link_url')),
             'activity_date' => sanitize($this->getPost('activity_date')),
             'image_cover' => $coverPath,
-            'status' => 'published'
+            // AMBIL STATUS DARI FORM (Default 'draft' jika kosong)
+            'status' => sanitize($this->getPost('status', 'draft'))
         ];
 
         // 3. Validasi
         $errors = $this->validate($data, [
             'title' => 'required',
-            'link_url' => 'required', // Link wajib diisi
-            'activity_date' => 'required'
+            'link_url' => 'required',
+            'activity_date' => 'required',
+            'status' => 'required'
         ]);
 
         if (!empty($errors)) {
-            setFlash('danger', 'Judul, Link Berita, dan Tanggal wajib diisi.');
+            setFlash('danger', 'Judul, Link, Tanggal, dan Status wajib diisi.');
             $this->redirect('/admin/activities/create');
         }
 
         $activityModel = $this->model('LabActivityModel');
+        // Tambahkan created_by dari session user login
+        $data['created_by'] = getUserId();
+
         if ($activityModel->createActivity($data)) {
-            setFlash('success', 'Kegiatan berhasil diterbitkan.');
+            setFlash('success', 'Kegiatan berhasil disimpan.');
             $this->redirect('/admin/activities');
         } else {
-            setFlash('danger', 'Gagal menerbitkan kegiatan.');
+            setFlash('danger', 'Gagal menyimpan kegiatan.');
             $this->redirect('/admin/activities/create');
         }
     }
-
     public function editActivityForm($id)
     {
         $activityModel = $this->model('LabActivityModel');
@@ -1275,16 +1282,31 @@ class AdminController extends Controller
         $activityModel = $this->model('LabActivityModel');
         $oldData = $activityModel->find($id);
 
+        if (!$oldData) {
+            setFlash('danger', 'Data tidak ditemukan.');
+            $this->redirect('/admin/activities');
+        }
+
+        // 1. Handle Upload Gambar Baru (Jika ada)
         $coverPath = $this->handleFileUpload('image_cover_file', 'uploads/activities/') ?? $oldData['image_cover'];
 
+        // 2. Ambil Input (Termasuk Status & Link)
         $data = [
             'title' => sanitize($this->getPost('title')),
             'activity_type' => sanitize($this->getPost('activity_type')),
             'description' => sanitize($this->getPost('description')),
-            'link_url' => trim($this->getPost('link_url')), // NEW
+            'link_url' => trim($this->getPost('link_url')),
             'activity_date' => sanitize($this->getPost('activity_date')),
-            'image_cover' => $coverPath
+            'image_cover' => $coverPath,
+            // PERBAIKAN: Ambil status dari form edit
+            'status' => sanitize($this->getPost('status', 'published'))
         ];
+
+        // 3. Validasi sederhana
+        if (empty($data['title']) || empty($data['link_url'])) {
+            setFlash('danger', 'Judul dan Link Wajib diisi.');
+            $this->redirect('/admin/activities/' . $id . '/edit');
+        }
 
         if ($activityModel->updateActivity($id, $data)) {
             setFlash('success', 'Kegiatan berhasil diperbarui.');
