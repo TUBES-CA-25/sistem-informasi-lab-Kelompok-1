@@ -195,9 +195,8 @@ class AsistenController extends Controller
     public function viewProblem($id)
     {
         $problemModel = $this->model('LabProblemModel');
-        $userModel = $this->model('UserModel');
-
-        // Ambil data detail masalah
+        $historyModel = $this->model('ProblemHistoryModel'); 
+        
         $problem = $problemModel->getProblemWithDetails($id);
 
         if (!$problem) {
@@ -206,7 +205,8 @@ class AsistenController extends Controller
         }
 
         $data = [
-            'problem' => $problem
+            'problem' => $problem,
+            'histories' => $historyModel->getHistoryByProblem($id) 
         ];
 
         $this->view('asisten/reports/detail', $data);
