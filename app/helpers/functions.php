@@ -356,3 +356,77 @@ function dd($data) {
     echo '</pre>';
     die();
 }
+
+// ==========================================
+// VALIDATION HELPERS (Clean Code)
+// ==========================================
+
+/**
+ * Validate and sanitize filter parameters for list pages
+ * 
+ * @param array $params Array containing 'status', 'search', 'page'
+ * @param array $validStatuses Valid status values (default: problem statuses)
+ * @return array Validated filters ['status', 'search', 'page']
+ */
+function validateListFilters($params, $validStatuses = ['all', 'active', 'reported', 'in_progress', 'resolved']) {
+    $statusFilter = $params['status'] ?? 'active';
+    $search = $params['search'] ?? '';
+    $page = (int)($params['page'] ?? 1);
+
+    // Validate status
+    if (!in_array($statusFilter, $validStatuses)) {
+        $statusFilter = 'active';
+    }
+
+    // Validate page
+    if ($page < 1) {
+        $page = 1;
+    }
+
+    return [
+        'status' => $statusFilter,
+        'search' => $search,
+        'page' => $page
+    ];
+}
+
+/**
+ * Build pagination data array for views
+ * 
+ * @param array $result Result from model (must have: page, totalPages, perPage, total)
+ * @return array Pagination data for view
+ */
+function buildPaginationData($result) {
+    return [
+        'current' => $result['page'],
+        'total' => $result['totalPages'],
+        'perPage' => $result['perPage'],
+        'totalRecords' => $result['total']
+    ];
+}
+
+/**
+ * Validate required fields in data array
+ * 
+ * @param array $data Data to validate
+ * @param array $required Required field names
+ * @return bool True if all required fields are present and not empty
+ */
+function validateRequired($data, $required) {
+    foreach ($required as $field) {
+        if (empty($data[$field])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
+ * Validate numeric ID
+ * 
+ * @param mixed $id ID to validate
+ * @return bool True if valid numeric ID
+ */
+function validateId($id) {
+    return !empty($id) && is_numeric($id) && $id > 0;
+}

@@ -83,34 +83,27 @@ class AsistenController extends Controller
         $problemModel = $this->model('LabProblemModel');
         $laboratoryModel = $this->model('LaboratoryModel');
 
-        // Get filter parameters
-        $statusFilter = $this->getQuery('status') ?? 'active';
-        $search = $this->getQuery('search') ?? '';
-        $page = (int)($this->getQuery('page') ?? 1);
-
-        // Validate
-        $validStatuses = ['all', 'active', 'reported', 'in_progress', 'resolved'];
-        if (!in_array($statusFilter, $validStatuses)) {
-            $statusFilter = 'active';
-        }
-        if ($page < 1) {
-            $page = 1;
-        }
+        // Validate filters using helper
+        $filters = validateListFilters([
+            'status' => $this->getQuery('status'),
+            'search' => $this->getQuery('search'),
+            'page' => $this->getQuery('page')
+        ]);
 
         // Get filtered data
-        $result = $problemModel->getFilteredProblems($statusFilter, $search, $page, 10);
+        $result = $problemModel->getFilteredProblems(
+            $filters['status'], 
+            $filters['search'], 
+            $filters['page'], 
+            10
+        );
 
         $data = [
             'problems' => $result['data'],
-            'pagination' => [
-                'current' => $result['page'],
-                'total' => $result['totalPages'],
-                'perPage' => $result['perPage'],
-                'totalRecords' => $result['total']
-            ],
+            'pagination' => buildPaginationData($result),
             'filters' => [
-                'status' => $statusFilter,
-                'search' => $search
+                'status' => $filters['status'],
+                'search' => $filters['search']
             ],
             'laboratories' => $laboratoryModel->getAllLaboratories()
         ];
@@ -140,7 +133,7 @@ class AsistenController extends Controller
                 'reported_by' => getUserId()
             ];
 
-            if (empty($data['laboratory_id']) || empty($data['description'])) {
+            if (!validateRequired($data, ['laboratory_id', 'description'])) {
                 setFlash('danger', 'Mohon lengkapi data laporan.');
                 $this->redirect('/asisten/problems/create');
             }
@@ -163,9 +156,9 @@ class AsistenController extends Controller
             return;
         }
 
-        // Validasi ID
-        if (empty($id) || !is_numeric($id)) {
-            setFlash('danger', '❌ ID permasalahan tidak valid!');
+        // Validate ID using helper
+        if (!validateId($id)) {
+            setFlash('danger', 'ID permasalahan tidak valid.');
             $this->redirect('/asisten/problems');
             return;
         }
@@ -175,7 +168,7 @@ class AsistenController extends Controller
         // Cek apakah problem exists
         $problem = $problemModel->find($id);
         if (!$problem) {
-            setFlash('danger', '❌ Laporan tidak ditemukan!');
+            setFlash('danger', 'Laporan tidak ditemukan.');
             $this->redirect('/asisten/problems');
             return;
         }
@@ -184,9 +177,9 @@ class AsistenController extends Controller
         $result = $problemModel->deleteProblem($id);
         
         if ($result) {
-            setFlash('success', '🗑️ Laporan masalah berhasil dihapus!');
+            setFlash('success', 'Laporan masalah berhasil dihapus.');
         } else {
-            setFlash('danger', '❌ Gagal menghapus laporan masalah!');
+            setFlash('danger', 'Gagal menghapus laporan masalah.');
         }
         
         $this->redirect('/asisten/problems');
