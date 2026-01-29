@@ -115,3 +115,5 @@
         </div>
     </main>
 </div>
+
+<?php include APP_PATH . '/views/admin/layouts/footer.php'; ?>
