@@ -300,11 +300,17 @@
             <article
                 class="group bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col hover:-translate-y-1">
                 <a href="<?= url('/activity/' . $news['id']) ?>" class="relative h-48 overflow-hidden block">
-                    <?php
-                            $imgSrc = !empty($news['image_cover']) ? $news['image_cover'] : 'https://placehold.co/600x400/e2e8f0/94a3b8?text=News';
-                            if (strpos($imgSrc, 'http') === false) $imgSrc = BASE_URL . $imgSrc;
-                            ?>
-                    <img src="<?= e($imgSrc) ?>"
+                    <?php 
+                    $imageSrc = 'https://placehold.co/600x400/e2e8f0/94a3b8?text=News';
+                    if (!empty($news['image_cover'])) {
+                        // Jika path dimulai dengan http/https, gunakan langsung (URL eksternal)
+                        // Jika path dimulai dengan /, gunakan BASE_URL (relative path)
+                        $imageSrc = (strpos($news['image_cover'], 'http') === 0) 
+                            ? $news['image_cover'] 
+                            : BASE_URL . $news['image_cover'];
+                    }
+                    ?>
+                    <img src="<?= e($imageSrc) ?>"
                         class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                         loading="lazy">
 

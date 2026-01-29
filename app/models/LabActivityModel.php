@@ -92,9 +92,12 @@ class LabActivityModel extends Model
         // Opsional: Hapus gambar fisik jika ada (Best Practice)
         $item = $this->find($id);
         if ($item && !empty($item['image_cover'])) {
-            $filePath = '../public/' . $item['image_cover'];
-            if (file_exists($filePath)) {
-                unlink($filePath);
+            // Hanya hapus jika bukan URL eksternal
+            if (strpos($item['image_cover'], 'http') !== 0) {
+                $filePath = PUBLIC_PATH . $item['image_cover'];
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
             }
         }
 
