@@ -8,13 +8,18 @@
 class KoordinatorController extends Controller
 {
 
+    /**
+     * Constructor - Ensure only koordinator can access this controller
+     */
     public function __construct()
     {
         $this->requireRole('koordinator');
     }
 
     /**
-     * Koordinator dashboard
+     * Display koordinator dashboard with statistics and pending problems
+     * 
+     * @return void
      */
     public function dashboard()
     {
@@ -24,12 +29,16 @@ class KoordinatorController extends Controller
             'pendingProblems' => $problemModel->getPendingProblems(),
             'userName' => getUserName()
         ];
-        // Sesuai gambar: dashboard.php ada di luar folder schedules (langsung di koordinator)
         $this->view('koordinator/dashboard', $data);
     }
 
     /**
-     * List all problems with filter & pagination
+     * Display paginated list of lab problems with filtering
+     * 
+     * Supports filtering by status and search query
+     * Uses helper functions for validation and pagination
+     * 
+     * @return void
      */
     public function listProblems()
     {
@@ -63,7 +72,11 @@ class KoordinatorController extends Controller
     }
 
     /**
-     * Show create problem form
+     * Display form for creating new problem report
+     * 
+     * Loads laboratory list for dropdown selection
+     * 
+     * @return void
      */
     public function createProblemForm()
     {
@@ -77,7 +90,12 @@ class KoordinatorController extends Controller
     }
 
     /**
-     * Store new problem
+     * Process and store new problem report
+     * 
+     * Validates required fields, creates problem record,
+     * and adds initial history entry
+     * 
+     * @return void Redirects to problems list with flash message
      */
     public function createProblem()
     {
@@ -110,7 +128,12 @@ class KoordinatorController extends Controller
     }
 
     /**
-     * View problem detail
+     * Display detailed view of a specific problem
+     * 
+     * Shows problem details, history, and available assistants for assignment
+     * 
+     * @param int $id Problem ID
+     * @return void
      */
     public function viewProblem($id)
     {
@@ -135,7 +158,13 @@ class KoordinatorController extends Controller
     }
 
     /**
-     * Update problem status
+     * Update problem status and add history entry
+     * 
+     * Updates problem status (reported/in_progress/resolved)
+     * and logs the change with optional notes
+     * 
+     * @param int $id Problem ID
+     * @return void Redirects to problem detail
      */
     public function updateProblemStatus($id)
     {
@@ -164,7 +193,12 @@ class KoordinatorController extends Controller
     }
 
     /**
-     * Show edit problem form
+     * Display form for editing existing problem
+     * 
+     * Loads problem data and laboratory list
+     * 
+     * @param int $id Problem ID
+     * @return void
      */
     public function editProblemForm($id)
     {
@@ -187,7 +221,12 @@ class KoordinatorController extends Controller
     }
 
     /**
-     * Update problem data
+     * Process problem update and save changes
+     * 
+     * Updates problem data and adds history entry
+     * 
+     * @param int $id Problem ID
+     * @return void Redirects to problem detail
      */
     public function updateProblem($id)
     {
@@ -215,7 +254,13 @@ class KoordinatorController extends Controller
     }
 
     /**
-     * Delete problem
+     * Delete problem and its associated history
+     * 
+     * Validates ID, checks existence, deletes history entries,
+     * then removes the problem record
+     * 
+     * @param int $id Problem ID
+     * @return void Redirects to problems list
      */
     public function deleteProblem($id)
     {
@@ -262,7 +307,12 @@ class KoordinatorController extends Controller
     }
 
     /**
-     * Assign problem to assistant
+     * Assign problem to an assistant
+     * 
+     * Updates assigned_to field and creates history entry
+     * 
+     * @param int $id Problem ID
+     * @return void Redirects to problem detail
      */
     public function assignProblem($id)
     {
@@ -294,7 +344,12 @@ class KoordinatorController extends Controller
     }
 
     /**
-     * List all assistant schedules with grid view & filter
+     * Display list of assistant schedules grouped by day
+     * 
+     * Shows weekly schedule with assistant assignments and jobdesk settings
+     * Supports grid view with day grouping
+     * 
+     * @return void
      */
     public function listAssistantSchedules()
     {
@@ -339,6 +394,13 @@ class KoordinatorController extends Controller
     /**
      * Show create schedule form
      */
+    /**
+     * Display form for creating new assistant schedule
+     * 
+     * Loads list of assistants for dropdown selection
+     * 
+     * @return void
+     */
     public function createScheduleForm()
     {
         $userModel = $this->model('UserModel');
@@ -352,6 +414,14 @@ class KoordinatorController extends Controller
 
     /**
      * Store new schedule
+     */
+    /**
+     * Process and store new assistant schedule
+     * 
+     * Validates required fields (user_id, day, time)
+     * Creates schedule record
+     * 
+     * @return void Redirects to schedules list
      */
     public function createSchedule()
     {
@@ -380,7 +450,12 @@ class KoordinatorController extends Controller
     }
 
     /**
-     * Show edit schedule form
+     * Display form for editing existing assistant schedule
+     * 
+     * Loads schedule data and assistant list
+     * 
+     * @param int $id Schedule ID
+     * @return void
      */
     public function editScheduleForm($id)
     {
@@ -403,7 +478,12 @@ class KoordinatorController extends Controller
     }
 
     /**
-     * Update schedule
+     * Process schedule update and save changes
+     * 
+     * Updates schedule data (user, day, time, status)
+     * 
+     * @param int $id Schedule ID
+     * @return void Redirects to schedules list
      */
     public function updateSchedule($id)
     {
@@ -427,7 +507,12 @@ class KoordinatorController extends Controller
     }
 
     /**
-     * Delete schedule
+     * Delete assistant schedule
+     * 
+     * Removes schedule record from database
+     * 
+     * @param int $id Schedule ID
+     * @return void Redirects to schedules list
      */
     public function deleteSchedule($id)
     {
@@ -445,6 +530,13 @@ class KoordinatorController extends Controller
     /**
      * List all laboratories with enhanced view
      */
+    /**
+     * Display list of all laboratories
+     * 
+     * Shows laboratory data with PC and TV counts
+     * 
+     * @return void
+     */
     public function listLaboratories()
     {
         $data = ['laboratories' => $this->model('LaboratoryModel')->getAllLaboratories()];
@@ -454,6 +546,11 @@ class KoordinatorController extends Controller
     /**
      * Show create laboratory form
      */
+    /**
+     * Display form for creating new laboratory
+     * 
+     * @return void
+     */
     public function createLaboratoryForm()
     {
         $this->view('koordinator/laboratories/create');
@@ -461,6 +558,14 @@ class KoordinatorController extends Controller
 
     /**
      * Store new laboratory
+     */
+    /**
+     * Process and store new laboratory
+     * 
+     * Validates lab name requirement
+     * Creates laboratory record with specs
+     * 
+     * @return void Redirects to laboratories list
      */
     public function createLaboratory()
     {
@@ -494,6 +599,14 @@ class KoordinatorController extends Controller
 
     /**
      * Show edit laboratory form
+     */
+    /**
+     * Display form for editing existing laboratory
+     * 
+     * Loads laboratory data
+     * 
+     * @param int $id Laboratory ID
+     * @return void
      */
     public function editLaboratoryForm($id)
     {
