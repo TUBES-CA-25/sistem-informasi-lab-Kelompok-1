@@ -35,34 +35,27 @@ class KoordinatorController extends Controller
     {
         $problemModel = $this->model('LabProblemModel');
 
-        // Get filter parameters
-        $statusFilter = $this->getQuery('status') ?? 'active';
-        $search = $this->getQuery('search') ?? '';
-        $page = (int)($this->getQuery('page') ?? 1);
-
-        // Validate
-        $validStatuses = ['all', 'active', 'reported', 'in_progress', 'resolved'];
-        if (!in_array($statusFilter, $validStatuses)) {
-            $statusFilter = 'active';
-        }
-        if ($page < 1) {
-            $page = 1;
-        }
+        // Validate filters using helper
+        $filters = validateListFilters([
+            'status' => $this->getQuery('status'),
+            'search' => $this->getQuery('search'),
+            'page' => $this->getQuery('page')
+        ]);
 
         // Get filtered data
-        $result = $problemModel->getFilteredProblems($statusFilter, $search, $page, 10);
+        $result = $problemModel->getFilteredProblems(
+            $filters['status'], 
+            $filters['search'], 
+            $filters['page'], 
+            10
+        );
 
         $data = [
             'problems' => $result['data'],
-            'pagination' => [
-                'current' => $result['page'],
-                'total' => $result['totalPages'],
-                'perPage' => $result['perPage'],
-                'totalRecords' => $result['total']
-            ],
+            'pagination' => buildPaginationData($result),
             'filters' => [
-                'status' => $statusFilter,
-                'search' => $search
+                'status' => $filters['status'],
+                'search' => $filters['search']
             ]
         ];
 
@@ -100,7 +93,7 @@ class KoordinatorController extends Controller
             'reported_by' => getUserId()
         ];
 
-        if (empty($data['laboratory_id']) || empty($data['description'])) {
+        if (!validateRequired($data, ['laboratory_id', 'description'])) {
             setFlash('danger', 'Mohon lengkapi data laporan dengan benar.');
             $this->redirect('/koordinator/problems/create');
         }
@@ -230,8 +223,8 @@ class KoordinatorController extends Controller
             $this->redirect('/koordinator/problems');
         }
 
-        // Validasi ID
-        if (empty($id) || !is_numeric($id)) {
+        // Validate ID using helper
+        if (!validateId($id)) {
             setFlash('danger', 'ID permasalahan tidak valid.');
             $this->redirect('/koordinator/problems');
         }
@@ -374,7 +367,7 @@ class KoordinatorController extends Controller
             'status' => sanitize($this->getPost('status')) ?: 'scheduled'
         ];
 
-        if (empty($data['user_id']) || empty($data['day']) || empty($data['start_time']) || empty($data['end_time'])) {
+        if (!validateRequired($data, ['user_id', 'day', 'start_time', 'end_time'])) {
             setFlash('danger', 'Mohon lengkapi semua field yang wajib diisi.');
             $this->redirect('/koordinator/assistant-schedules/create');
         }
@@ -487,7 +480,7 @@ class KoordinatorController extends Controller
             'status' => sanitize($this->getPost('status'))
         ];
 
-        if (empty($data['lab_name'])) {
+        if (!validateRequired($data, ['lab_name'])) {
             setFlash('danger', 'Nama laboratorium wajib diisi.');
             $this->redirect('/koordinator/laboratories/create');
         }
