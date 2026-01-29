@@ -126,6 +126,8 @@ $adminLayout = true; ?>
     </main>
 </div>
 
+<?php include APP_PATH . '/views/admin/layouts/footer.php'; ?>
+
 <script>
 function previewImage(event) {
     const reader = new FileReader();

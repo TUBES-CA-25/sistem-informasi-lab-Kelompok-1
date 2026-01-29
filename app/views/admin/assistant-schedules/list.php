@@ -165,3 +165,5 @@ document.getElementById('jobModal').addEventListener('click', function(e) {
     if (e.target === this) closeJobModal();
 });
 </script>
+
+<?php include APP_PATH . '/views/admin/layouts/footer.php'; ?>

@@ -236,6 +236,8 @@
     </main>
 </div>
 
+<?php include APP_PATH . '/views/admin/layouts/footer.php'; ?>
+
 <script>
 function previewImage(input) {
     if (input.files && input.files[0]) {

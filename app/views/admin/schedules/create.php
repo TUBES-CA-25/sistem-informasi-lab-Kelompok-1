@@ -244,6 +244,8 @@
     </main>
 </div>
 
+<?php include APP_PATH . '/views/admin/layouts/footer.php'; ?>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const startDateInput = document.getElementById('start_date');
