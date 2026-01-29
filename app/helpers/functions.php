@@ -60,15 +60,20 @@ function verifyPassword($password, $hash) {
     return password_verify($password, $hash);
 }
 
-/**
- * Sanitize input
- */
-function sanitize($data) {
+
+function sanitize($data)
+{
     if (is_array($data)) {
         return array_map('sanitize', $data);
     }
-    
-    return htmlspecialchars(strip_tags(trim($data)), ENT_QUOTES, 'UTF-8');
+
+    // Pastikan data tidak null
+    $data = $data ?? '';
+
+    // HAPUS htmlspecialchars dari sini!
+    // Cukup trim (hapus spasi depan/belakang) dan strip_tags (hapus tag HTML <script> dll)
+    // Simbol seperti ' dan " akan tetap asli masuk ke database.
+    return strip_tags(trim($data));
 }
 
 /**

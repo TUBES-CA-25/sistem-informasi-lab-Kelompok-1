@@ -165,6 +165,26 @@ class AsistenController extends Controller
         }
     }
 
+    public function viewProblem($id)
+    {
+        $problemModel = $this->model('LabProblemModel');
+        $userModel = $this->model('UserModel');
+
+        // Ambil data detail masalah
+        $problem = $problemModel->getProblemWithDetails($id);
+
+        if (!$problem) {
+            setFlash('danger', 'Laporan tidak ditemukan.');
+            $this->redirect('/asisten/problems');
+        }
+
+        $data = [
+            'problem' => $problem
+        ];
+
+        $this->view('asisten/reports/detail', $data);
+    }
+
     // ==========================================
     // PAGE 3: JADWAL PIKET
     // ==========================================

@@ -63,7 +63,14 @@ $router->post('/asisten/jobdesk/:id/edit', 'AsistenController@updateTaskStatus')
 $router->get('/asisten/problems', 'AsistenController@problems');
 $router->get('/asisten/problems/create', 'AsistenController@createProblemForm');
 $router->post('/asisten/problems/create', 'AsistenController@createProblem');
-$router->post('/asisten/delete-problem/:id', 'AsistenController@deleteProblem');
+
+// Route Khusus (Edit & Delete) - Pastikan urutannya di atas route Detail (:id)
+$router->get('/asisten/problems/:id/edit', 'AsistenController@editProblemForm');
+$router->post('/asisten/problems/:id/edit', 'AsistenController@updateProblem');
+$router->post('/asisten/problems/:id/delete', 'AsistenController@deleteProblem');
+
+// Route Detail (Paling bawah agar tidak bentrok)
+$router->get('/asisten/problems/:id', 'AsistenController@viewProblem');
 
 // 3. Fitur Jadwal Piket
 $router->get('/asisten/assistant-schedules', 'AsistenController@listAssistantSchedules');
