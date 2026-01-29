@@ -271,7 +271,7 @@ function displayFlash() {
     $flash = getFlash();
     if ($flash) {
         $type = $flash['type'];
-        $message = $flash['message'];
+        $message = htmlspecialchars($flash['message'], ENT_QUOTES, 'UTF-8'); // Escape message
         
         // Map alert types to Tailwind colors and icons
         $config = [
@@ -314,6 +314,7 @@ function displayFlash() {
         
         $style = $config[$type] ?? $config['info'];
         
+        // HANYA HTML, TANPA JavaScript inline
         echo "
         <div id='toast-notification' class='fixed top-6 right-6 z-50 transform translate-x-0 transition-all duration-500 ease-out'>
             <div class='flex items-center w-full max-w-sm p-4 {$style['bg']} border {$style['border']} rounded-lg shadow-xl backdrop-blur-sm'>
@@ -328,35 +329,6 @@ function displayFlash() {
                 </button>
             </div>
         </div>
-        
-        <script>
-            // Auto hide after 5 seconds
-            setTimeout(function() {
-                closeToast();
-            }, 5000);
-            
-            function closeToast() {
-                const toast = document.getElementById('toast-notification');
-                if (toast) {
-                    toast.classList.add('translate-x-full', 'opacity-0');
-                    setTimeout(function() {
-                        toast.remove();
-                    }, 300);
-                }
-            }
-            
-            // Slide in animation on load
-            window.addEventListener('DOMContentLoaded', function() {
-                const toast = document.getElementById('toast-notification');
-                if (toast) {
-                    toast.classList.add('-translate-x-full');
-                    setTimeout(function() {
-                        toast.classList.remove('-translate-x-full');
-                        toast.classList.add('translate-x-0');
-                    }, 100);
-                }
-            });
-        </script>
         ";
     }
 }
