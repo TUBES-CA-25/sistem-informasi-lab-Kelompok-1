@@ -85,7 +85,7 @@ if (!empty($presenceList)) {
             <div class="flex flex-wrap justify-center -mx-4">
                 <?php if (!empty($staff)): ?>
                     <?php foreach ($staff as $person): ?>
-                        <div class="w-full md:w-1/2 lg:w-1/4 px-4 mb-6">
+                        <div class="w-full md:w-1/2 lg:w-1/3 px-4 mb-6">
                             <?php renderPresenceCard($person, false); ?>
                         </div>
                     <?php endforeach; ?>
