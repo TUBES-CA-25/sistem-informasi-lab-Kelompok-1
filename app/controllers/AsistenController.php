@@ -8,11 +8,21 @@
 class AsistenController extends Controller
 {
 
+    /**
+     * Constructor - Ensure only asisten can access this controller
+     */
     public function __construct()
     {
         $this->requireRole('asisten');
     }
 
+    /**
+     * Dashboard redirect to jobdesk page
+     * 
+     * Redirects asisten directly to their main work page (jobdesk)
+     * 
+     * @return void
+     */
     public function dashboard()
     {
         // Redirect ke jobdesk agar Asisten langsung fokus kerja
@@ -23,6 +33,13 @@ class AsistenController extends Controller
     // PAGE 1: JOBDESK SAYA (Tugas Maintenance)
     // ==========================================
 
+    /**
+     * Display asisten's assigned tasks (jobdesk)
+     * 
+     * Shows problems assigned to current asisten for maintenance
+     * 
+     * @return void
+     */
     public function jobdesk()
     {
         $problemModel = $this->model('LabProblemModel');
@@ -35,6 +52,14 @@ class AsistenController extends Controller
         $this->view('asisten/jobdesk/index', $data);
     }
 
+    /**
+     * Display form for editing task status
+     * 
+     * Loads task details for status update
+     * 
+     * @param int $id Task (problem) ID
+     * @return void
+     */
     public function editTaskForm($id)
 {
     $problemModel = $this->model('LabProblemModel');
@@ -53,6 +78,14 @@ class AsistenController extends Controller
     $this->view('asisten/jobdesk/edit', $data);
 }
 
+    /**
+     * Update task progress status
+     * 
+     * Updates task status and adds history entry with notes
+     * 
+     * @param int $id Task (problem) ID
+     * @return void Redirects to jobdesk
+     */
     public function updateTaskStatus($id)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -78,6 +111,14 @@ class AsistenController extends Controller
     // PAGE 2: PERMASALAHAN LAB (Lapor Masalah)
     // ==========================================
 
+    /**
+     * Display paginated list of problem reports
+     * 
+     * Shows all lab problems with filtering capability
+     * Uses helper functions for validation and pagination
+     * 
+     * @return void
+     */
     public function problems()
     {
         $problemModel = $this->model('LabProblemModel');
@@ -111,6 +152,13 @@ class AsistenController extends Controller
         $this->view('asisten/reports/index', $data);
     }
 
+    /**
+     * Display form for creating new problem report
+     * 
+     * Loads laboratory list for dropdown selection
+     * 
+     * @return void
+     */
     public function createProblemForm()
     {
         $laboratoryModel = $this->model('LaboratoryModel');
@@ -122,6 +170,14 @@ class AsistenController extends Controller
         $this->view('asisten/reports/create', $data);
     }
 
+    /**
+     * Process and store new problem report
+     * 
+     * Validates required fields, creates problem record,
+     * and adds initial history entry
+     * 
+     * @return void Redirects to problems list
+     */
     public function createProblem()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -149,6 +205,15 @@ class AsistenController extends Controller
         }
     }
 
+    /**
+     * Delete problem report
+     * 
+     * Validates ID and existence before deletion
+     * Asisten can only delete their own reports
+     * 
+     * @param int $id Problem ID
+     * @return void Redirects to problems list
+     */
     public function deleteProblem($id)
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -185,6 +250,14 @@ class AsistenController extends Controller
         $this->redirect('/asisten/problems');
     }
 
+    /**
+     * Display detailed view of a specific problem
+     * 
+     * Shows problem details and history
+     * 
+     * @param int $id Problem ID
+     * @return void
+     */
     public function viewProblem($id)
     {
         $problemModel = $this->model('LabProblemModel');
@@ -209,6 +282,13 @@ class AsistenController extends Controller
     // PAGE 3: JADWAL PIKET
     // ==========================================
 
+    /**
+     * Display current asisten's schedule
+     * 
+     * Shows weekly schedule for logged-in asisten only
+     * 
+     * @return void
+     */
     public function listAssistantSchedules()
     {
         $scheduleModel = $this->model('AssistantScheduleModel');
@@ -251,6 +331,15 @@ class AsistenController extends Controller
     }
 
     // Form Edit Masalah
+    /**
+     * Display form for editing existing problem
+     * 
+     * Validates ownership and status before allowing edit
+     * Asisten can only edit their own unresolved reports
+     * 
+     * @param int $id Problem ID
+     * @return void
+     */
     public function editProblemForm($id)
     {
         $problemModel = $this->model('LabProblemModel');
@@ -285,6 +374,14 @@ class AsistenController extends Controller
     }
 
     // Proses Update Masalah
+    /**
+     * Process problem update and save changes
+     * 
+     * Updates problem data and adds history entry
+     * 
+     * @param int $id Problem ID
+     * @return void Redirects to problems list
+     */
     public function updateProblem($id)
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
