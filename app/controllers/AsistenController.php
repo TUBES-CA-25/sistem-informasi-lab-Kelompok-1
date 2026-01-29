@@ -165,7 +165,7 @@ class AsistenController extends Controller
 
         // Validasi ID
         if (empty($id) || !is_numeric($id)) {
-            setFlash('danger', '❌ ID permasalahan tidak valid!');
+            setFlash('danger', 'ID permasalahan tidak valid.');
             $this->redirect('/asisten/problems');
             return;
         }
@@ -175,7 +175,7 @@ class AsistenController extends Controller
         // Cek apakah problem exists
         $problem = $problemModel->find($id);
         if (!$problem) {
-            setFlash('danger', '❌ Laporan tidak ditemukan!');
+            setFlash('danger', 'Laporan tidak ditemukan.');
             $this->redirect('/asisten/problems');
             return;
         }
@@ -184,9 +184,9 @@ class AsistenController extends Controller
         $result = $problemModel->deleteProblem($id);
         
         if ($result) {
-            setFlash('success', '🗑️ Laporan masalah berhasil dihapus!');
+            setFlash('success', 'Laporan masalah berhasil dihapus.');
         } else {
-            setFlash('danger', '❌ Gagal menghapus laporan masalah!');
+            setFlash('danger', 'Gagal menghapus laporan masalah.');
         }
         
         $this->redirect('/asisten/problems');
