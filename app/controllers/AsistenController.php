@@ -158,11 +158,38 @@ class AsistenController extends Controller
 
     public function deleteProblem($id)
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->model('LabProblemModel')->deleteProblem($id);
-            setFlash('success', 'Laporan masalah dihapus.');
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/asisten/problems');
+            return;
         }
+
+        // Validasi ID
+        if (empty($id) || !is_numeric($id)) {
+            setFlash('danger', '❌ ID permasalahan tidak valid!');
+            $this->redirect('/asisten/problems');
+            return;
+        }
+
+        $problemModel = $this->model('LabProblemModel');
+        
+        // Cek apakah problem exists
+        $problem = $problemModel->find($id);
+        if (!$problem) {
+            setFlash('danger', '❌ Laporan tidak ditemukan!');
+            $this->redirect('/asisten/problems');
+            return;
+        }
+
+        // Delete problem
+        $result = $problemModel->deleteProblem($id);
+        
+        if ($result) {
+            setFlash('success', '🗑️ Laporan masalah berhasil dihapus!');
+        } else {
+            setFlash('danger', '❌ Gagal menghapus laporan masalah!');
+        }
+        
+        $this->redirect('/asisten/problems');
     }
 
     public function viewProblem($id)
