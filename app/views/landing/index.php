@@ -213,7 +213,7 @@
 </section>
 
 <section id="sarana" class="py-20 bg-slate-50 relative overflow-hidden">
-    <div class="max-w-7xl mx-auto px-4 relative z-10">
+    <div class="max-w-6xl mx-auto px-4 relative z-10">
         <div class="text-center mb-16">
             <h2 class="text-sky-500 font-bold tracking-widest text-sm uppercase mb-2">FASILITAS LABORATORIUM</h2>
             <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900">Sarana Penunjang Praktikum</h2>
@@ -297,7 +297,7 @@
             $hasActivities = false;
             if (!empty($activities)):
                 foreach ($activities as $news):
-                    // PERBAIKAN: Filter hanya status published
+                    // Filter hanya status published
                     if (($news['status'] ?? 'published') !== 'published') continue;
                     $hasActivities = true;
             ?>
@@ -307,8 +307,6 @@
                     <?php 
                     $imageSrc = 'https://placehold.co/600x400/e2e8f0/94a3b8?text=No+Image';
                     if (!empty($news['image_cover'])) {
-                        // Jika path dimulai dengan http/https, gunakan langsung (URL eksternal)
-                        // Jika path dimulai dengan /, gunakan BASE_URL (relative path)
                         $imageSrc = (strpos($news['image_cover'], 'http') === 0) 
                             ? $news['image_cover'] 
                             : BASE_URL . $news['image_cover'];
@@ -377,10 +375,9 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Real-time Schedule Status Highlight
     function updateScheduleStatus() {
         const now = new Date();
-        const currentTime = now.toTimeString().split(' ')[0]; // Format: "14:30:00"
+        const currentTime = now.toTimeString().split(' ')[0];
 
         const rows = document.querySelectorAll('.schedule-row');
         rows.forEach(row => {
@@ -389,7 +386,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const badge = row.querySelector('.status-badge');
 
             if (currentTime >= start && currentTime <= end) {
-                // ACTIVE
                 row.classList.add('bg-blue-50/50', 'border-l-4', 'border-l-blue-500');
                 row.classList.remove('opacity-50', 'grayscale');
                 if (badge) {
@@ -398,7 +394,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     badge.innerHTML = '<i class="bi bi-record-circle-fill mr-1"></i> Berlangsung';
                 }
             } else if (currentTime > end) {
-                // COMPLETED
                 row.classList.remove('bg-blue-50/50', 'border-l-4', 'border-l-blue-500');
                 row.classList.add('opacity-50', 'grayscale');
                 if (badge) {
@@ -407,7 +402,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     badge.textContent = 'Selesai';
                 }
             } else {
-                // UPCOMING
                 row.classList.remove('bg-blue-50/50', 'border-l-4', 'border-l-blue-500', 'opacity-50',
                     'grayscale');
                 if (badge) {
@@ -420,7 +414,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     updateScheduleStatus();
-    setInterval(updateScheduleStatus, 60000); // Update tiap 1 menit
+    setInterval(updateScheduleStatus, 60000);
 });
 </script>
 
