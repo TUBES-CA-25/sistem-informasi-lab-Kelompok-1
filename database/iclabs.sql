@@ -55,7 +55,7 @@ CREATE TABLE `assistant_schedules` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `assistant_schedules_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -64,7 +64,7 @@ CREATE TABLE `assistant_schedules` (
 
 LOCK TABLES `assistant_schedules` WRITE;
 /*!40000 ALTER TABLE `assistant_schedules` DISABLE KEYS */;
-INSERT INTO `assistant_schedules` VALUES (26,10,'putra','Wednesday','Putra'),(27,3,'putra','Tuesday','Putra'),(28,4,'putra','Monday','Putra'),(29,4,'putra','Tuesday','Putra'),(30,4,'putra','Wednesday','Putri');
+INSERT INTO `assistant_schedules` VALUES (26,10,'putra','Wednesday','Putra'),(27,3,'putra','Tuesday','Putra'),(28,4,'putra','Monday','Putra'),(29,4,'putra','Tuesday','Putra'),(30,4,'putra','Wednesday','Putra'),(31,3,'putri','Thursday','Angkat kursi'),(32,5,'putra','Sunday','Putra'),(33,3,'putra','Tuesday','Putra'),(34,4,'putra','Tuesday','Putra'),(35,5,'putra','Thursday','Putra'),(36,4,'putra','Tuesday','Putra');
 /*!40000 ALTER TABLE `assistant_schedules` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -97,7 +97,7 @@ CREATE TABLE `course_plans` (
   PRIMARY KEY (`id`),
   KEY `laboratory_id` (`laboratory_id`),
   CONSTRAINT `course_plans_ibfk_1` FOREIGN KEY (`laboratory_id`) REFERENCES `laboratories` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -106,7 +106,7 @@ CREATE TABLE `course_plans` (
 
 LOCK TABLES `course_plans` WRITE;
 /*!40000 ALTER TABLE `course_plans` DISABLE KEYS */;
-INSERT INTO `course_plans` VALUES (2,14,'ALGORITMA PEMROGRAMAN','TEKNIK INFORMATIKA',4,'A1','WINDA','http://localhost/iclabs/public/uploads/lecturers/69703714563f4_1768961812.jpg','FRANCO','http://localhost/iclabs/public/uploads/assistants/6970371456c81_1768961812.jpg','BASUDARA','http://localhost/iclabs/public/uploads/assistants/6970371457440_1768961812.jpg','Wednesday','10:20:00','00:00:00',5,'BAPAK','2026-01-21 02:16:52'),(3,15,'Alpro bapak','ti',1,'b1','uceng','http://localhost/iclabs/public/uploads/lecturers/6970503a0e8f7_1768968250.jpg','basudara','http://localhost/iclabs/public/uploads/assistants/6970503a1027f_1768968250.jpg','windah','http://localhost/iclabs/public/uploads/assistants/6970503a10ef9_1768968250.jpg','Thursday','09:40:00','12:10:00',6,'bapak','2026-01-21 04:04:10'),(4,13,'Machine Learning','Teknik Informatika',8,'A6','Ir. Huzain Azis, S.Kom., M.Cs., MTA.',NULL,'Ahmad Mufly Ramadhan','http://localhost/iclabs/public/uploads/assistants/6973e53ebb47d_1769203006.png','Nahwa Kaka Saputra Anggareksa','http://localhost/iclabs/public/uploads/assistants/6973e53ebcf86_1769203006.png','Saturday','07:00:00','09:40:00',10,'Melajar Untuk mengolah data, dalam kalsifikasi data sederhana','2026-01-23 21:16:46');
+INSERT INTO `course_plans` VALUES (2,14,'ALGORITMA PEMROGRAMAN','TEKNIK INFORMATIKA',4,'A1','WINDA','http://localhost/iclabs/public/uploads/lecturers/69703714563f4_1768961812.jpg','FRANCO','http://localhost/iclabs/public/uploads/assistants/6970371456c81_1768961812.jpg','BASUDARA','http://localhost/iclabs/public/uploads/assistants/6970371457440_1768961812.jpg','Wednesday','10:20:00','00:00:00',5,'BAPAK','2026-01-21 02:16:52'),(3,15,'Alpro bapak','ti',1,'b1','uceng','http://localhost/iclabs/public/uploads/lecturers/6970503a0e8f7_1768968250.jpg','basudara','http://localhost/iclabs/public/uploads/assistants/6970503a1027f_1768968250.jpg','windah','http://localhost/iclabs/public/uploads/assistants/6970503a10ef9_1768968250.jpg','Thursday','09:40:00','12:10:00',6,'bapak','2026-01-21 04:04:10'),(4,13,'Machine Learning','Teknik Informatika',8,'A6','Ir. Huzain Azis, S.Kom., M.Cs., MTA.',NULL,'Ahmad Mufly Ramadhan','http://localhost/iclabs/public/uploads/assistants/6973e53ebb47d_1769203006.png','Nahwa Kaka Saputra Anggareksa','http://localhost/iclabs/public/uploads/assistants/6973e53ebcf86_1769203006.png','Saturday','07:00:00','09:40:00',10,'Melajar Untuk mengolah data, dalam kalsifikasi data sederhana','2026-01-23 21:16:46'),(5,14,'IOT','Tekni',12,'fla','dapok[vaf',NULL,'dafa',NULL,'faklfk',NULL,'Friday','09:54:00','02:02:00',14,'lkfkwmf','2026-01-29 01:52:42');
 /*!40000 ALTER TABLE `course_plans` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -122,6 +122,7 @@ CREATE TABLE `head_laboran` (
   `user_id` int(11) NOT NULL,
   `phone` varchar(20) DEFAULT NULL,
   `position` varchar(100) DEFAULT 'Laboran',
+  `category` enum('head','staff') DEFAULT 'staff',
   `photo` varchar(255) DEFAULT NULL,
   `status` enum('active','inactive') DEFAULT 'active',
   `location` varchar(100) DEFAULT NULL,
@@ -132,7 +133,7 @@ CREATE TABLE `head_laboran` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`),
   CONSTRAINT `head_laboran_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -141,7 +142,7 @@ CREATE TABLE `head_laboran` (
 
 LOCK TABLES `head_laboran` WRITE;
 /*!40000 ALTER TABLE `head_laboran` DISABLE KEYS */;
-INSERT INTO `head_laboran` VALUES (1,2,NULL,'Kepala Lab Komputer Dasar','','active','Lab Komputer 1',NULL,'Standby di ruangan A201','08:00:00','2026-01-16 03:50:50'),(2,6,NULL,'Kepala Lab Multimedia',NULL,'inactive','Luar Kota','2026-01-05 08:00:00','Sedang Dinas Luar di Jakarta',NULL,'2026-01-16 03:50:50'),(3,7,NULL,'Kepala Lab Jaringan',NULL,'active','Lab Jaringan B1',NULL,'Siap melayani konsultasi','07:30:00','2026-01-16 03:50:50'),(4,8,NULL,'Staff Laboran',NULL,'active','Ruang Server',NULL,'Maintenance Server Rutin','08:00:00','2026-01-16 03:50:50');
+INSERT INTO `head_laboran` VALUES (1,2,NULL,'Kepala Lab Komputer Dasar','staff','','active','Lab Komputer 1',NULL,'Standby di ruangan A201','08:00:00','2026-01-16 03:50:50'),(2,6,NULL,'Kepala Lab Multimedia','staff',NULL,'inactive','Luar Kota','2026-01-05 08:00:00','Sedang Dinas Luar di Jakarta',NULL,'2026-01-16 03:50:50'),(3,7,NULL,'Kepala Lab Jaringan','staff',NULL,'active','Lab Jaringan B1',NULL,'Siap melayani konsultasi','07:30:00','2026-01-16 03:50:50'),(4,8,NULL,'Staff Laboran','staff',NULL,'active','Ruang Server',NULL,'Maintenance Server Rutin','08:00:00','2026-01-16 03:50:50'),(5,1,'82258198784','Kepala lab 1','head',NULL,'active','da','0000-00-00 00:00:00','daopalf[a;dla','23:12:00','2026-01-29 02:58:05');
 /*!40000 ALTER TABLE `head_laboran` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -193,7 +194,7 @@ CREATE TABLE `lab_activities` (
   KEY `created_by` (`created_by`),
   KEY `idx_lab_activities_date` (`activity_date`),
   CONSTRAINT `lab_activities_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -202,7 +203,7 @@ CREATE TABLE `lab_activities` (
 
 LOCK TABLES `lab_activities` WRITE;
 /*!40000 ALTER TABLE `lab_activities` DISABLE KEYS */;
-INSERT INTO `lab_activities` VALUES (1,'Workshop Python Programming','/uploads/activities/activity_6978549d293a5.png','workshop','2025-01-15','Lab Komputer 1','Workshop pemrograman Python untuk pemula','','published',1,'2026-01-16 03:50:50'),(2,'Maintenance Rutin Lab','https://placehold.co/600x400/10b981/FFF?text=Maintenance','maintenance','2025-01-10','Semua Lab','Maintenance dan pembersihan rutin semua laboratorium',NULL,'published',1,'2026-01-16 03:50:50'),(3,'Seminar Keamanan Siber','/uploads/activities/activity_69788f41f3f4f.png','seminar','2025-01-20','Lab Jaringan','Seminar tentang keamanan siber dan ethical hacking','https://komikindo.ch/','published',1,'2026-01-16 03:50:50'),(4,'Praktikum Database Lanjut','https://placehold.co/600x400/ef4444/FFF?text=Database','praktikum','2025-01-08','Lab Komputer 2','Praktikum database management sistem lanjutan',NULL,'published',1,'2026-01-16 03:50:50');
+INSERT INTO `lab_activities` VALUES (3,'Seminar Keamanan Siber','/uploads/activities/activity_69788f41f3f4f.png','seminar','2025-01-20','Lab Jaringa','Seminar tentang keamanan siber dan ethical hacking','https://komikindo.ch/','published',1,'2026-01-16 03:50:50'),(6,'dakmkmafa','http://localhost/iclabs/public/uploads/activities/697ac118755c2_1769652504.png','','2005-01-25',NULL,'singkat kali','https://www.bing.com/search?pglt=299&q=john+fitzpatrick+dan+timnya+dari+stochholm+university+serta+manchester+university+NHS+foundation+Trust+tentang+sperm&cvid=1142110f38ca41349bdf78615713feed&gs_lcrp=EgRlZGdlKgYIABBFGDkyBggAEEUYOTIHCAEQ6wcYQNIBCTU2ODA4a','published',1,'2026-01-29 02:08:24');
 /*!40000 ALTER TABLE `lab_activities` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -260,7 +261,7 @@ CREATE TABLE `lab_problems` (
   CONSTRAINT `fk_lab_problems_assigned` FOREIGN KEY (`assigned_to`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `lab_problems_ibfk_1` FOREIGN KEY (`laboratory_id`) REFERENCES `laboratories` (`id`) ON DELETE CASCADE,
   CONSTRAINT `lab_problems_ibfk_2` FOREIGN KEY (`reported_by`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -269,7 +270,7 @@ CREATE TABLE `lab_problems` (
 
 LOCK TABLES `lab_problems` WRITE;
 /*!40000 ALTER TABLE `lab_problems` DISABLE KEYS */;
-INSERT INTO `lab_problems` VALUES (5,15,'02','hardware','meledak pcnya','in_progress',2,3,'2026-01-27 09:36:59','2026-01-27 17:58:09','2026-01-27 17:57:48'),(6,13,'05','software','MELEKADJJJ LAGI','resolved',2,3,'2026-01-27 09:38:54',NULL,'2026-01-27 17:46:15'),(7,15,'01','network','jaringan jelekkk','reported',3,NULL,'2026-01-27 09:46:47',NULL,NULL),(8,15,'01','hardware','MELEDAKK PCNYA','reported',3,4,'2026-01-27 09:58:58',NULL,NULL);
+INSERT INTO `lab_problems` VALUES (9,15,'01','network','MELEKDAA lagi','resolved',2,10,'2026-01-28 11:50:22',NULL,NULL),(12,14,'04','network','dapokfoafa','reported',3,3,'2026-01-29 01:08:18',NULL,NULL),(13,15,'25','hardware','apfkalfa','reported',3,4,'2026-01-29 01:22:30',NULL,NULL);
 /*!40000 ALTER TABLE `lab_problems` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -346,7 +347,7 @@ CREATE TABLE `laboratories` (
 
 LOCK TABLES `laboratories` WRITE;
 /*!40000 ALTER TABLE `laboratories` DISABLE KEYS */;
-INSERT INTO `laboratories` VALUES (13,'Multimedia','http://localhost/iclabs/public/uploads/laboratories/69701d042bdf2_1768955140.jpg','...',21,1,25,'active','2nd Floor','afag','',''),(14,'DS','http://localhost/iclabs/public/uploads/laboratories/6970369fe20b6_1768961695.jpg','BAPAK',26,1,0,'active','FIKOM LT2',NULL,NULL,NULL),(15,'IoT','http://localhost/iclabs/public/uploads/laboratories/69704fb108e98_1768968113.jpg','bapak',26,2,0,'active','2nd floor',NULL,NULL,NULL),(18,'da[ddava',NULL,'.dsmfaldLL',213,0,23,'active','','','','');
+INSERT INTO `laboratories` VALUES (13,'Multimedia','http://localhost/iclabs/public/uploads/laboratories/69701d042bdf2_1768955140.jpg','...',22,1,25,'active','2nd Floor','ald;adad','',''),(14,'DS','http://localhost/iclabs/public/uploads/laboratories/6970369fe20b6_1768961695.jpg','akjdlaa&#039;fa',26,1,0,'active','FIKOM LT2','','',''),(15,'IoT','http://localhost/iclabs/public/uploads/laboratories/69704fb108e98_1768968113.jpg','bapak',26,2,0,'active','2nd floor',NULL,NULL,NULL),(18,'da[ddava',NULL,'.dsmfaldLL',213,0,23,'active','','','','');
 /*!40000 ALTER TABLE `laboratories` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -369,7 +370,7 @@ CREATE TABLE `problem_histories` (
   KEY `updated_by` (`updated_by`),
   CONSTRAINT `problem_histories_ibfk_1` FOREIGN KEY (`problem_id`) REFERENCES `lab_problems` (`id`) ON DELETE CASCADE,
   CONSTRAINT `problem_histories_ibfk_2` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -378,7 +379,7 @@ CREATE TABLE `problem_histories` (
 
 LOCK TABLES `problem_histories` WRITE;
 /*!40000 ALTER TABLE `problem_histories` DISABLE KEYS */;
-INSERT INTO `problem_histories` VALUES (14,5,'reported','Laporan dibuat oleh Koordinator',2,'2026-01-27 09:36:59'),(15,5,'reported','Ditugaskan kepada: Asisten 2',2,'2026-01-27 09:37:31'),(16,6,'reported','Laporan dibuat oleh Koordinator',2,'2026-01-27 09:38:54'),(17,6,'reported','Problem updated by Koordinator',2,'2026-01-27 09:38:58'),(18,6,'reported','Ditugaskan kepada: Asisten 1',2,'2026-01-27 09:39:01'),(19,6,'resolved','Update Jobdesk: sudah melakukan perbaikan pada komponen',3,'2026-01-27 09:46:01'),(20,6,'reported','Status updated by assignee',3,'2026-01-27 09:46:08'),(21,6,'resolved','Update Jobdesk: done',3,'2026-01-27 09:46:15'),(22,7,'reported','Laporan baru dibuat oleh Asisten',3,'2026-01-27 09:46:47'),(23,5,'reported','Ditugaskan kepada: Asisten 1',2,'2026-01-27 09:51:16'),(24,5,'resolved','Update Jobdesk: SUDAH fixx',3,'2026-01-27 09:57:48'),(25,5,'in_progress','Update Jobdesk: masih maintannce',3,'2026-01-27 09:58:09'),(26,8,'reported','Laporan baru dibuat oleh Asisten',3,'2026-01-27 09:58:58'),(27,8,'reported','Ditugaskan kepada: MUHAMMAD RIFKY SAPUTRA SCANIA',2,'2026-01-27 09:59:41'),(28,8,'reported','Ditugaskan kepada: Asisten 2',2,'2026-01-27 09:59:55');
+INSERT INTO `problem_histories` VALUES (30,9,'reported','Laporan dibuat oleh Koordinator',2,'2026-01-28 11:50:22'),(33,12,'reported','Laporan baru dibuat oleh Asisten',3,'2026-01-29 01:08:18'),(34,13,'reported','Laporan baru dibuat oleh Asisten',3,'2026-01-29 01:22:30'),(35,13,'reported','Problem updated by Koordinator',2,'2026-01-29 02:32:56'),(36,13,'reported','',2,'2026-01-29 02:33:04'),(37,13,'reported','Ditugaskan kepada: Asisten 2',2,'2026-01-29 02:33:13'),(38,12,'reported','Ditugaskan kepada: Asisten 1',2,'2026-01-29 02:33:28'),(39,9,'reported','Ditugaskan kepada: MUHAMMAD RIFKY SAPUTRA SCANIA',2,'2026-01-29 02:33:40'),(40,9,'resolved','',2,'2026-01-29 02:33:46');
 /*!40000 ALTER TABLE `problem_histories` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -430,7 +431,7 @@ CREATE TABLE `schedule_sessions` (
   KEY `idx_session_date` (`session_date`),
   KEY `idx_session_time` (`start_time`,`end_time`),
   CONSTRAINT `schedule_sessions_ibfk_1` FOREIGN KEY (`course_plan_id`) REFERENCES `course_plans` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -439,7 +440,7 @@ CREATE TABLE `schedule_sessions` (
 
 LOCK TABLES `schedule_sessions` WRITE;
 /*!40000 ALTER TABLE `schedule_sessions` DISABLE KEYS */;
-INSERT INTO `schedule_sessions` VALUES (3,2,1,'2026-01-21','10:20:00','00:00:00',NULL,'scheduled',0),(4,2,2,'2026-01-28','10:20:00','00:00:00',NULL,'scheduled',0),(5,2,3,'2026-02-04','10:20:00','00:00:00',NULL,'scheduled',0),(6,2,4,'2026-02-11','10:20:00','00:00:00',NULL,'scheduled',0),(7,2,5,'2026-02-18','10:20:00','00:00:00',NULL,'scheduled',0),(8,3,1,'2026-01-22','09:40:00','12:10:00',NULL,'scheduled',0),(9,3,2,'2026-01-29','09:40:00','12:10:00',NULL,'scheduled',0),(10,3,3,'2026-02-05','09:40:00','12:10:00',NULL,'scheduled',0),(11,3,4,'2026-02-12','09:40:00','12:10:00',NULL,'scheduled',0),(12,3,5,'2026-02-19','09:40:00','12:10:00',NULL,'scheduled',0),(13,3,6,'2026-02-26','09:40:00','12:10:00',NULL,'scheduled',0),(14,4,1,'2026-01-24','07:00:00','09:40:00',NULL,'scheduled',0),(15,4,2,'2026-01-31','07:00:00','09:40:00',NULL,'scheduled',0),(16,4,3,'2026-02-07','07:00:00','09:40:00',NULL,'scheduled',0),(17,4,4,'2026-02-14','07:00:00','09:40:00',NULL,'scheduled',0),(18,4,5,'2026-02-21','07:00:00','09:40:00',NULL,'scheduled',0),(19,4,6,'2026-02-28','07:00:00','09:40:00',NULL,'scheduled',0),(20,4,7,'2026-03-07','07:00:00','09:40:00',NULL,'scheduled',0),(21,4,8,'2026-03-14','07:00:00','09:40:00',NULL,'scheduled',0),(22,4,9,'2026-03-21','07:00:00','09:40:00',NULL,'scheduled',0),(23,4,10,'2026-03-28','07:00:00','09:40:00',NULL,'scheduled',0);
+INSERT INTO `schedule_sessions` VALUES (3,2,1,'2026-01-21','10:20:00','00:00:00',NULL,'scheduled',0),(4,2,2,'2026-01-28','10:20:00','00:00:00',NULL,'scheduled',0),(5,2,3,'2026-02-04','10:20:00','00:00:00',NULL,'scheduled',0),(6,2,4,'2026-02-11','10:20:00','00:00:00',NULL,'scheduled',0),(7,2,5,'2026-02-18','10:20:00','00:00:00',NULL,'scheduled',0),(8,3,1,'2026-01-22','09:40:00','12:10:00',NULL,'scheduled',0),(9,3,2,'2026-01-29','09:40:00','12:10:00',NULL,'scheduled',0),(10,3,3,'2026-02-05','09:40:00','12:10:00',NULL,'scheduled',0),(11,3,4,'2026-02-12','09:40:00','12:10:00',NULL,'scheduled',0),(12,3,5,'2026-02-19','09:40:00','12:10:00',NULL,'scheduled',0),(13,3,6,'2026-02-26','09:40:00','12:10:00',NULL,'scheduled',0),(14,4,1,'2026-01-24','07:00:00','09:40:00',NULL,'scheduled',0),(15,4,2,'2026-01-31','07:00:00','09:40:00',NULL,'scheduled',0),(16,4,3,'2026-02-07','07:00:00','09:40:00',NULL,'scheduled',0),(17,4,4,'2026-02-14','07:00:00','09:40:00',NULL,'scheduled',0),(18,4,5,'2026-02-21','07:00:00','09:40:00',NULL,'scheduled',0),(19,4,6,'2026-02-28','07:00:00','09:40:00',NULL,'scheduled',0),(20,4,7,'2026-03-07','07:00:00','09:40:00',NULL,'scheduled',0),(21,4,8,'2026-03-14','07:00:00','09:40:00',NULL,'scheduled',0),(22,4,9,'2026-03-21','07:00:00','09:40:00',NULL,'scheduled',0),(23,4,10,'2026-03-28','07:00:00','09:40:00',NULL,'scheduled',0),(24,5,1,'2003-01-24','09:54:00','02:02:00',NULL,'scheduled',0),(25,5,2,'2003-01-31','09:54:00','02:02:00',NULL,'scheduled',0),(26,5,3,'2003-02-07','09:54:00','02:02:00',NULL,'scheduled',0),(27,5,4,'2003-02-14','09:54:00','02:02:00',NULL,'scheduled',0),(28,5,5,'2003-02-21','09:54:00','02:02:00',NULL,'scheduled',0),(29,5,6,'2003-02-28','09:54:00','02:02:00',NULL,'scheduled',0),(30,5,7,'2003-03-07','09:54:00','02:02:00',NULL,'scheduled',0),(31,5,8,'2003-03-14','09:54:00','02:02:00',NULL,'scheduled',0),(32,5,9,'2003-03-21','09:54:00','02:02:00',NULL,'scheduled',0),(33,5,10,'2003-03-28','09:54:00','02:02:00',NULL,'scheduled',0),(34,5,11,'2003-04-04','09:54:00','02:02:00',NULL,'scheduled',0),(35,5,12,'2003-04-11','09:54:00','02:02:00',NULL,'scheduled',0),(36,5,13,'2003-04-18','09:54:00','02:02:00',NULL,'scheduled',0),(37,5,14,'2003-04-25','09:54:00','02:02:00',NULL,'scheduled',0);
 /*!40000 ALTER TABLE `schedule_sessions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -486,4 +487,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-01-28 18:21:38
+-- Dump completed on 2026-01-29 11:02:46

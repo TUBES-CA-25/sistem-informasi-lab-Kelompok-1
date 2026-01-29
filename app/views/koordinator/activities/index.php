@@ -143,8 +143,9 @@
 
                             <!-- Actions -->
                             <div class="flex gap-2 pt-4 border-t border-slate-100">
-                                <a href="<?= url('/koordinator/activities/' . $activity['id'] . '/edit') ?>" class="flex-1 px-4 py-2 bg-sky-50 hover:bg-sky-100 text-sky-700 font-medium rounded-lg transition-colors text-center text-sm">
-                                    <i class="bi bi-pencil mr-1"></i> Edit
+                                <a href="<?= url('/activity/' . $activity['id']) ?>" 
+                                   class="flex-1 px-4 py-2 bg-sky-50 hover:bg-sky-100 text-sky-700 font-medium rounded-lg transition-colors text-center text-sm">
+                                    <i class="bi bi-eye mr-1"></i> Lihat Detail
                                 </a>
                                 <button type="button" 
                                         class="btn-delete flex-1 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 font-medium rounded-lg transition-colors text-sm"

@@ -158,9 +158,6 @@
                                             <a href="<?= url('/koordinator/problems/' . $problem['id']) ?>" class="text-sky-600 hover:text-sky-800 font-medium" title="Lihat Detail">
                                                 <i class="bi bi-eye"></i>
                                             </a>
-                                            <a href="<?= url('/koordinator/problems/' . $problem['id'] . '/edit') ?>" class="text-blue-600 hover:text-blue-800 font-medium" title="Edit">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
                                             <button type="button" class="btn-delete text-red-600 hover:text-red-800 font-medium" title="Hapus" data-problem-id="<?= $problem['id'] ?>" data-description="<?= htmlspecialchars($problem['description']) ?>">
                                                 <i class="bi bi-trash"></i>
                                             </button>

@@ -124,8 +124,9 @@
 
                         <!-- Actions -->
                         <div class="px-6 pb-6 flex gap-2">
-                            <a href="<?= url('/koordinator/laboratories/' . $lab['id'] . '/edit') ?>" class="flex-1 px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium rounded-lg transition-colors text-center text-sm">
-                                <i class="bi bi-pencil"></i> Edit
+                            <a href="<?= url('/laboratory/' . $lab['id']) ?>" 
+                               class="flex-1 px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium rounded-lg transition-colors text-center text-sm">
+                                <i class="bi bi-eye"></i> Lihat Detail
                             </a>
                             <button type="button" onclick="confirmDeleteLab(<?= $lab['id'] ?>, '<?= htmlspecialchars($lab['lab_name'], ENT_QUOTES) ?>'); return false;" class="flex-1 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 font-medium rounded-lg transition-colors text-sm">
                                 <i class="bi bi-trash"></i> Hapus
