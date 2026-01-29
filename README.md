@@ -32,7 +32,8 @@ iclabs/
 │   │   ├── HeadLaboranModel.php
 │   │   ├── LabActivityModel.php
 │   │   ├── LabProblemModel.php
-│   │   └── ProblemHistoryModel.php
+│   │   ├── ProblemHistoryModel.php
+│   │   └── SettingsModel.php
 │   ├── controllers/
 │   │   ├── AuthController.php
 │   │   ├── LandingController.php
@@ -55,20 +56,25 @@ iclabs/
 │       ├── js/
 │       └── uploads/
 └── database/
-    └── schema.sql             # Database schema & seed data
+    └── iclabs.sql             # Database schema & seed data
 ```
 
 ## 🗄️ Database Schema
-### 9 Tabel Utama:
+### 14 Tabel:
 1. **roles** - Role definitions (admin, koordinator, asisten)
 2. **users** - User accounts dengan relasi ke role
 3. **laboratories** - Data laboratorium
-4. **lab_schedules** - Jadwal praktikum per lab
-5. **assistant_schedules** - Jadwal piket asisten
-6. **head_laboran** - Data kepala laboran
-7. **lab_activities** - Kegiatan laboratorium
-8. **lab_problems** - Laporan permasalahan lab
-9. **problem_histories** - Riwayat update status masalah
+4. **assistant_schedules** - Jadwal piket asisten (tanggal, shift, user_id)
+5. **schedule_sessions** - Jadwal sesi kuliah praktikum (jam, hari, lab_id)
+6. **course_plans** - Rencana Pembelajaran Semester (RPS) per lab
+7. **head_laboran** - Data kepala laboran (status, lokasi, phone)
+8. **lab_activities** - Kegiatan laboratorium (title, date, status)
+9. **lab_problems** - Laporan permasalahan lab (reporter, status)
+10. **problem_histories** - Riwayat update status masalah
+11. **lab_photos** - Foto dokumentasi laboratorium
+12. **job_presets** - Template pekerjaan piket (putra/putri)
+13. **app_settings** - Pengaturan aplikasi (job_putra, job_putri)
+14. **lab_schedules_old** - Tabel lama jadwal (deprecated)
 
 ## 👥 Role & Access Control
 
@@ -107,23 +113,25 @@ iclabs/
 
 ### 2. Setup Database
 ```bash
-# Buka phpMyAdmin atau MySQL CLI
-# Import file database
-mysql -u root -p < database/schema.sql
+# Via MySQL CLI (port 3310)
+mysql -u root -P 3310 < database/iclabs.sql
 ```
 
 Atau manual:
 1. Buka phpMyAdmin → http://localhost/phpmyadmin
-2. Import file: `database/schema.sql`
-3. Database `iclabs` akan otomatis dibuat dengan data sample
+2. Buat database baru: `iclabs`
+3. Import file: `database/iclabs.sql`
+4. Database akan berisi struktur tabel + data sample
 
 ### 3. Konfigurasi
 Edit `app/config/database.php` jika perlu:
 ```php
-define('DB_HOST', 'localhost');
+define('DB_HOST', '127.0.0.1');
+define('DB_PORT', '3310');        // Port MySQL (default 3310)
 define('DB_NAME', 'iclabs');
 define('DB_USER', 'root');
 define('DB_PASS', '');
+define('DB_CHARSET', 'utf8mb4');
 ```
 
 ### 4. URL Rewrite (Apache)
@@ -201,6 +209,8 @@ http://localhost/iclabs/public/
 2. **Head Laboran**
    - Satu user hanya bisa menjadi 1 head laboran
    - Support upload foto
+   - Tracking status (active/inactive) dan lokasi real-time
+   - Field: phone, position, location, return_time, time_in
 
 3. **Lab Problems**
    - Asisten hanya bisa create report
@@ -212,80 +222,6 @@ http://localhost/iclabs/public/
    - Status: draft/published/cancelled
    - Public hanya melihat yang published
 
-## 🎨 UI/UX
-- **Public Pages**: Navbar + Hero section + Cards
-- **Admin Panel**: Sidebar navigation + Top navbar + Content area
-- **Responsive**: Grid layout dengan auto-fit
-- **Color Scheme**: 
-  - Primary: #2563eb (Blue)
-  - Success: #10b981 (Green)
-  - Warning: #f59e0b (Orange)
-  - Danger: #ef4444 (Red)
-
-## 🧪 Testing Checklist
-
-### Authentication
-- [ ] Login dengan email & password yang benar
-- [ ] Login dengan credential salah (harus gagal)
-- [ ] Logout berhasil
-- [ ] Redirect ke dashboard sesuai role setelah login
-
-### Public Access
-- [ ] Landing page dapat diakses tanpa login
-- [ ] Schedule page dapat diakses tanpa login
-- [ ] Head laboran terlihat di landing
-- [ ] Activities terlihat di landing
-
-### Asisten Features
-- [ ] Dashboard asisten muncul setelah login
-- [ ] Form report problem berfungsi
-- [ ] Laporan masuk ke database
-- [ ] Riwayat laporan sendiri muncul
-
-### Koordinator Features
-- [ ] Dashboard dengan statistik tampil
-- [ ] List semua problems tampil
-- [ ] Detail problem dapat dibuka
-- [ ] Update status problem berhasil
-- [ ] History tercatat saat update
-
-### Admin Features
-- [ ] Dashboard dengan statistik lengkap
-- [ ] CRUD Users berfungsi
-- [ ] CRUD Laboratories berfungsi
-- [ ] CRUD Lab Schedules berfungsi
-- [ ] CRUD Assistant Schedules berfungsi
-- [ ] CRUD Head Laboran berfungsi (+ upload foto)
-- [ ] CRUD Activities berfungsi
-- [ ] View & update problems berfungsi
-- [ ] Delete problem berfungsi
-
-### Data Integrity
-- [ ] Foreign key constraints berfungsi
-- [ ] Tidak bisa delete lab yang punya schedule
-- [ ] Tidak bisa delete user yang punya data relasi
-- [ ] History problem tersimpan setiap update
-
-## 🐛 Troubleshooting
-
-### Error: "Database connection failed"
-- Pastikan MySQL service berjalan
-- Cek credential di `config/database.php`
-- Pastikan database `iclabs` sudah dibuat
-
-### Error: "404 Not Found" pada semua route
-- Pastikan mod_rewrite Apache aktif
-- Cek file `.htaccess` ada di folder `public/`
-- Pastikan URL menggunakan `/public/`
-
-### Error: "Call to undefined function"
-- Pastikan semua file di `app/helpers/` di-load
-- Cek `public/index.php` sudah require semua files
-
-### Upload foto tidak berfungsi
-- Pastikan folder `public/uploads/` writable (chmod 777)
-- Cek max upload size di php.ini
-
 ## 📞 Support
 Jika ada pertanyaan atau bug, silakan hubungi administrator.
 
@@ -293,6 +229,8 @@ Jika ada pertanyaan atau bug, silakan hubungi administrator.
 Educational Purpose - ICLABS Project
 
 ---
-**Developed by**: Senior Full-Stack Engineer  
-**Date**: December 2025  
-**Version**: 1.0.0
+**Developed by**: ICLABS Development Team
+**Last Updated**: January 2026  
+**Version**: 1.2.0  
+**Database**: MariaDB 10.4.32 (Port 3310)  
+**PHP Version**: 8.x

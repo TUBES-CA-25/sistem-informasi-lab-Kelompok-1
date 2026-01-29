@@ -107,7 +107,7 @@
                 </li>
                 <li>
                     <a href="<?= url('/activities') ?>"
-                        class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/activities') !== false ? 'text-sky-600 font-bold' : 'text-slate-600 hover:text-sky-600' ?>">
+                        class="block py-2 px-3 rounded md:p-0 transition-colors <?= (strpos($_SERVER['REQUEST_URI'], '/activities') !== false && strpos($_SERVER['REQUEST_URI'], '/koordinator/activities') === false && strpos($_SERVER['REQUEST_URI'], '/asisten/activities') === false && strpos($_SERVER['REQUEST_URI'], '/admin/activities') === false) ? 'text-sky-600 font-bold' : 'text-slate-600 hover:text-sky-600' ?>">
                         Kegiatan
                     </a>
                 </li>
