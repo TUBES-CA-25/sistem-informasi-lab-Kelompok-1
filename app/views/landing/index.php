@@ -286,7 +286,11 @@
 
 <section id="activity" class="py-20 bg-white">
     <div class="max-w-6xl mx-auto px-4">
-        <h2 class="text-center text-3xl font-bold text-blue-600 mb-12 uppercase tracking-wide">Kegiatan Terbaru</h2>
+        <a href="<?= url('/activities') ?>" class="block text-center mb-12 group">
+            <h2 class="text-3xl font-bold text-blue-600 uppercase tracking-wide group-hover:text-blue-700 transition-colors inline-flex items-center gap-2">
+                Kegiatan Terbaru
+            </h2>
+        </a>
 
         <div class="grid gap-8 md:grid-cols-3">
             <?php
@@ -298,10 +302,10 @@
                     $hasActivities = true;
             ?>
             <article
-                class="group bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col hover:-translate-y-1">
-                <a href="<?= url('/activity/' . $news['id']) ?>" class="relative h-48 overflow-hidden block">
+                class="flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group h-full">
+                <a href="<?= url('/activity/' . $news['id']) ?>" class="relative h-56 overflow-hidden block">
                     <?php 
-                    $imageSrc = 'https://placehold.co/600x400/e2e8f0/94a3b8?text=News';
+                    $imageSrc = 'https://placehold.co/600x400/e2e8f0/94a3b8?text=No+Image';
                     if (!empty($news['image_cover'])) {
                         // Jika path dimulai dengan http/https, gunakan langsung (URL eksternal)
                         // Jika path dimulai dengan /, gunakan BASE_URL (relative path)
@@ -312,40 +316,48 @@
                     ?>
                     <img src="<?= e($imageSrc) ?>"
                         class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
-                        loading="lazy">
+                        alt="<?= e($news['title']) ?>" loading="lazy">
 
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-60"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
 
-                    <div class="absolute top-3 left-3">
+                    <div class="absolute top-4 left-4 flex gap-2">
                         <span
-                            class="bg-blue-600/90 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider shadow-sm">
+                            class="bg-white/90 backdrop-blur-md text-blue-700 text-[10px] font-bold px-3 py-1.5 rounded-lg uppercase tracking-wider shadow-sm border border-white/50">
                             <?= getActivityTypeLabel($news['activity_type']) ?>
                         </span>
                     </div>
                 </a>
 
-                <div class="p-6 flex flex-col flex-1">
-                    <div class="flex items-center gap-2 text-xs text-slate-400 font-bold uppercase tracking-wide mb-3">
-                        <i class="bi bi-calendar-event"></i>
-                        <?= date('d F Y', strtotime($news['activity_date'])) ?>
+                <div class="p-6 flex flex-col flex-1 relative">
+                    <div
+                        class="absolute -top-5 right-6 bg-blue-600 text-white text-xs font-bold px-3 py-2 rounded-lg shadow-lg flex flex-col items-center border-2 border-white">
+                        <span class="text-lg leading-none"><?= date('d', strtotime($news['activity_date'])) ?></span>
+                        <span class="uppercase text-[10px]"><?= date('M', strtotime($news['activity_date'])) ?></span>
                     </div>
 
-                    <h3
-                        class="text-lg font-bold text-slate-800 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                        <a href="<?= url('/activity/' . $news['id']) ?>">
-                            <?= e($news['title']) ?>
-                        </a>
-                    </h3>
+                    <div class="mt-2 mb-3">
+                        <h3
+                            class="text-xl font-bold text-slate-900 leading-snug group-hover:text-blue-600 transition-colors line-clamp-2">
+                            <a href="<?= url('/activity/' . $news['id']) ?>">
+                                <?= e($news['title']) ?>
+                            </a>
+                        </h3>
+                    </div>
 
-                    <p class="text-slate-500 text-sm line-clamp-3 mb-4 flex-1">
+                    <p class="text-slate-600 text-sm leading-relaxed mb-6 line-clamp-3 flex-1">
                         <?= e($news['description']) ?>
                     </p>
 
-                    <a href="<?= url('/activity/' . $news['id']) ?>"
-                        class="inline-flex items-center text-blue-600 font-bold text-sm hover:underline mt-auto">
-                        Baca Selengkapnya <i
-                            class="bi bi-arrow-right ml-1 transition-transform group-hover:translate-x-1"></i>
-                    </a>
+                    <div class="pt-6 border-t border-slate-100 flex items-center justify-between mt-auto">
+                        <span class="text-xs text-slate-400 font-medium flex items-center gap-1">
+                            <i class="bi bi-clock"></i> <?= date('Y', strtotime($news['activity_date'])) ?>
+                        </span>
+
+                        <a href="<?= url('/activity/' . $news['id']) ?>"
+                            class="inline-flex items-center text-blue-600 font-bold text-sm hover:gap-2 gap-1 transition-all group">
+                            Baca Selengkapnya<i class="bi bi-arrow-right transition-transform group-hover:translate-x-1"></i>
+                        </a>
+                    </div>
                 </div>
             </article>
             <?php endforeach; ?>

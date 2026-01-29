@@ -36,29 +36,19 @@ $title = e($activity['title']);
     <div class="bg-slate-50 border-b border-slate-200">
         <div class="max-w-5xl mx-auto px-4 py-10">
 
-            <nav class="flex mb-6" aria-label="Breadcrumb">
-                <ol class="inline-flex items-center space-x-1 md:space-x-3 text-sm">
-                    <li class="inline-flex items-center">
-                        <a href="<?= url('/') ?>" class="inline-flex items-center text-slate-500 hover:text-blue-600">
-                            <i class="bi bi-house-door-fill mr-2"></i> Home
-                        </a>
-                    </li>
-                    <li>
-                        <div class="flex items-center">
-                            <i class="bi bi-chevron-right text-slate-400 mx-1"></i>
-                            <a href="<?= url('/activities') ?>" class="text-slate-500 hover:text-blue-600">Kegiatan</a>
-                        </div>
-                    </li>
-                    <li aria-current="page">
-                        <div class="flex items-center">
-                            <i class="bi bi-chevron-right text-slate-400 mx-1"></i>
-                            <span class="text-slate-400 truncate max-w-[150px] md:max-w-xs">Detail</span>
-                        </div>
-                    </li>
-                </ol>
-            </nav>
+            <!-- Back Button -->
+            <div class="mb-6">
+                <a href="<?= url('/activities') ?>" class="inline-flex items-center gap-2 text-slate-600 hover:text-blue-600 font-medium transition-colors group">
+                    <i class="bi bi-arrow-left transition-transform group-hover:-translate-x-1"></i>
+                    <span>Kembali ke Kegiatan</span>
+                </a>
+            </div>
 
-            <div class="flex flex-wrap items-center gap-3 mb-6">
+            <h1 class="text-3xl md:text-5xl font-extrabold text-slate-900 leading-tight mb-6">
+                <?= e($activity['title']) ?>
+            </h1>
+
+            <div class="flex flex-wrap items-center gap-3">
                 <span
                     class="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide border border-blue-200">
                     <?= getActivityTypeLabel($activity['activity_type']) ?>
@@ -68,10 +58,6 @@ $title = e($activity['title']);
                     <?= date('d F Y', strtotime($activity['activity_date'])) ?>
                 </span>
             </div>
-
-            <h1 class="text-3xl md:text-5xl font-extrabold text-slate-900 leading-tight mb-4">
-                <?= e($activity['title']) ?>
-            </h1>
         </div>
     </div>
 
