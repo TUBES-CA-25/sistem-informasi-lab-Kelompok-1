@@ -705,7 +705,7 @@ class KoordinatorController extends Controller
         // Handle image upload
         $imagePath = null;
         if (isset($_FILES['image_cover']) && $_FILES['image_cover']['error'] === UPLOAD_ERR_OK) {
-            $imagePath = $this->uploadActivityImage($_FILES['image_cover']);
+            $imagePath = uploadFile($_FILES['image_cover'], 'activities', null, 5242880, 'activity');
             if (!$imagePath) {
                 setFlash('danger', 'Gagal upload gambar. Pastikan format dan ukuran file sudah sesuai.');
                 $this->redirect('/koordinator/activities/create');
@@ -766,7 +766,7 @@ class KoordinatorController extends Controller
         // Handle image upload
         $imagePath = $activity['image_cover']; // Keep existing image
         if (isset($_FILES['image_cover']) && $_FILES['image_cover']['error'] === UPLOAD_ERR_OK) {
-            $newImagePath = $this->uploadActivityImage($_FILES['image_cover']);
+            $newImagePath = uploadFile($_FILES['image_cover'], 'activities', null, 5242880, 'activity');
             if ($newImagePath) {
                 // Delete old image if exists
                 if ($imagePath && file_exists(PUBLIC_PATH . $imagePath)) {
@@ -827,39 +827,7 @@ class KoordinatorController extends Controller
     /**
      * Upload activity image
      */
-    private function uploadActivityImage($file)
-    {
-        $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-        $maxSize = 5 * 1024 * 1024; // 5MB
 
-        // Validate file type
-        if (!in_array($file['type'], $allowedTypes)) {
-            return false;
-        }
-
-        // Validate file size
-        if ($file['size'] > $maxSize) {
-            return false;
-        }
-
-        // Create upload directory if not exists
-        $uploadDir = PUBLIC_PATH . '/uploads/activities/';
-        if (!file_exists($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
-        }
-
-        // Generate unique filename
-        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-        $filename = uniqid('activity_') . '.' . $extension;
-        $filepath = $uploadDir . $filename;
-
-        // Move uploaded file
-        if (move_uploaded_file($file['tmp_name'], $filepath)) {
-            return '/uploads/activities/' . $filename;
-        }
-
-        return false;
-    }
 
 
 

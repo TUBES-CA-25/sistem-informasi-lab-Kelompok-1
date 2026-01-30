@@ -193,35 +193,53 @@ function getDayName($day) {
 }
 
 /**
- * Upload file
+ * Upload file to specified directory with comprehensive validation
+ * 
+ * @param array $file Uploaded file data from $_FILES
+ * @param string $directory Target directory name (activities, lecturers, assistants, schedules, laboratories, profiles)
+ * @param array|null $allowedTypes Allowed MIME types (default: images only)
+ * @param int $maxSize Maximum file size in bytes (default: 5MB)
+ * @param string $prefix Filename prefix for unique naming (default: 'file')
+ * @return string|false Relative path to uploaded file or false on failure
  */
-function uploadFile($file, $uploadDir = 'uploads/', $allowedTypes = ['jpg', 'jpeg', 'png']) {
-    if (!isset($file['error']) || is_array($file['error'])) {
-        return ['success' => false, 'message' => 'Invalid file'];
+function uploadFile($file, $directory = 'activities', $allowedTypes = null, $maxSize = 5242880, $prefix = 'file') {
+    // Default allowed types: images
+    if ($allowedTypes === null) {
+        $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
     }
     
-    if ($file['error'] !== UPLOAD_ERR_OK) {
-        return ['success' => false, 'message' => 'Upload error'];
+    // Validate file upload error
+    if (!isset($file['error']) || is_array($file['error']) || $file['error'] !== UPLOAD_ERR_OK) {
+        return false;
     }
     
-    $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-    
-    if (!in_array($fileExtension, $allowedTypes)) {
-        return ['success' => false, 'message' => 'File type not allowed'];
+    // Validate file type
+    if (!in_array($file['type'], $allowedTypes)) {
+        return false;
     }
     
-    $fileName = uniqid() . '.' . $fileExtension;
-    $targetPath = PUBLIC_PATH . '/' . $uploadDir . $fileName;
-    
-    if (!is_dir(PUBLIC_PATH . '/' . $uploadDir)) {
-        mkdir(PUBLIC_PATH . '/' . $uploadDir, 0777, true);
+    // Validate file size
+    if ($file['size'] > $maxSize) {
+        return false;
     }
     
-    if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-        return ['success' => true, 'filename' => $fileName, 'path' => $uploadDir . $fileName];
+    // Create upload directory if not exists
+    $uploadDir = PUBLIC_PATH . '/uploads/' . $directory . '/';
+    if (!file_exists($uploadDir)) {
+        mkdir($uploadDir, 0777, true);
     }
     
-    return ['success' => false, 'message' => 'Failed to move uploaded file'];
+    // Generate unique filename
+    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+    $filename = uniqid($prefix . '_') . '.' . $extension;
+    $filepath = $uploadDir . $filename;
+    
+    // Move uploaded file
+    if (move_uploaded_file($file['tmp_name'], $filepath)) {
+        return '/uploads/' . $directory . '/' . $filename;
+    }
+    
+    return false;
 }
 
 /**
