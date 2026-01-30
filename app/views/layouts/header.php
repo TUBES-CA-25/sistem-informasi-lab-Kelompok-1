@@ -103,6 +103,28 @@
             }
         }
 
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
         .animate-fadeIn {
             animation: fadeIn 0.2s ease-out;
         }
@@ -111,6 +133,25 @@
             animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
     </style>
+
+    <script>
+        // Flash message auto-dismiss system
+        function dismissFlash() {
+            const toast = document.getElementById('flash-toast');
+            if (toast) {
+                toast.style.animation = 'slideOutRight 0.3s ease-in forwards';
+                setTimeout(() => toast.remove(), 300);
+            }
+        }
+
+        // Auto-dismiss after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const toast = document.getElementById('flash-toast');
+            if (toast) {
+                setTimeout(() => dismissFlash(), 5000);
+            }
+        });
+    </script>
 </head>
 
 <body class="bg-white text-slate-800 flex flex-col min-h-screen selection:bg-sky-200 selection:text-sky-900">

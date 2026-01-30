@@ -332,17 +332,18 @@ function displayFlash() {
         
         $style = $config[$type] ?? $config['info'];
         
-        // HANYA HTML, TANPA JavaScript inline
+        // Professional toast notification with auto-dismiss
         echo "
-        <div id='toast-notification' class='fixed top-6 right-6 z-50 transform translate-x-0 transition-all duration-500 ease-out'>
-            <div class='flex items-center w-full max-w-sm p-4 {$style['bg']} border {$style['border']} rounded-lg shadow-xl backdrop-blur-sm'>
+        <div id='flash-toast' class='fixed top-6 right-6 z-50 transform transition-all duration-300 ease-out' style='animation: slideInRight 0.3s ease-out;'>
+            <div class='flex items-center w-full max-w-sm p-4 {$style['bg']} border {$style['border']} rounded-lg shadow-xl'>
                 <div class='inline-flex items-center justify-center flex-shrink-0 w-10 h-10 {$style['iconColor']}'>
                     <i class='bi {$style['icon']} text-2xl'></i>
                 </div>
-                <div class='ml-3 text-sm font-medium {$style['text']} flex-1'>
+                <div class='ml-3 text-sm font-medium {$style['text']} flex-1 leading-snug'>
                     {$message}
                 </div>
-                <button type='button' onclick='closeToast()' class='ml-3 -mx-1.5 -my-1.5 {$style['bg']} {$style['text']} hover:bg-opacity-80 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 inline-flex items-center justify-center h-8 w-8 transition-colors'>
+                <button type='button' onclick='dismissFlash()' class='ml-3 -mx-1.5 -my-1.5 {$style['bg']} {$style['text']} hover:bg-opacity-80 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 inline-flex items-center justify-center h-8 w-8 transition-colors'>
+                    <span class='sr-only'>Close</span>
                     <i class='bi bi-x-lg'></i>
                 </button>
             </div>
