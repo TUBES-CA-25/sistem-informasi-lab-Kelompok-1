@@ -202,10 +202,10 @@ function getDayName($day) {
  * @param string $prefix Filename prefix for unique naming (default: 'file')
  * @return string|false Relative path to uploaded file or false on failure
  */
-function uploadFile($file, $directory = 'activities', $allowedTypes = null, $maxSize = 5242880, $prefix = 'file') {
+function uploadFile($file, $directory = UPLOAD_DIR_ACTIVITIES, $allowedTypes = null, $maxSize = MAX_UPLOAD_SIZE, $prefix = 'file') {
     // Default allowed types: images
     if ($allowedTypes === null) {
-        $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+        $allowedTypes = ALLOWED_IMAGE_TYPES;
     }
     
     // Validate file upload error
@@ -256,7 +256,7 @@ function deleteFile($filePath) {
 /**
  * Set flash message
  */
-function setFlash($type, $message) {
+function setFlash($type = FLASH_SUCCESS, $message) {
     $_SESSION['flash'] = [
         'type' => $type,
         'message' => $message

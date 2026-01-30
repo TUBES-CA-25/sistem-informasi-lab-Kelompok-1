@@ -225,7 +225,7 @@ class AdminController extends Controller
 
         // 1. Handle Upload Foto
         // Pastikan folder public/uploads/laboratories/ sudah dibuat
-        $imagePath = $this->handleFileUpload('image_file', 'laboratories');
+        $imagePath = $this->handleFileUpload('image_file', UPLOAD_DIR_LABORATORIES);
 
         $data = [
             'lab_name' => sanitize($this->getPost('lab_name')),
@@ -267,7 +267,7 @@ class AdminController extends Controller
         $oldData = $laboratoryModel->find($id);
 
         // 1. Cek Upload Baru (Pakai foto lama jika tidak ada upload baru)
-        $imagePath = $this->handleFileUpload('image_file', 'laboratories') ?? $oldData['image'];
+        $imagePath = $this->handleFileUpload('image_file', UPLOAD_DIR_LABORATORIES) ?? $oldData['image'];
 
         $data = [
             'lab_name' => sanitize($this->getPost('lab_name')),
@@ -398,10 +398,10 @@ class AdminController extends Controller
      * @param string $targetDir Target directory name (lecturers, assistants, schedules)
      * @return string|null Full URL for database storage or null on failure
      */
-    private function handleFileUpload($fileInputName, $targetDir = 'schedules')
+    private function handleFileUpload($fileInputName, $targetDir = UPLOAD_DIR_SCHEDULES)
     {
         if (isset($_FILES[$fileInputName]) && $_FILES[$fileInputName]['error'] === UPLOAD_ERR_OK) {
-            $relativePath = uploadFile($_FILES[$fileInputName], $targetDir, null, 5242880, 'file');
+            $relativePath = uploadFile($_FILES[$fileInputName], $targetDir, null, MAX_UPLOAD_SIZE, 'file');
             if ($relativePath) {
                 // Return full URL for database storage
                 return BASE_URL . $relativePath;
@@ -416,9 +416,9 @@ class AdminController extends Controller
         }
 
         // 1. HANDLE UPLOAD 3 FOTO (Lecturer + 2 Assistants)
-        $lecturerPhoto = $this->handleFileUpload('lecturer_photo_file', 'lecturers');
-        $asst1Photo = $this->handleFileUpload('assistant_photo_file', 'assistants'); // Sesuai name di form
-        $asst2Photo = $this->handleFileUpload('assistant2_photo_file', 'assistants'); // Sesuai name di form
+        $lecturerPhoto = $this->handleFileUpload('lecturer_photo_file', UPLOAD_DIR_LECTURERS);
+        $asst1Photo = $this->handleFileUpload('assistant_photo_file', UPLOAD_DIR_ASSISTANTS); // Sesuai name di form
+        $asst2Photo = $this->handleFileUpload('assistant2_photo_file', UPLOAD_DIR_ASSISTANTS); // Sesuai name di form
 
         // 2. DATA MASTER (Rencana Kuliah)
         $totalMeetings = (int) sanitize($this->getPost('total_meetings'));
@@ -544,9 +544,9 @@ class AdminController extends Controller
         $oldData = $scheduleModel->getScheduleDetail($id);
 
         // 1. Handle Uploads
-        $lecturerPhoto = $this->handleFileUpload('lecturer_photo_file', 'lecturers') ?? $oldData['lecturer_photo'];
-        $assistantPhoto = $this->handleFileUpload('assistant_photo_file', 'assistants') ?? $oldData['assistant_1_photo'];
-        $assistant2Photo = $this->handleFileUpload('assistant2_photo_file', 'assistants') ?? $oldData['assistant_2_photo'];
+        $lecturerPhoto = $this->handleFileUpload('lecturer_photo_file', UPLOAD_DIR_LECTURERS) ?? $oldData['lecturer_photo'];
+        $assistantPhoto = $this->handleFileUpload('assistant_photo_file', UPLOAD_DIR_ASSISTANTS) ?? $oldData['assistant_1_photo'];
+        $assistant2Photo = $this->handleFileUpload('assistant2_photo_file', UPLOAD_DIR_ASSISTANTS) ?? $oldData['assistant_2_photo'];
 
         // 2. Data Update Master
         $data = [
@@ -1010,7 +1010,7 @@ class AdminController extends Controller
         }
 
         // 1. Handle Upload Foto Profil
-        $photoPath = $this->handleFileUpload('photo_file', 'profiles');
+        $photoPath = $this->handleFileUpload('photo_file', UPLOAD_DIR_PROFILES);
 
         // 2. Ambil Input (Termasuk Phone)
         $data = [
@@ -1087,7 +1087,7 @@ class AdminController extends Controller
         $headLaboranModel = $this->model('HeadLaboranModel');
         $oldData = $headLaboranModel->find($id);
 
-        $photoPath = $this->handleFileUpload('photo_file', 'profiles') ?? $oldData['photo'];
+        $photoPath = $this->handleFileUpload('photo_file', UPLOAD_DIR_PROFILES) ?? $oldData['photo'];
 
         $data = [
             'phone' => sanitize($this->getPost('phone')),
@@ -1201,7 +1201,7 @@ class AdminController extends Controller
         }
 
         // 1. Handle Upload Cover
-        $coverPath = $this->handleFileUpload('image_cover_file', 'activities');
+        $coverPath = $this->handleFileUpload('image_cover_file', UPLOAD_DIR_ACTIVITIES);
 
         // 2. Ambil Input (Termasuk Status)
         $data = [
@@ -1269,7 +1269,7 @@ class AdminController extends Controller
         }
 
         // 1. Handle Upload Gambar Baru (Jika ada)
-        $coverPath = $this->handleFileUpload('image_cover_file', 'activities') ?? $oldData['image_cover'];
+        $coverPath = $this->handleFileUpload('image_cover_file', UPLOAD_DIR_ACTIVITIES) ?? $oldData['image_cover'];
 
         // 2. Ambil Input (Termasuk Status & Link)
         $data = [

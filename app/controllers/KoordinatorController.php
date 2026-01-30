@@ -684,7 +684,7 @@ class KoordinatorController extends Controller
         // Handle image upload
         $imagePath = null;
         if (isset($_FILES['image_cover']) && $_FILES['image_cover']['error'] === UPLOAD_ERR_OK) {
-            $imagePath = uploadFile($_FILES['image_cover'], 'activities', null, 5242880, 'activity');
+            $imagePath = uploadFile($_FILES['image_cover'], UPLOAD_DIR_ACTIVITIES, null, MAX_UPLOAD_SIZE, 'activity');
             if (!$imagePath) {
                 setFlash('danger', 'Gagal upload gambar. Pastikan format dan ukuran file sudah sesuai.');
                 $this->redirect('/koordinator/activities/create');
@@ -745,7 +745,7 @@ class KoordinatorController extends Controller
         // Handle image upload
         $imagePath = $activity['image_cover']; // Keep existing image
         if (isset($_FILES['image_cover']) && $_FILES['image_cover']['error'] === UPLOAD_ERR_OK) {
-            $newImagePath = uploadFile($_FILES['image_cover'], 'activities', null, 5242880, 'activity');
+            $newImagePath = uploadFile($_FILES['image_cover'], UPLOAD_DIR_ACTIVITIES, null, MAX_UPLOAD_SIZE, 'activity');
             if ($newImagePath) {
                 $imagePath = $newImagePath;
             }
