@@ -283,19 +283,9 @@ class KoordinatorController extends Controller
             $this->redirect('/koordinator/problems');
         }
 
-        // Delete histories jika tabel ada
-        try {
-            $historyModel = $this->model('ProblemHistoryModel');
-            $histories = $historyModel->getHistoryByProblem($id);
-            foreach ($histories as $history) {
-                $historyModel->delete($history['id']);
-            }
-        } catch (Exception $e) {
-            // Tabel history tidak ada atau error, skip
-        }
-
-        // Delete problem
-        $result = $problemModel->deleteProblem($id);
+        // Delete problem with cascading history (moved to model)
+        $historyModel = $this->model('ProblemHistoryModel');
+        $result = $problemModel->deleteProblemWithHistory($id, $historyModel);
         
         if ($result) {
             setFlash('success', 'Data masalah berhasil dihapus.');
@@ -365,20 +355,9 @@ class KoordinatorController extends Controller
             'Putra' => $settingsModel->get('job_putra', 'Belum diatur')
         ];
 
-        // 3. Buat Matriks Data
+        // 3. Build matrix using model method
+        $matrix = $scheduleModel->buildScheduleMatrix($rawSchedules);
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-        $matrix = [
-            'Putri' => array_fill_keys($days, []),
-            'Putra' => array_fill_keys($days, [])
-        ];
-
-        foreach ($rawSchedules as $row) {
-            $role = $row['job_role'];
-            $day  = $row['day'];
-            if (isset($matrix[$role][$day])) {
-                $matrix[$role][$day][] = $row;
-            }
-        }
 
         $data = [
             'matrix' => $matrix,
@@ -705,7 +684,7 @@ class KoordinatorController extends Controller
         // Handle image upload
         $imagePath = null;
         if (isset($_FILES['image_cover']) && $_FILES['image_cover']['error'] === UPLOAD_ERR_OK) {
-            $imagePath = $this->uploadActivityImage($_FILES['image_cover']);
+            $imagePath = uploadFile($_FILES['image_cover'], UPLOAD_DIR_ACTIVITIES, null, MAX_UPLOAD_SIZE, 'activity');
             if (!$imagePath) {
                 setFlash('danger', 'Gagal upload gambar. Pastikan format dan ukuran file sudah sesuai.');
                 $this->redirect('/koordinator/activities/create');
@@ -766,12 +745,8 @@ class KoordinatorController extends Controller
         // Handle image upload
         $imagePath = $activity['image_cover']; // Keep existing image
         if (isset($_FILES['image_cover']) && $_FILES['image_cover']['error'] === UPLOAD_ERR_OK) {
-            $newImagePath = $this->uploadActivityImage($_FILES['image_cover']);
+            $newImagePath = uploadFile($_FILES['image_cover'], UPLOAD_DIR_ACTIVITIES, null, MAX_UPLOAD_SIZE, 'activity');
             if ($newImagePath) {
-                // Delete old image if exists
-                if ($imagePath && file_exists(PUBLIC_PATH . $imagePath)) {
-                    unlink(PUBLIC_PATH . $imagePath);
-                }
                 $imagePath = $newImagePath;
             }
         }
@@ -787,7 +762,7 @@ class KoordinatorController extends Controller
             'image_cover' => $imagePath
         ];
 
-        $activityModel->updateActivity($id, $data);
+        $activityModel->updateActivityWithImageCleanup($id, $data);
 
         setFlash('success', 'Kegiatan "' . $data['title'] . '" berhasil diperbarui.');
         $this->redirect('/koordinator/activities');
@@ -827,39 +802,7 @@ class KoordinatorController extends Controller
     /**
      * Upload activity image
      */
-    private function uploadActivityImage($file)
-    {
-        $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-        $maxSize = 5 * 1024 * 1024; // 5MB
 
-        // Validate file type
-        if (!in_array($file['type'], $allowedTypes)) {
-            return false;
-        }
-
-        // Validate file size
-        if ($file['size'] > $maxSize) {
-            return false;
-        }
-
-        // Create upload directory if not exists
-        $uploadDir = PUBLIC_PATH . '/uploads/activities/';
-        if (!file_exists($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
-        }
-
-        // Generate unique filename
-        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-        $filename = uniqid('activity_') . '.' . $extension;
-        $filepath = $uploadDir . $filename;
-
-        // Move uploaded file
-        if (move_uploaded_file($file['tmp_name'], $filepath)) {
-            return '/uploads/activities/' . $filename;
-        }
-
-        return false;
-    }
 
 
 
@@ -881,20 +824,9 @@ class KoordinatorController extends Controller
             'Putra' => $settingsModel->get('job_putra', 'Belum diatur')
         ];
 
-        // 3. Buat Matriks Data
+        // 3. Build matrix using model method
+        $matrix = $scheduleModel->buildScheduleMatrix($rawSchedules);
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-        $matrix = [
-            'Putri' => array_fill_keys($days, []),
-            'Putra' => array_fill_keys($days, [])
-        ];
-
-        foreach ($rawSchedules as $row) {
-            $role = $row['job_role'];
-            $day  = $row['day'];
-            if (isset($matrix[$role][$day])) {
-                $matrix[$role][$day][] = $row;
-            }
-        }
 
         $data = [
             'matrix' => $matrix,
