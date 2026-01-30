@@ -143,15 +143,15 @@
 
                             <!-- Actions -->
                             <div class="flex gap-2 pt-4 border-t border-slate-100">
-                                <a href="<?= url('/activity/' . $activity['id']) ?>" 
-                                   class="flex-1 px-4 py-2 bg-sky-50 hover:bg-sky-100 text-sky-700 font-medium rounded-lg transition-colors text-center text-sm">
-                                    <i class="bi bi-eye mr-1"></i> Lihat Detail
+                                <a href="<?= url('/koordinator/activities/' . $activity['id'] . '/edit') ?>" 
+                                   class="flex-1 px-4 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 font-medium rounded-lg transition-colors text-center text-sm">
+                                    <i class="bi bi-pencil"></i> Edit
                                 </a>
                                 <button type="button" 
                                         class="btn-delete flex-1 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 font-medium rounded-lg transition-colors text-sm"
                                         data-activity-id="<?= $activity['id'] ?>"
                                         data-title="<?= htmlspecialchars($activity['title']) ?>">
-                                    <i class="bi bi-trash mr-1"></i> Hapus
+                                    <i class="bi bi-trash"></i> Hapus
                                 </button>
                             </div>
                         </div>
