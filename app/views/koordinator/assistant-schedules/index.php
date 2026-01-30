@@ -87,14 +87,12 @@
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
 
-                                            <form method="POST" action="<?= url('/koordinator/assistant-schedules/' . $schedule['id'] . '/delete') ?>" class="inline">
-                                                <button type="submit"
-                                                        onclick="return confirm('Are you sure you want to delete this schedule?')"
-                                                        class="w-8 h-8 flex items-center justify-center rounded-lg text-rose-600 bg-rose-50 hover:bg-rose-100 hover:scale-105 transition-all border border-transparent hover:border-rose-200"
-                                                        title="Delete Schedule">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </form>
+                                            <button type="button"
+                                                    onclick="confirmDelete(<?= $schedule['id'] ?>, '<?= htmlspecialchars($schedule['assistant_name'], ENT_QUOTES) ?>')"
+                                                    class="w-8 h-8 flex items-center justify-center rounded-lg text-rose-600 bg-rose-50 hover:bg-rose-100 hover:scale-105 transition-all border border-transparent hover:border-rose-200"
+                                                    title="Delete Schedule">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -126,5 +124,61 @@
 
     </div>
 </div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+        <div class="flex items-start gap-4">
+            <div class="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <i class="bi bi-exclamation-triangle text-2xl text-red-600"></i>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-lg font-semibold text-slate-900 mb-2">Delete Schedule?</h3>
+                <p class="text-slate-600 text-sm" id="deleteMessage">
+                    Are you sure you want to delete this schedule? This action cannot be undone.
+                </p>
+            </div>
+        </div>
+        <div class="flex gap-3 mt-6">
+            <button onclick="closeDeleteModal()" class="flex-1 px-4 py-2 bg-slate-100 text-slate-700 font-medium rounded-lg hover:bg-slate-200 transition-colors">Cancel</button>
+            <form id="deleteForm" method="POST" class="flex-1">
+                <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors shadow-lg shadow-red-500/30">Yes, Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmDelete(scheduleId, assistantName) {
+    const modal = document.getElementById('deleteModal');
+    const form = document.getElementById('deleteForm');
+    const message = document.getElementById('deleteMessage');
+    
+    const deleteUrl = '<?= url('/koordinator/assistant-schedules/') ?>' + scheduleId + '/delete';
+    form.action = deleteUrl;
+    message.textContent = `Are you sure you want to delete the schedule for "${assistantName}"? This action cannot be undone.`;
+    
+    modal.classList.remove('hidden');
+}
+
+function closeDeleteModal() {
+    const modal = document.getElementById('deleteModal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}
+
+// Close modal when clicking outside
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('deleteModal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteModal();
+            }
+        });
+    }
+});
+</script>
 
 <?php include APP_PATH . '/views/layouts/footer.php'; ?>

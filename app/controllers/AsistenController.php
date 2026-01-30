@@ -8,11 +8,21 @@
 class AsistenController extends Controller
 {
 
+    /**
+     * Constructor - Ensure only asisten can access this controller
+     */
     public function __construct()
     {
         $this->requireRole('asisten');
     }
 
+    /**
+     * Dashboard redirect to jobdesk page
+     * 
+     * Redirects asisten directly to their main work page (jobdesk)
+     * 
+     * @return void
+     */
     public function dashboard()
     {
         // Redirect ke jobdesk agar Asisten langsung fokus kerja
@@ -23,6 +33,13 @@ class AsistenController extends Controller
     // PAGE 1: JOBDESK SAYA (Tugas Maintenance)
     // ==========================================
 
+    /**
+     * Display asisten's assigned tasks (jobdesk)
+     * 
+     * Shows problems assigned to current asisten for maintenance
+     * 
+     * @return void
+     */
     public function jobdesk()
     {
         $problemModel = $this->model('LabProblemModel');
@@ -35,6 +52,14 @@ class AsistenController extends Controller
         $this->view('asisten/jobdesk/index', $data);
     }
 
+    /**
+     * Display form for editing task status
+     * 
+     * Loads task details for status update
+     * 
+     * @param int $id Task (problem) ID
+     * @return void
+     */
     public function editTaskForm($id)
 {
     $problemModel = $this->model('LabProblemModel');
@@ -53,6 +78,14 @@ class AsistenController extends Controller
     $this->view('asisten/jobdesk/edit', $data);
 }
 
+    /**
+     * Update task progress status
+     * 
+     * Updates task status and adds history entry with notes
+     * 
+     * @param int $id Task (problem) ID
+     * @return void Redirects to jobdesk
+     */
     public function updateTaskStatus($id)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -63,13 +96,16 @@ class AsistenController extends Controller
             $historyModel = $this->model('ProblemHistoryModel');
 
             // Update status and timestamp
-            $problemModel->updateTaskProgress($id, $status);
+            if ($problemModel->updateTaskProgress($id, $status)) {
+                // Catat history
+                $historyLog = !empty($note) ? "Update Jobdesk: " . $note : "Status updated by assignee";
+                $historyModel->addHistory($id, $status, $historyLog);
 
-            // Catat history
-            $historyLog = !empty($note) ? "Update Jobdesk: " . $note : "Status updated by assignee";
-            $historyModel->addHistory($id, $status, $historyLog);
-
-            setFlash('success', 'Status pekerjaan berhasil diperbarui.');
+                setFlash('success', 'Status pekerjaan berhasil diperbarui.');
+            } else {
+                setFlash('danger', 'Gagal memperbarui status.');
+            }
+            
             $this->redirect('/asisten/jobdesk');
         }
     }
@@ -78,39 +114,40 @@ class AsistenController extends Controller
     // PAGE 2: PERMASALAHAN LAB (Lapor Masalah)
     // ==========================================
 
+    /**
+     * Display paginated list of problem reports
+     * 
+     * Shows all lab problems with filtering capability
+     * Uses helper functions for validation and pagination
+     * 
+     * @return void
+     */
     public function problems()
     {
         $problemModel = $this->model('LabProblemModel');
         $laboratoryModel = $this->model('LaboratoryModel');
 
-        // Get filter parameters
-        $statusFilter = $this->getQuery('status') ?? 'active';
-        $search = $this->getQuery('search') ?? '';
-        $page = (int)($this->getQuery('page') ?? 1);
-
-        // Validate
-        $validStatuses = ['all', 'active', 'reported', 'in_progress', 'resolved'];
-        if (!in_array($statusFilter, $validStatuses)) {
-            $statusFilter = 'active';
-        }
-        if ($page < 1) {
-            $page = 1;
-        }
+        // Validate filters using helper
+        $filters = validateListFilters([
+            'status' => $this->getQuery('status'),
+            'search' => $this->getQuery('search'),
+            'page' => $this->getQuery('page')
+        ]);
 
         // Get filtered data
-        $result = $problemModel->getFilteredProblems($statusFilter, $search, $page, 10);
+        $result = $problemModel->getFilteredProblems(
+            $filters['status'], 
+            $filters['search'], 
+            $filters['page'], 
+            10
+        );
 
         $data = [
             'problems' => $result['data'],
-            'pagination' => [
-                'current' => $result['page'],
-                'total' => $result['totalPages'],
-                'perPage' => $result['perPage'],
-                'totalRecords' => $result['total']
-            ],
+            'pagination' => buildPaginationData($result),
             'filters' => [
-                'status' => $statusFilter,
-                'search' => $search
+                'status' => $filters['status'],
+                'search' => $filters['search']
             ],
             'laboratories' => $laboratoryModel->getAllLaboratories()
         ];
@@ -118,6 +155,13 @@ class AsistenController extends Controller
         $this->view('asisten/reports/index', $data);
     }
 
+    /**
+     * Display form for creating new problem report
+     * 
+     * Loads laboratory list for dropdown selection
+     * 
+     * @return void
+     */
     public function createProblemForm()
     {
         $laboratoryModel = $this->model('LaboratoryModel');
@@ -129,6 +173,14 @@ class AsistenController extends Controller
         $this->view('asisten/reports/create', $data);
     }
 
+    /**
+     * Process and store new problem report
+     * 
+     * Validates required fields, creates problem record,
+     * and adds initial history entry
+     * 
+     * @return void Redirects to problems list
+     */
     public function createProblem()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -140,7 +192,7 @@ class AsistenController extends Controller
                 'reported_by' => getUserId()
             ];
 
-            if (empty($data['laboratory_id']) || empty($data['description'])) {
+            if (!validateRequired($data, ['laboratory_id', 'description'])) {
                 setFlash('danger', 'Mohon lengkapi data laporan.');
                 $this->redirect('/asisten/problems/create');
             }
@@ -148,29 +200,77 @@ class AsistenController extends Controller
             $problemModel = $this->model('LabProblemModel');
             $problemId = $problemModel->createProblem($data);
 
-            // Add history awal
-            $this->model('ProblemHistoryModel')->addHistory($problemId, 'reported', 'Laporan baru dibuat oleh Asisten');
-
-            setFlash('success', 'Laporan masalah berhasil ditambahkan.');
+            if ($problemId) {
+                // Add history awal
+                $this->model('ProblemHistoryModel')->addHistory($problemId, 'reported', 'Laporan baru dibuat oleh Asisten');
+                
+                setFlash('success', 'Laporan masalah berhasil ditambahkan.');
+            } else {
+                setFlash('danger', 'Gagal menambahkan laporan masalah.');
+            }
+            
             $this->redirect('/asisten/problems');
         }
     }
 
+    /**
+     * Delete problem report
+     * 
+     * Validates ID and existence before deletion
+     * Asisten can only delete their own reports
+     * 
+     * @param int $id Problem ID
+     * @return void Redirects to problems list
+     */
     public function deleteProblem($id)
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->model('LabProblemModel')->deleteProblem($id);
-            setFlash('success', 'Laporan masalah dihapus.');
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/asisten/problems');
+            return;
         }
+
+        // Validate ID using helper
+        if (!validateId($id)) {
+            setFlash('danger', 'ID permasalahan tidak valid.');
+            $this->redirect('/asisten/problems');
+            return;
+        }
+
+        $problemModel = $this->model('LabProblemModel');
+        
+        // Cek apakah problem exists
+        $problem = $problemModel->find($id);
+        if (!$problem) {
+            setFlash('danger', 'Laporan tidak ditemukan.');
+            $this->redirect('/asisten/problems');
+            return;
+        }
+
+        // Delete problem
+        $result = $problemModel->deleteProblem($id);
+        
+        if ($result) {
+            setFlash('success', 'Laporan masalah berhasil dihapus.');
+        } else {
+            setFlash('danger', 'Gagal menghapus laporan masalah.');
+        }
+        
+        $this->redirect('/asisten/problems');
     }
 
+    /**
+     * Display detailed view of a specific problem
+     * 
+     * Shows problem details and history
+     * 
+     * @param int $id Problem ID
+     * @return void
+     */
     public function viewProblem($id)
     {
         $problemModel = $this->model('LabProblemModel');
-        $userModel = $this->model('UserModel');
-
-        // Ambil data detail masalah
+        $historyModel = $this->model('ProblemHistoryModel'); 
+        
         $problem = $problemModel->getProblemWithDetails($id);
 
         if (!$problem) {
@@ -179,7 +279,8 @@ class AsistenController extends Controller
         }
 
         $data = [
-            'problem' => $problem
+            'problem' => $problem,
+            'histories' => $historyModel->getHistoryByProblem($id) 
         ];
 
         $this->view('asisten/reports/detail', $data);
@@ -189,6 +290,13 @@ class AsistenController extends Controller
     // PAGE 3: JADWAL PIKET
     // ==========================================
 
+    /**
+     * Display current asisten's schedule
+     * 
+     * Shows weekly schedule for logged-in asisten only
+     * 
+     * @return void
+     */
     public function listAssistantSchedules()
     {
         $scheduleModel = $this->model('AssistantScheduleModel');
@@ -203,21 +311,9 @@ class AsistenController extends Controller
             'Putra' => $settingsModel->get('job_putra', 'Belum diatur')
         ];
 
-        // 3. Susun Data Matriks
+        // 3. Build matrix using model method
+        $matrix = $scheduleModel->buildScheduleMatrix($rawSchedules);
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-        $matrix = [
-            'Putri' => array_fill_keys($days, []),
-            'Putra' => array_fill_keys($days, [])
-        ];
-
-        foreach ($rawSchedules as $row) {
-            $role = $row['job_role'];
-            $day  = $row['day'];
-
-            if (isset($matrix[$role][$day])) {
-                $matrix[$role][$day][] = $row;
-            }
-        }
 
         $data = [
             'matrix' => $matrix,
@@ -231,6 +327,15 @@ class AsistenController extends Controller
     }
 
     // Form Edit Masalah
+    /**
+     * Display form for editing existing problem
+     * 
+     * Validates ownership and status before allowing edit
+     * Asisten can only edit their own unresolved reports
+     * 
+     * @param int $id Problem ID
+     * @return void
+     */
     public function editProblemForm($id)
     {
         $problemModel = $this->model('LabProblemModel');
@@ -265,6 +370,14 @@ class AsistenController extends Controller
     }
 
     // Proses Update Masalah
+    /**
+     * Process problem update and save changes
+     * 
+     * Updates problem data and adds history entry
+     * 
+     * @param int $id Problem ID
+     * @return void Redirects to problems list
+     */
     public function updateProblem($id)
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

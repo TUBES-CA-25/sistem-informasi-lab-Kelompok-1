@@ -108,11 +108,17 @@ class AdminController extends Controller
         if ($userModel->getByEmail($data['email'])) {
             setFlash('danger', 'Email already exists');
             $this->redirect('/admin/users/create');
+            return;
         }
 
-        $userModel->createUser($data);
+        $result = $userModel->createUser($data);
 
-        setFlash('success', 'User created successfully');
+        if ($result) {
+            setFlash('success', 'User created successfully');
+        } else {
+            setFlash('danger', 'Failed to create user');
+        }
+        
         $this->redirect('/admin/users');
     }
 
@@ -156,9 +162,14 @@ class AdminController extends Controller
         }
 
         $userModel = $this->model('UserModel');
-        $userModel->updateUser($id, $data);
+        $result = $userModel->updateUser($id, $data);
 
-        setFlash('success', 'User updated successfully');
+        if ($result) {
+            setFlash('success', 'User updated successfully');
+        } else {
+            setFlash('danger', 'Failed to update user');
+        }
+        
         $this->redirect('/admin/users');
     }
 
@@ -225,7 +236,7 @@ class AdminController extends Controller
 
         // 1. Handle Upload Foto
         // Pastikan folder public/uploads/laboratories/ sudah dibuat
-        $imagePath = $this->handleFileUpload('image_file', 'uploads/laboratories/');
+        $imagePath = $this->handleFileUpload('image_file', UPLOAD_DIR_LABORATORIES);
 
         $data = [
             'lab_name' => sanitize($this->getPost('lab_name')),
@@ -237,9 +248,14 @@ class AdminController extends Controller
         ];
 
         $laboratoryModel = $this->model('LaboratoryModel');
-        $laboratoryModel->createLaboratory($data);
+        $result = $laboratoryModel->createLaboratory($data);
 
-        setFlash('success', 'Laboratorium berhasil ditambahkan');
+        if ($result) {
+            setFlash('success', 'Laboratorium berhasil ditambahkan');
+        } else {
+            setFlash('danger', 'Gagal menambahkan laboratorium');
+        }
+        
         $this->redirect('/admin/laboratories');
     }
 
@@ -267,7 +283,7 @@ class AdminController extends Controller
         $oldData = $laboratoryModel->find($id);
 
         // 1. Cek Upload Baru (Pakai foto lama jika tidak ada upload baru)
-        $imagePath = $this->handleFileUpload('image_file', 'uploads/laboratories/') ?? $oldData['image'];
+        $imagePath = $this->handleFileUpload('image_file', UPLOAD_DIR_LABORATORIES) ?? $oldData['image'];
 
         $data = [
             'lab_name' => sanitize($this->getPost('lab_name')),
@@ -278,9 +294,14 @@ class AdminController extends Controller
             'location' => sanitize($this->getPost('location'))
         ];
 
-        $laboratoryModel->updateLaboratory($id, $data);
+        $result = $laboratoryModel->updateLaboratory($id, $data);
 
-        setFlash('success', 'Laboratorium berhasil diperbarui');
+        if ($result) {
+            setFlash('success', 'Laboratorium berhasil diperbarui');
+        } else {
+            setFlash('danger', 'Gagal memperbarui laboratorium');
+        }
+        
         $this->redirect('/admin/laboratories');
     }
 
@@ -288,12 +309,25 @@ class AdminController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/admin/laboratories');
+            return;
+        }
+
+        // Validate ID
+        if (!validateId($id)) {
+            setFlash('danger', 'Invalid laboratory ID.');
+            $this->redirect('/admin/laboratories');
+            return;
         }
 
         $laboratoryModel = $this->model('LaboratoryModel');
-        $laboratoryModel->deleteLaboratory($id);
+        $result = $laboratoryModel->deleteLaboratory($id);
 
-        setFlash('success', 'Laboratory deleted successfully');
+        if ($result) {
+            setFlash('success', 'Laboratory deleted successfully');
+        } else {
+            setFlash('danger', 'Failed to delete laboratory.');
+        }
+        
         $this->redirect('/admin/laboratories');
     }
 
@@ -391,25 +425,20 @@ class AdminController extends Controller
         }
         exit;
     }
-    private function handleFileUpload($fileInputName, $targetDir = 'uploads/schedules/')
+    /**
+     * Handle file upload with standardized helper
+     * 
+     * @param string $fileInputName Name of file input field
+     * @param string $targetDir Target directory name (lecturers, assistants, schedules)
+     * @return string|null Full URL for database storage or null on failure
+     */
+    private function handleFileUpload($fileInputName, $targetDir = UPLOAD_DIR_SCHEDULES)
     {
         if (isset($_FILES[$fileInputName]) && $_FILES[$fileInputName]['error'] === UPLOAD_ERR_OK) {
-            $tmpName = $_FILES[$fileInputName]['tmp_name'];
-            $fileName = basename($_FILES[$fileInputName]['name']);
-            $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-
-            // Generate nama unik agar tidak bentrok
-            $newFileName = uniqid() . '_' . time() . '.' . $fileExt;
-            $targetPath = '../public/' . $targetDir . $newFileName;
-
-            // Pastikan folder ada
-            if (!is_dir('../public/' . $targetDir)) {
-                mkdir('../public/' . $targetDir, 0777, true);
-            }
-
-            if (move_uploaded_file($tmpName, $targetPath)) {
-                // Kembalikan URL publik untuk disimpan di DB
-                return BASE_URL . '/' . $targetDir . $newFileName;
+            $relativePath = uploadFile($_FILES[$fileInputName], $targetDir, null, MAX_UPLOAD_SIZE, 'file');
+            if ($relativePath) {
+                // Return full URL for database storage
+                return BASE_URL . $relativePath;
             }
         }
         return null;
@@ -421,9 +450,9 @@ class AdminController extends Controller
         }
 
         // 1. HANDLE UPLOAD 3 FOTO (Lecturer + 2 Assistants)
-        $lecturerPhoto = $this->handleFileUpload('lecturer_photo_file', 'uploads/lecturers/');
-        $asst1Photo = $this->handleFileUpload('assistant_photo_file', 'uploads/assistants/'); // Sesuai name di form
-        $asst2Photo = $this->handleFileUpload('assistant2_photo_file', 'uploads/assistants/'); // Sesuai name di form
+        $lecturerPhoto = $this->handleFileUpload('lecturer_photo_file', UPLOAD_DIR_LECTURERS);
+        $asst1Photo = $this->handleFileUpload('assistant_photo_file', UPLOAD_DIR_ASSISTANTS); // Sesuai name di form
+        $asst2Photo = $this->handleFileUpload('assistant2_photo_file', UPLOAD_DIR_ASSISTANTS); // Sesuai name di form
 
         // 2. DATA MASTER (Rencana Kuliah)
         $totalMeetings = (int) sanitize($this->getPost('total_meetings'));
@@ -549,9 +578,9 @@ class AdminController extends Controller
         $oldData = $scheduleModel->getScheduleDetail($id);
 
         // 1. Handle Uploads
-        $lecturerPhoto = $this->handleFileUpload('lecturer_photo_file', 'uploads/lecturers/') ?? $oldData['lecturer_photo'];
-        $assistantPhoto = $this->handleFileUpload('assistant_photo_file', 'uploads/assistants/') ?? $oldData['assistant_1_photo'];
-        $assistant2Photo = $this->handleFileUpload('assistant2_photo_file', 'uploads/assistants/') ?? $oldData['assistant_2_photo'];
+        $lecturerPhoto = $this->handleFileUpload('lecturer_photo_file', UPLOAD_DIR_LECTURERS) ?? $oldData['lecturer_photo'];
+        $assistantPhoto = $this->handleFileUpload('assistant_photo_file', UPLOAD_DIR_ASSISTANTS) ?? $oldData['assistant_1_photo'];
+        $assistant2Photo = $this->handleFileUpload('assistant2_photo_file', UPLOAD_DIR_ASSISTANTS) ?? $oldData['assistant_2_photo'];
 
         // 2. Data Update Master
         $data = [
@@ -824,23 +853,9 @@ class AdminController extends Controller
             'Putra' => $settingsModel->get('job_putra', 'Belum diatur (Klik untuk edit)')
         ];
 
-        // 3. OLAH DATA MENJADI MATRIKS
-        // Struktur: $matrix['Putra']['Monday'] = [Data Asisten A, Data Asisten B]
+        // 3. Build matrix using model method
+        $matrix = $scheduleModel->buildScheduleMatrix($rawSchedules);
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-        $matrix = [
-            'Putri' => array_fill_keys($days, []),
-            'Putra' => array_fill_keys($days, [])
-        ];
-
-        foreach ($rawSchedules as $row) {
-            $role = $row['job_role']; // 'Putra' atau 'Putri'
-            $day  = $row['day'];
-
-            // Masukkan ke slot yang sesuai jika role valid
-            if (isset($matrix[$role][$day])) {
-                $matrix[$role][$day][] = $row;
-            }
-        }
 
         $data = [
             'matrix' => $matrix,
@@ -880,8 +895,14 @@ class AdminController extends Controller
                 'job_role' => sanitize($this->getPost('job_role')) // Hanya simpan 'Putra' atau 'Putri'
             ];
 
-            $this->model('AssistantScheduleModel')->createSchedule($data);
-            setFlash('success', 'Jadwal asisten berhasil ditambahkan.');
+            $result = $this->model('AssistantScheduleModel')->createSchedule($data);
+            
+            if ($result) {
+                setFlash('success', 'Jadwal asisten berhasil ditambahkan.');
+            } else {
+                setFlash('danger', 'Gagal menambahkan jadwal asisten.');
+            }
+            
             $this->redirect('/admin/assistant-schedules');
             return;
         }
@@ -937,8 +958,14 @@ class AdminController extends Controller
                 'job_role' => sanitize($this->getPost('job_role'))
             ];
 
-            $scheduleModel->updateSchedule($id, $data);
-            setFlash('success', 'Jadwal berhasil diperbarui.');
+            $result = $scheduleModel->updateSchedule($id, $data);
+            
+            if ($result) {
+                setFlash('success', 'Jadwal berhasil diperbarui.');
+            } else {
+                setFlash('danger', 'Gagal memperbarui jadwal.');
+            }
+            
             $this->redirect('/admin/assistant-schedules');
             return;
         }
@@ -958,12 +985,25 @@ class AdminController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/admin/assistant-schedules');
+            return;
+        }
+
+        // Validate ID
+        if (!validateId($id)) {
+            setFlash('danger', 'Invalid schedule ID.');
+            $this->redirect('/admin/assistant-schedules');
+            return;
         }
 
         $scheduleModel = $this->model('AssistantScheduleModel');
-        $scheduleModel->deleteSchedule($id);
+        $result = $scheduleModel->deleteSchedule($id);
 
-        setFlash('success', 'Assistant schedule deleted successfully');
+        if ($result) {
+            setFlash('success', 'Assistant schedule deleted successfully');
+        } else {
+            setFlash('danger', 'Failed to delete schedule.');
+        }
+        
         $this->redirect('/admin/assistant-schedules');
     }
 
@@ -976,9 +1016,12 @@ class AdminController extends Controller
             $key = ($role == 'Putra') ? 'job_putra' : 'job_putri';
 
             // Simpan ke SettingsModel
-            $this->model('SettingsModel')->save($key, $content);
-
-            setFlash('success', "Deskripsi tugas $role berhasil diperbarui.");
+            if ($this->model('SettingsModel')->save($key, $content)) {
+                setFlash('success', "Deskripsi tugas $role berhasil diperbarui.");
+            } else {
+                setFlash('danger', "Gagal memperbarui deskripsi tugas.");
+            }
+            
             $this->redirect('/admin/assistant-schedules');
         }
     }
@@ -1029,7 +1072,7 @@ class AdminController extends Controller
         }
 
         // 1. Handle Upload Foto Profil
-        $photoPath = $this->handleFileUpload('photo_file', 'uploads/profiles/');
+        $photoPath = $this->handleFileUpload('photo_file', UPLOAD_DIR_PROFILES);
 
         // 2. Ambil Input (Termasuk Phone)
         $data = [
@@ -1106,7 +1149,7 @@ class AdminController extends Controller
         $headLaboranModel = $this->model('HeadLaboranModel');
         $oldData = $headLaboranModel->find($id);
 
-        $photoPath = $this->handleFileUpload('photo_file', 'uploads/profiles/') ?? $oldData['photo'];
+        $photoPath = $this->handleFileUpload('photo_file', UPLOAD_DIR_PROFILES) ?? $oldData['photo'];
 
         $data = [
             'phone' => sanitize($this->getPost('phone')),
@@ -1220,7 +1263,7 @@ class AdminController extends Controller
         }
 
         // 1. Handle Upload Cover
-        $coverPath = $this->handleFileUpload('image_cover_file', 'uploads/activities/');
+        $coverPath = $this->handleFileUpload('image_cover_file', UPLOAD_DIR_ACTIVITIES);
 
         // 2. Ambil Input (Termasuk Status)
         $data = [
@@ -1288,7 +1331,7 @@ class AdminController extends Controller
         }
 
         // 1. Handle Upload Gambar Baru (Jika ada)
-        $coverPath = $this->handleFileUpload('image_cover_file', 'uploads/activities/') ?? $oldData['image_cover'];
+        $coverPath = $this->handleFileUpload('image_cover_file', UPLOAD_DIR_ACTIVITIES) ?? $oldData['image_cover'];
 
         // 2. Ambil Input (Termasuk Status & Link)
         $data = [
@@ -1321,6 +1364,14 @@ class AdminController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/admin/activities');
+            return;
+        }
+
+        // Validate ID
+        if (!validateId($id)) {
+            setFlash('danger', 'ID kegiatan tidak valid.');
+            $this->redirect('/admin/activities');
+            return;
         }
 
         $activityModel = $this->model('LabActivityModel');
@@ -1419,13 +1470,17 @@ class AdminController extends Controller
 
         // Update problem status
         $problemModel = $this->model('LabProblemModel');
-        $problemModel->updateProblem($id, ['status' => $status]);
+        
+        if ($problemModel->updateProblem($id, ['status' => $status])) {
+            // Add to history
+            $historyModel = $this->model('ProblemHistoryModel');
+            $historyModel->addHistory($id, $status, $note);
 
-        // Add to history
-        $historyModel = $this->model('ProblemHistoryModel');
-        $historyModel->addHistory($id, $status, $note);
-
-        setFlash('success', 'Problem status updated successfully');
+            setFlash('success', 'Problem status updated successfully');
+        } else {
+            setFlash('danger', 'Failed to update problem status');
+        }
+        
         $this->redirect('/admin/problems/' . $id);
     }
 
@@ -1433,20 +1488,27 @@ class AdminController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/admin/problems');
+            return;
         }
 
-        // Delete histories first
-        $historyModel = $this->model('ProblemHistoryModel');
-        $histories = $historyModel->getHistoryByProblem($id);
-        foreach ($histories as $history) {
-            $historyModel->delete($history['id']);
+        // Validate ID
+        if (!validateId($id)) {
+            setFlash('danger', 'Invalid problem ID.');
+            $this->redirect('/admin/problems');
+            return;
         }
 
-        // Delete problem
+        // Delete problem with cascading history (moved to model)
         $problemModel = $this->model('LabProblemModel');
-        $problemModel->deleteProblem($id);
+        $historyModel = $this->model('ProblemHistoryModel');
+        $result = $problemModel->deleteProblemWithHistory($id, $historyModel);
 
-        setFlash('success', 'Problem deleted successfully');
+        if ($result) {
+            setFlash('success', 'Problem deleted successfully');
+        } else {
+            setFlash('danger', 'Failed to delete problem.');
+        }
+        
         $this->redirect('/admin/problems');
     }
 
@@ -1510,10 +1572,13 @@ class AdminController extends Controller
             'description' => sanitize($this->getPost('description'))
         ];
 
-        $this->model('LabProblemModel')->updateProblem($id, $data);
-        $this->model('ProblemHistoryModel')->addHistory($id, 'reported', 'Detail masalah diupdate oleh Admin');
-
-        setFlash('success', 'Data masalah berhasil diperbarui.');
+        if ($this->model('LabProblemModel')->updateProblem($id, $data)) {
+            $this->model('ProblemHistoryModel')->addHistory($id, 'reported', 'Detail masalah diupdate oleh Admin');
+            setFlash('success', 'Data masalah berhasil diperbarui.');
+        } else {
+            setFlash('danger', 'Gagal memperbarui data masalah.');
+        }
+        
         $this->redirect('/admin/problems/' . $id);
     }
 
@@ -1524,13 +1589,16 @@ class AdminController extends Controller
         $assignedTo = sanitize($this->getPost('assigned_to'));
 
         // Update assigned_to
-        $this->model('LabProblemModel')->updateProblem($id, ['assigned_to' => $assignedTo]);
+        if ($this->model('LabProblemModel')->updateProblem($id, ['assigned_to' => $assignedTo])) {
+            // Ambil nama asisten untuk history
+            $assignee = $this->model('UserModel')->find($assignedTo);
+            $this->model('ProblemHistoryModel')->addHistory($id, 'reported', 'Admin menugaskan ke: ' . $assignee['name']);
 
-        // Ambil nama asisten untuk history
-        $assignee = $this->model('UserModel')->find($assignedTo);
-        $this->model('ProblemHistoryModel')->addHistory($id, 'reported', 'Admin menugaskan ke: ' . $assignee['name']);
-
-        setFlash('success', 'Tugas berhasil diberikan.');
+            setFlash('success', 'Tugas berhasil diberikan.');
+        } else {
+            setFlash('danger', 'Gagal menugaskan masalah.');
+        }
+        
         $this->redirect('/admin/problems/' . $id);
     }
 

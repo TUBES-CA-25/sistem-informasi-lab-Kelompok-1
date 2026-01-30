@@ -70,13 +70,10 @@
                                             <a href="<?= url('/koordinator/assistant-schedules/' . $sched['id'] . '/edit') ?>"
                                                 class="w-5 h-5 bg-amber-400 text-white rounded-full flex items-center justify-center text-[10px] shadow-sm"><i
                                                     class="bi bi-pencil"></i></a>
-                                            <form method="POST"
-                                                action="<?= url('/koordinator/assistant-schedules/' . $sched['id'] . '/delete') ?>"
-                                                onsubmit="return confirm('Hapus?')">
-                                                <button type="submit"
-                                                    class="w-5 h-5 bg-rose-500 text-white rounded-full flex items-center justify-center text-[10px] shadow-sm"><i
-                                                        class="bi bi-x"></i></button>
-                                            </form>
+                                            <button type="button"
+                                                onclick="confirmDeleteSchedule(<?= $sched['id'] ?>, '<?= htmlspecialchars($sched['assistant_name'], ENT_QUOTES) ?>')"
+                                                class="w-5 h-5 bg-rose-500 text-white rounded-full flex items-center justify-center text-[10px] shadow-sm"><i
+                                                    class="bi bi-x"></i></button>
                                         </div>
                                     </div>
                                     <?php endforeach; ?>
@@ -118,6 +115,29 @@
     </div>
 </div>
 
+<!-- Delete Schedule Modal -->
+<div id="deleteScheduleModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+        <div class="flex items-start gap-4">
+            <div class="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <i class="bi bi-exclamation-triangle text-2xl text-red-600"></i>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-lg font-semibold text-slate-900 mb-2">Hapus Jadwal?</h3>
+                <p class="text-slate-600 text-sm" id="deleteScheduleMessage">
+                    Apakah Anda yakin ingin menghapus jadwal ini? Tindakan ini tidak dapat dibatalkan.
+                </p>
+            </div>
+        </div>
+        <div class="flex gap-3 mt-6">
+            <button onclick="closeDeleteScheduleModal()" class="flex-1 px-4 py-2 bg-slate-100 text-slate-700 font-medium rounded-lg hover:bg-slate-200 transition-colors">Batal</button>
+            <form id="deleteScheduleForm" method="POST" class="flex-1">
+                <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors shadow-lg shadow-red-500/30">Ya, Hapus</button>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
 function openJobModal(role, content) {
     document.getElementById('jobModal').classList.remove('hidden');
@@ -129,5 +149,36 @@ function openJobModal(role, content) {
 function closeJobModal() {
     document.getElementById('jobModal').classList.add('hidden');
 }
+
+function confirmDeleteSchedule(scheduleId, assistantName) {
+    const modal = document.getElementById('deleteScheduleModal');
+    const form = document.getElementById('deleteScheduleForm');
+    const message = document.getElementById('deleteScheduleMessage');
+    
+    const deleteUrl = '<?= url('/koordinator/assistant-schedules/') ?>' + scheduleId + '/delete';
+    form.action = deleteUrl;
+    message.textContent = `Apakah Anda yakin ingin menghapus jadwal untuk "${assistantName}"? Tindakan ini tidak dapat dibatalkan.`;
+    
+    modal.classList.remove('hidden');
+}
+
+function closeDeleteScheduleModal() {
+    const modal = document.getElementById('deleteScheduleModal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}
+
+// Close modal when clicking outside
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteModal = document.getElementById('deleteScheduleModal');
+    if (deleteModal) {
+        deleteModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteScheduleModal();
+            }
+        });
+    }
+});
 </script>
 <?php include APP_PATH . '/views/layouts/footer.php'; ?>

@@ -8,13 +8,18 @@
 class KoordinatorController extends Controller
 {
 
+    /**
+     * Constructor - Ensure only koordinator can access this controller
+     */
     public function __construct()
     {
         $this->requireRole('koordinator');
     }
 
     /**
-     * Koordinator dashboard
+     * Display koordinator dashboard with statistics and pending problems
+     * 
+     * @return void
      */
     public function dashboard()
     {
@@ -24,45 +29,42 @@ class KoordinatorController extends Controller
             'pendingProblems' => $problemModel->getPendingProblems(),
             'userName' => getUserName()
         ];
-        // Sesuai gambar: dashboard.php ada di luar folder schedules (langsung di koordinator)
         $this->view('koordinator/dashboard', $data);
     }
 
     /**
-     * List all problems with filter & pagination
+     * Display paginated list of lab problems with filtering
+     * 
+     * Supports filtering by status and search query
+     * Uses helper functions for validation and pagination
+     * 
+     * @return void
      */
     public function listProblems()
     {
         $problemModel = $this->model('LabProblemModel');
 
-        // Get filter parameters
-        $statusFilter = $this->getQuery('status') ?? 'active';
-        $search = $this->getQuery('search') ?? '';
-        $page = (int)($this->getQuery('page') ?? 1);
-
-        // Validate
-        $validStatuses = ['all', 'active', 'reported', 'in_progress', 'resolved'];
-        if (!in_array($statusFilter, $validStatuses)) {
-            $statusFilter = 'active';
-        }
-        if ($page < 1) {
-            $page = 1;
-        }
+        // Validate filters using helper
+        $filters = validateListFilters([
+            'status' => $this->getQuery('status'),
+            'search' => $this->getQuery('search'),
+            'page' => $this->getQuery('page')
+        ]);
 
         // Get filtered data
-        $result = $problemModel->getFilteredProblems($statusFilter, $search, $page, 10);
+        $result = $problemModel->getFilteredProblems(
+            $filters['status'], 
+            $filters['search'], 
+            $filters['page'], 
+            10
+        );
 
         $data = [
             'problems' => $result['data'],
-            'pagination' => [
-                'current' => $result['page'],
-                'total' => $result['totalPages'],
-                'perPage' => $result['perPage'],
-                'totalRecords' => $result['total']
-            ],
+            'pagination' => buildPaginationData($result),
             'filters' => [
-                'status' => $statusFilter,
-                'search' => $search
+                'status' => $filters['status'],
+                'search' => $filters['search']
             ]
         ];
 
@@ -70,7 +72,11 @@ class KoordinatorController extends Controller
     }
 
     /**
-     * Show create problem form
+     * Display form for creating new problem report
+     * 
+     * Loads laboratory list for dropdown selection
+     * 
+     * @return void
      */
     public function createProblemForm()
     {
@@ -84,7 +90,12 @@ class KoordinatorController extends Controller
     }
 
     /**
-     * Store new problem
+     * Process and store new problem report
+     * 
+     * Validates required fields, creates problem record,
+     * and adds initial history entry
+     * 
+     * @return void Redirects to problems list with flash message
      */
     public function createProblem()
     {
@@ -100,24 +111,34 @@ class KoordinatorController extends Controller
             'reported_by' => getUserId()
         ];
 
-        if (empty($data['laboratory_id']) || empty($data['description'])) {
-            setFlash('danger', '⚠️ Mohon lengkapi data laporan dengan benar!');
+        if (!validateRequired($data, ['laboratory_id', 'description'])) {
+            setFlash('danger', 'Mohon lengkapi data laporan dengan benar.');
             $this->redirect('/koordinator/problems/create');
         }
 
         $problemModel = $this->model('LabProblemModel');
         $problemId = $problemModel->createProblem($data);
 
-        // Add history
-        $historyModel = $this->model('ProblemHistoryModel');
-        $historyModel->addHistory($problemId, 'reported', 'Laporan dibuat oleh Koordinator');
-
-        setFlash('success', '✅ Laporan masalah berhasil ditambahkan ke sistem!');
+        if ($problemId) {
+            // Add history
+            $historyModel = $this->model('ProblemHistoryModel');
+            $historyModel->addHistory($problemId, 'reported', 'Laporan dibuat oleh Koordinator');
+            
+            setFlash('success', 'Laporan masalah berhasil ditambahkan.');
+        } else {
+            setFlash('danger', 'Gagal menambahkan laporan masalah.');
+        }
+        
         $this->redirect('/koordinator/problems');
     }
 
     /**
-     * View problem detail
+     * Display detailed view of a specific problem
+     * 
+     * Shows problem details, history, and available assistants for assignment
+     * 
+     * @param int $id Problem ID
+     * @return void
      */
     public function viewProblem($id)
     {
@@ -128,7 +149,7 @@ class KoordinatorController extends Controller
         $problem = $problemModel->getProblemWithDetails($id);
 
         if (!$problem) {
-            setFlash('danger', 'Problem not found');
+            setFlash('danger', 'Data masalah tidak ditemukan.');
             $this->redirect('/koordinator/problems');
         }
 
@@ -142,7 +163,13 @@ class KoordinatorController extends Controller
     }
 
     /**
-     * Update problem status
+     * Update problem status and add history entry
+     * 
+     * Updates problem status (reported/in_progress/resolved)
+     * and logs the change with optional notes
+     * 
+     * @param int $id Problem ID
+     * @return void Redirects to problem detail
      */
     public function updateProblemStatus($id)
     {
@@ -154,7 +181,7 @@ class KoordinatorController extends Controller
         $note = sanitize($this->getPost('note'));
 
         if (empty($status)) {
-            setFlash('danger', '⚠️ Status wajib dipilih!');
+            setFlash('danger', 'Status wajib dipilih.');
             $this->redirect('/koordinator/problems/' . $id);
         }
 
@@ -166,12 +193,17 @@ class KoordinatorController extends Controller
         $historyModel = $this->model('ProblemHistoryModel');
         $historyModel->addHistory($id, $status, $note);
 
-        setFlash('success', '✅ Status masalah berhasil diperbarui!');
+        setFlash('success', 'Status masalah berhasil diperbarui.');
         $this->redirect('/koordinator/problems/' . $id);
     }
 
     /**
-     * Show edit problem form
+     * Display form for editing existing problem
+     * 
+     * Loads problem data and laboratory list
+     * 
+     * @param int $id Problem ID
+     * @return void
      */
     public function editProblemForm($id)
     {
@@ -181,7 +213,7 @@ class KoordinatorController extends Controller
         $problem = $problemModel->find($id);
 
         if (!$problem) {
-            setFlash('danger', '❌ Data masalah tidak ditemukan!');
+            setFlash('danger', 'Data masalah tidak ditemukan.');
             $this->redirect('/koordinator/problems');
         }
 
@@ -194,7 +226,12 @@ class KoordinatorController extends Controller
     }
 
     /**
-     * Update problem data
+     * Process problem update and save changes
+     * 
+     * Updates problem data and adds history entry
+     * 
+     * @param int $id Problem ID
+     * @return void Redirects to problem detail
      */
     public function updateProblem($id)
     {
@@ -211,18 +248,28 @@ class KoordinatorController extends Controller
         ];
 
         $problemModel = $this->model('LabProblemModel');
-        $problemModel->updateProblem($id, $data);
+        
+        if ($problemModel->updateProblem($id, $data)) {
+            // Add history
+            $historyModel = $this->model('ProblemHistoryModel');
+            $historyModel->addHistory($id, $data['status'], 'Problem updated by Koordinator');
 
-        // Add history
-        $historyModel = $this->model('ProblemHistoryModel');
-        $historyModel->addHistory($id, $data['status'], 'Problem updated by Koordinator');
-
-        setFlash('success', '✅ Data masalah berhasil diperbarui!');
+            setFlash('success', 'Data masalah berhasil diperbarui.');
+        } else {
+            setFlash('danger', 'Gagal memperbarui data masalah.');
+        }
+        
         $this->redirect('/koordinator/problems/' . $id);
     }
 
     /**
-     * Delete problem
+     * Delete problem and its associated history
+     * 
+     * Validates ID, checks existence, deletes history entries,
+     * then removes the problem record
+     * 
+     * @param int $id Problem ID
+     * @return void Redirects to problems list
      */
     public function deleteProblem($id)
     {
@@ -230,9 +277,9 @@ class KoordinatorController extends Controller
             $this->redirect('/koordinator/problems');
         }
 
-        // Validasi ID
-        if (empty($id) || !is_numeric($id)) {
-            setFlash('danger', '❌ ID permasalahan tidak valid!');
+        // Validate ID using helper
+        if (!validateId($id)) {
+            setFlash('danger', 'ID permasalahan tidak valid.');
             $this->redirect('/koordinator/problems');
         }
 
@@ -241,35 +288,30 @@ class KoordinatorController extends Controller
         // Cek apakah problem exists
         $problem = $problemModel->find($id);
         if (!$problem) {
-            setFlash('danger', '❌ Data masalah tidak ditemukan!');
+            setFlash('danger', 'Data masalah tidak ditemukan.');
             $this->redirect('/koordinator/problems');
         }
 
-        // Delete histories jika tabel ada
-        try {
-            $historyModel = $this->model('ProblemHistoryModel');
-            $histories = $historyModel->getHistoryByProblem($id);
-            foreach ($histories as $history) {
-                $historyModel->delete($history['id']);
-            }
-        } catch (Exception $e) {
-            // Tabel history tidak ada atau error, skip
-        }
-
-        // Delete problem
-        $result = $problemModel->deleteProblem($id);
+        // Delete problem with cascading history (moved to model)
+        $historyModel = $this->model('ProblemHistoryModel');
+        $result = $problemModel->deleteProblemWithHistory($id, $historyModel);
         
         if ($result) {
-            setFlash('success', '🗑️ Data masalah berhasil dihapus!');
+            setFlash('success', 'Data masalah berhasil dihapus.');
         } else {
-            setFlash('danger', '❌ Gagal menghapus data masalah!');
+            setFlash('danger', 'Gagal menghapus data masalah.');
         }
         
         $this->redirect('/koordinator/problems');
     }
 
     /**
-     * Assign problem to assistant
+     * Assign problem to an assistant
+     * 
+     * Updates assigned_to field and creates history entry
+     * 
+     * @param int $id Problem ID
+     * @return void Redirects to problem detail
      */
     public function assignProblem($id)
     {
@@ -280,7 +322,7 @@ class KoordinatorController extends Controller
         $assignedTo = sanitize($this->getPost('assigned_to'));
 
         if (empty($assignedTo)) {
-            setFlash('danger', '⚠️ Silakan pilih asisten terlebih dahulu!');
+            setFlash('danger', 'Silakan pilih asisten terlebih dahulu.');
             $this->redirect('/koordinator/problems/' . $id);
         }
 
@@ -296,12 +338,17 @@ class KoordinatorController extends Controller
         $historyModel = $this->model('ProblemHistoryModel');
         $historyModel->addHistory($id, 'reported', 'Ditugaskan kepada: ' . $assignee['name']);
 
-        setFlash('success', '👤 Tugas berhasil diberikan kepada ' . $assignee['name'] . '!');
+        setFlash('success', 'Tugas berhasil diberikan kepada ' . $assignee['name'] . '.');
         $this->redirect('/koordinator/problems/' . $id);
     }
 
     /**
-     * List all assistant schedules with grid view & filter
+     * Display list of assistant schedules grouped by day
+     * 
+     * Shows weekly schedule with assistant assignments and jobdesk settings
+     * Supports grid view with day grouping
+     * 
+     * @return void
      */
     public function listAssistantSchedules()
     {
@@ -317,20 +364,9 @@ class KoordinatorController extends Controller
             'Putra' => $settingsModel->get('job_putra', 'Belum diatur')
         ];
 
-        // 3. Buat Matriks Data
+        // 3. Build matrix using model method
+        $matrix = $scheduleModel->buildScheduleMatrix($rawSchedules);
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-        $matrix = [
-            'Putri' => array_fill_keys($days, []),
-            'Putra' => array_fill_keys($days, [])
-        ];
-
-        foreach ($rawSchedules as $row) {
-            $role = $row['job_role'];
-            $day  = $row['day'];
-            if (isset($matrix[$role][$day])) {
-                $matrix[$role][$day][] = $row;
-            }
-        }
 
         $data = [
             'matrix' => $matrix,
@@ -346,6 +382,13 @@ class KoordinatorController extends Controller
     /**
      * Show create schedule form
      */
+    /**
+     * Display form for creating new assistant schedule
+     * 
+     * Loads list of assistants for dropdown selection
+     * 
+     * @return void
+     */
     public function createScheduleForm()
     {
         $userModel = $this->model('UserModel');
@@ -359,6 +402,14 @@ class KoordinatorController extends Controller
 
     /**
      * Store new schedule
+     */
+    /**
+     * Process and store new assistant schedule
+     * 
+     * Validates required fields (user_id, day, time)
+     * Creates schedule record
+     * 
+     * @return void Redirects to schedules list
      */
     public function createSchedule()
     {
@@ -374,20 +425,30 @@ class KoordinatorController extends Controller
             'status' => sanitize($this->getPost('status')) ?: 'scheduled'
         ];
 
-        if (empty($data['user_id']) || empty($data['day']) || empty($data['start_time']) || empty($data['end_time'])) {
-            setFlash('danger', '⚠️ Mohon lengkapi semua field yang wajib diisi!');
+        if (!validateRequired($data, ['user_id', 'day', 'start_time', 'end_time'])) {
+            setFlash('danger', 'Mohon lengkapi semua field yang wajib diisi.');
             $this->redirect('/koordinator/assistant-schedules/create');
         }
 
         $scheduleModel = $this->model('AssistantScheduleModel');
-        $scheduleModel->createSchedule($data);
+        $result = $scheduleModel->createSchedule($data);
 
-        setFlash('success', '📅 Jadwal piket berhasil ditambahkan!');
+        if ($result) {
+            setFlash('success', 'Jadwal piket berhasil ditambahkan.');
+        } else {
+            setFlash('danger', 'Gagal menambahkan jadwal piket.');
+        }
+        
         $this->redirect('/koordinator/assistant-schedules');
     }
 
     /**
-     * Show edit schedule form
+     * Display form for editing existing assistant schedule
+     * 
+     * Loads schedule data and assistant list
+     * 
+     * @param int $id Schedule ID
+     * @return void
      */
     public function editScheduleForm($id)
     {
@@ -397,7 +458,7 @@ class KoordinatorController extends Controller
         $schedule = $scheduleModel->find($id);
 
         if (!$schedule) {
-            setFlash('danger', '❌ Jadwal tidak ditemukan!');
+            setFlash('danger', 'Jadwal tidak ditemukan.');
             $this->redirect('/koordinator/assistant-schedules');
         }
 
@@ -410,7 +471,12 @@ class KoordinatorController extends Controller
     }
 
     /**
-     * Update schedule
+     * Process schedule update and save changes
+     * 
+     * Updates schedule data (user, day, time, status)
+     * 
+     * @param int $id Schedule ID
+     * @return void Redirects to schedules list
      */
     public function updateSchedule($id)
     {
@@ -427,30 +493,59 @@ class KoordinatorController extends Controller
         ];
 
         $scheduleModel = $this->model('AssistantScheduleModel');
-        $scheduleModel->updateSchedule($id, $data);
-
-        setFlash('success', '✅ Jadwal piket berhasil diperbarui!');
+        
+        if ($scheduleModel->updateSchedule($id, $data)) {
+            setFlash('success', 'Jadwal piket berhasil diperbarui.');
+        } else {
+            setFlash('danger', 'Gagal memperbarui jadwal piket.');
+        }
+        
         $this->redirect('/koordinator/assistant-schedules');
     }
 
     /**
-     * Delete schedule
+     * Delete assistant schedule
+     * 
+     * Removes schedule record from database
+     * 
+     * @param int $id Schedule ID
+     * @return void Redirects to schedules list
      */
     public function deleteSchedule($id)
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/koordinator/assistant-schedules');
+            return;
+        }
+
+        // Validate ID
+        if (!validateId($id)) {
+            setFlash('danger', 'ID jadwal tidak valid.');
+            $this->redirect('/koordinator/assistant-schedules');
+            return;
         }
 
         $scheduleModel = $this->model('AssistantScheduleModel');
-        $scheduleModel->deleteSchedule($id);
+        $result = $scheduleModel->deleteSchedule($id);
 
-        setFlash('success', '🗑️ Jadwal piket berhasil dihapus!');
+        if ($result) {
+            setFlash('success', 'Jadwal piket berhasil dihapus.');
+        } else {
+            setFlash('danger', 'Gagal menghapus jadwal piket.');
+        }
+        
         $this->redirect('/koordinator/assistant-schedules');
     }
 
     /**
      * List all laboratories with enhanced view
+     */
+    /**
+     * Display list of all laboratories
+     * 
+     * Shows laboratory data with PC and TV counts
+     * 
+     * @return void
      */
     public function listLaboratories()
     {
@@ -461,6 +556,11 @@ class KoordinatorController extends Controller
     /**
      * Show create laboratory form
      */
+    /**
+     * Display form for creating new laboratory
+     * 
+     * @return void
+     */
     public function createLaboratoryForm()
     {
         $this->view('koordinator/laboratories/create');
@@ -468,6 +568,14 @@ class KoordinatorController extends Controller
 
     /**
      * Store new laboratory
+     */
+    /**
+     * Process and store new laboratory
+     * 
+     * Validates lab name requirement
+     * Creates laboratory record with specs
+     * 
+     * @return void Redirects to laboratories list
      */
     public function createLaboratory()
     {
@@ -487,20 +595,33 @@ class KoordinatorController extends Controller
             'status' => sanitize($this->getPost('status'))
         ];
 
-        if (empty($data['lab_name'])) {
-            setFlash('danger', '⚠️ Nama laboratorium wajib diisi!');
+        if (!validateRequired($data, ['lab_name'])) {
+            setFlash('danger', 'Nama laboratorium wajib diisi.');
             $this->redirect('/koordinator/laboratories/create');
         }
 
         $laboratoryModel = $this->model('LaboratoryModel');
-        $laboratoryModel->createLaboratory($data);
+        $result = $laboratoryModel->createLaboratory($data);
 
-        setFlash('success', '🏢 Laboratorium "' . $data['lab_name'] . '" berhasil ditambahkan!');
+        if ($result) {
+            setFlash('success', 'Laboratorium "' . $data['lab_name'] . '" berhasil ditambahkan.');
+        } else {
+            setFlash('danger', 'Gagal menambahkan laboratorium.');
+        }
+        
         $this->redirect('/koordinator/laboratories');
     }
 
     /**
      * Show edit laboratory form
+     */
+    /**
+     * Display form for editing existing laboratory
+     * 
+     * Loads laboratory data
+     * 
+     * @param int $id Laboratory ID
+     * @return void
      */
     public function editLaboratoryForm($id)
     {
@@ -509,8 +630,9 @@ class KoordinatorController extends Controller
         $lab = $laboratoryModel->find($id);
 
         if (!$lab) {
-            setFlash('danger', '❌ Laboratorium tidak ditemukan!');
+            setFlash('danger', 'Laboratorium tidak ditemukan!');
             $this->redirect('/koordinator/laboratories');
+            return;
         }
 
         $data = ['laboratory' => $lab];
@@ -541,9 +663,13 @@ class KoordinatorController extends Controller
         ];
 
         $laboratoryModel = $this->model('LaboratoryModel');
-        $laboratoryModel->updateLaboratory($id, $data);
-
-        setFlash('success', '✅ Data laboratorium "' . $data['lab_name'] . '" berhasil diperbarui!');
+        
+        if ($laboratoryModel->updateLaboratory($id, $data)) {
+            setFlash('success', 'Data laboratorium "' . $data['lab_name'] . '" berhasil diperbarui.');
+        } else {
+            setFlash('danger', 'Gagal memperbarui data laboratorium.');
+        }
+        
         $this->redirect('/koordinator/laboratories');
     }
 
@@ -554,12 +680,25 @@ class KoordinatorController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/koordinator/laboratories');
+            return;
+        }
+
+        // Validate ID
+        if (!validateId($id)) {
+            setFlash('danger', 'ID laboratorium tidak valid.');
+            $this->redirect('/koordinator/laboratories');
+            return;
         }
 
         $laboratoryModel = $this->model('LaboratoryModel');
-        $laboratoryModel->deleteLaboratory($id);
+        $result = $laboratoryModel->deleteLaboratory($id);
 
-        setFlash('success', '🗑️ Laboratorium berhasil dihapus dari sistem!');
+        if ($result) {
+            setFlash('success', 'Laboratorium berhasil dihapus dari sistem.');
+        } else {
+            setFlash('danger', 'Gagal menghapus laboratorium.');
+        }
+        
         $this->redirect('/koordinator/laboratories');
     }
 
@@ -599,9 +738,9 @@ class KoordinatorController extends Controller
         // Handle image upload
         $imagePath = null;
         if (isset($_FILES['image_cover']) && $_FILES['image_cover']['error'] === UPLOAD_ERR_OK) {
-            $imagePath = $this->uploadActivityImage($_FILES['image_cover']);
+            $imagePath = uploadFile($_FILES['image_cover'], UPLOAD_DIR_ACTIVITIES, null, MAX_UPLOAD_SIZE, 'activity');
             if (!$imagePath) {
-                setFlash('danger', '❌ Gagal upload gambar! Pastikan format dan ukuran file sudah sesuai.');
+                setFlash('danger', 'Gagal upload gambar. Pastikan format dan ukuran file sudah sesuai.');
                 $this->redirect('/koordinator/activities/create');
             }
         }
@@ -619,7 +758,7 @@ class KoordinatorController extends Controller
 
         $activityModel->createActivity($data);
 
-        setFlash('success', '📸 Kegiatan "' . $data['title'] . '" berhasil ditambahkan!');
+        setFlash('success', 'Kegiatan "' . $data['title'] . '" berhasil ditambahkan.');
         $this->redirect('/koordinator/activities');
     }
 
@@ -632,7 +771,7 @@ class KoordinatorController extends Controller
         $activity = $activityModel->find($id);
 
         if (!$activity) {
-            setFlash('danger', '❌ Kegiatan tidak ditemukan!');
+            setFlash('danger', 'Kegiatan tidak ditemukan.');
             $this->redirect('/koordinator/activities');
         }
 
@@ -653,19 +792,15 @@ class KoordinatorController extends Controller
         $activity = $activityModel->find($id);
 
         if (!$activity) {
-            setFlash('danger', '❌ Kegiatan tidak ditemukan!');
+            setFlash('danger', 'Kegiatan tidak ditemukan.');
             $this->redirect('/koordinator/activities');
         }
 
         // Handle image upload
         $imagePath = $activity['image_cover']; // Keep existing image
         if (isset($_FILES['image_cover']) && $_FILES['image_cover']['error'] === UPLOAD_ERR_OK) {
-            $newImagePath = $this->uploadActivityImage($_FILES['image_cover']);
+            $newImagePath = uploadFile($_FILES['image_cover'], UPLOAD_DIR_ACTIVITIES, null, MAX_UPLOAD_SIZE, 'activity');
             if ($newImagePath) {
-                // Delete old image if exists
-                if ($imagePath && file_exists(PUBLIC_PATH . $imagePath)) {
-                    unlink(PUBLIC_PATH . $imagePath);
-                }
                 $imagePath = $newImagePath;
             }
         }
@@ -681,9 +816,12 @@ class KoordinatorController extends Controller
             'image_cover' => $imagePath
         ];
 
-        $activityModel->updateActivity($id, $data);
-
-        setFlash('success', '✅ Kegiatan "' . $data['title'] . '" berhasil diperbarui!');
+        if ($activityModel->updateActivityWithImageCleanup($id, $data)) {
+            setFlash('success', 'Kegiatan "' . $data['title'] . '" berhasil diperbarui.');
+        } else {
+            setFlash('danger', 'Gagal memperbarui kegiatan.');
+        }
+        
         $this->redirect('/koordinator/activities');
     }
 
@@ -694,21 +832,25 @@ class KoordinatorController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/koordinator/activities');
+            return;
         }
 
         $activityModel = $this->model('LabActivityModel');
         $activity = $activityModel->find($id);
 
-        if ($activity) {
-            // Delete image file if exists
-            if ($activity['image_cover'] && file_exists(PUBLIC_PATH . $activity['image_cover'])) {
-                unlink(PUBLIC_PATH . $activity['image_cover']);
-            }
+        if (!$activity) {
+            setFlash('danger', 'Kegiatan tidak ditemukan.');
+            $this->redirect('/koordinator/activities');
+            return;
+        }
 
-            $activityModel->deleteActivity($id);
-            setFlash('success', '🗑️ Kegiatan berhasil dihapus dari sistem!');
+        // Delete via model (akan hapus file juga jika ada)
+        $result = $activityModel->deleteActivity($id);
+        
+        if ($result) {
+            setFlash('success', 'Kegiatan "' . $activity['title'] . '" berhasil dihapus.');
         } else {
-            setFlash('danger', '❌ Kegiatan tidak ditemukan!');
+            setFlash('danger', 'Gagal menghapus kegiatan.');
         }
 
         $this->redirect('/koordinator/activities');
@@ -717,39 +859,7 @@ class KoordinatorController extends Controller
     /**
      * Upload activity image
      */
-    private function uploadActivityImage($file)
-    {
-        $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-        $maxSize = 5 * 1024 * 1024; // 5MB
 
-        // Validate file type
-        if (!in_array($file['type'], $allowedTypes)) {
-            return false;
-        }
-
-        // Validate file size
-        if ($file['size'] > $maxSize) {
-            return false;
-        }
-
-        // Create upload directory if not exists
-        $uploadDir = PUBLIC_PATH . '/uploads/activities/';
-        if (!file_exists($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
-        }
-
-        // Generate unique filename
-        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-        $filename = uniqid('activity_') . '.' . $extension;
-        $filepath = $uploadDir . $filename;
-
-        // Move uploaded file
-        if (move_uploaded_file($file['tmp_name'], $filepath)) {
-            return '/uploads/activities/' . $filename;
-        }
-
-        return false;
-    }
 
 
 
@@ -771,20 +881,9 @@ class KoordinatorController extends Controller
             'Putra' => $settingsModel->get('job_putra', 'Belum diatur')
         ];
 
-        // 3. Buat Matriks Data
+        // 3. Build matrix using model method
+        $matrix = $scheduleModel->buildScheduleMatrix($rawSchedules);
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-        $matrix = [
-            'Putri' => array_fill_keys($days, []),
-            'Putra' => array_fill_keys($days, [])
-        ];
-
-        foreach ($rawSchedules as $row) {
-            $role = $row['job_role'];
-            $day  = $row['day'];
-            if (isset($matrix[$role][$day])) {
-                $matrix[$role][$day][] = $row;
-            }
-        }
 
         $data = [
             'matrix' => $matrix,
@@ -806,7 +905,7 @@ class KoordinatorController extends Controller
                 'job_role' => sanitize($this->getPost('job_role'))
             ];
             $this->model('AssistantScheduleModel')->createSchedule($data);
-            setFlash('success', '📅 Jadwal asisten berhasil ditambahkan!');
+            setFlash('success', 'Jadwal asisten berhasil ditambahkan.');
             $this->redirect('/koordinator/assistant-schedules');
             return;
         }
@@ -836,7 +935,7 @@ class KoordinatorController extends Controller
                 'job_role' => sanitize($this->getPost('job_role'))
             ];
             $scheduleModel->updateSchedule($id, $data);
-            setFlash('success', '✅ Jadwal asisten berhasil diperbarui!');
+            setFlash('success', 'Jadwal asisten berhasil diperbarui.');
             $this->redirect('/koordinator/assistant-schedules');
             return;
         }
@@ -863,17 +962,34 @@ class KoordinatorController extends Controller
             $key = ($role == 'Putra') ? 'job_putra' : 'job_putri';
 
             $this->model('SettingsModel')->save($key, $content);
-            setFlash('success', "📝 Jobdesk $role berhasil diperbarui!");
+            setFlash('success', "Jobdesk $role berhasil diperbarui.");
             $this->redirect('/koordinator/assistant-schedules');
         }
     }
 
     public function deleteAssistantSchedule($id)
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->model('AssistantScheduleModel')->deleteSchedule($id);
-            setFlash('success', '🗑️ Jadwal asisten berhasil dihapus!');
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/koordinator/assistant-schedules');
+            return;
         }
+
+        // Validate ID
+        if (!validateId($id)) {
+            setFlash('danger', 'ID jadwal tidak valid.');
+            $this->redirect('/koordinator/assistant-schedules');
+            return;
+        }
+
+        $scheduleModel = $this->model('AssistantScheduleModel');
+        $result = $scheduleModel->deleteSchedule($id);
+
+        if ($result) {
+            setFlash('success', 'Jadwal asisten berhasil dihapus.');
+        } else {
+            setFlash('danger', 'Gagal menghapus jadwal asisten.');
+        }
+        
+        $this->redirect('/koordinator/assistant-schedules');
     }
 }

@@ -193,35 +193,60 @@ function getDayName($day) {
 }
 
 /**
- * Upload file
+ * Upload file to specified directory with comprehensive validation
+ * 
+ * @param array $file Uploaded file data from $_FILES
+ * @param string $directory Target directory name (activities, lecturers, assistants, schedules, laboratories, profiles)
+ * @param array|null $allowedTypes Allowed MIME types (default: images only)
+ * @param int $maxSize Maximum file size in bytes (default: 5MB)
+ * @param string $prefix Filename prefix for unique naming (default: 'file')
+ * @return string|false Relative path to uploaded file or false on failure
  */
-function uploadFile($file, $uploadDir = 'uploads/', $allowedTypes = ['jpg', 'jpeg', 'png']) {
-    if (!isset($file['error']) || is_array($file['error'])) {
-        return ['success' => false, 'message' => 'Invalid file'];
+function uploadFile($file, $directory = UPLOAD_DIR_ACTIVITIES, $allowedTypes = null, $maxSize = MAX_UPLOAD_SIZE, $prefix = 'file') {
+    // Default allowed types: images
+    if ($allowedTypes === null) {
+        $allowedTypes = ALLOWED_IMAGE_TYPES;
     }
     
-    if ($file['error'] !== UPLOAD_ERR_OK) {
-        return ['success' => false, 'message' => 'Upload error'];
+    // Validate file upload error
+    if (!isset($file['error']) || is_array($file['error']) || $file['error'] !== UPLOAD_ERR_OK) {
+        return false;
     }
     
-    $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-    
-    if (!in_array($fileExtension, $allowedTypes)) {
-        return ['success' => false, 'message' => 'File type not allowed'];
+    // Validate file type (MIME type)
+    if (!in_array($file['type'], $allowedTypes)) {
+        return false;
     }
     
-    $fileName = uniqid() . '.' . $fileExtension;
-    $targetPath = PUBLIC_PATH . '/' . $uploadDir . $fileName;
-    
-    if (!is_dir(PUBLIC_PATH . '/' . $uploadDir)) {
-        mkdir(PUBLIC_PATH . '/' . $uploadDir, 0777, true);
+    // Validate file size
+    if ($file['size'] > $maxSize) {
+        return false;
     }
     
-    if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-        return ['success' => true, 'filename' => $fileName, 'path' => $uploadDir . $fileName];
+    // Extract and validate file extension
+    $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+    
+    if (!in_array($extension, $allowedExtensions)) {
+        return false;
     }
     
-    return ['success' => false, 'message' => 'Failed to move uploaded file'];
+    // Create upload directory if not exists
+    $uploadDir = PUBLIC_PATH . '/uploads/' . $directory . '/';
+    if (!file_exists($uploadDir)) {
+        mkdir($uploadDir, 0755, true); // Secure permissions
+    }
+    
+    // Generate unique filename with sanitized extension
+    $filename = uniqid($prefix . '_') . '.' . $extension;
+    $filepath = $uploadDir . $filename;
+    
+    // Move uploaded file
+    if (move_uploaded_file($file['tmp_name'], $filepath)) {
+        return '/uploads/' . $directory . '/' . $filename;
+    }
+    
+    return false;
 }
 
 /**
@@ -238,7 +263,7 @@ function deleteFile($filePath) {
 /**
  * Set flash message
  */
-function setFlash($type, $message) {
+function setFlash($type = FLASH_SUCCESS, $message) {
     $_SESSION['flash'] = [
         'type' => $type,
         'message' => $message
@@ -271,7 +296,7 @@ function displayFlash() {
     $flash = getFlash();
     if ($flash) {
         $type = $flash['type'];
-        $message = $flash['message'];
+        $message = htmlspecialchars($flash['message'], ENT_QUOTES, 'UTF-8'); // Escape message
         
         // Map alert types to Tailwind colors and icons
         $config = [
@@ -314,49 +339,22 @@ function displayFlash() {
         
         $style = $config[$type] ?? $config['info'];
         
+        // Professional toast notification with auto-dismiss
         echo "
-        <div id='toast-notification' class='fixed top-6 right-6 z-50 transform translate-x-0 transition-all duration-500 ease-out'>
-            <div class='flex items-center w-full max-w-sm p-4 {$style['bg']} border {$style['border']} rounded-lg shadow-xl backdrop-blur-sm'>
+        <div id='flash-toast' class='fixed top-6 right-6 z-50 transform transition-all duration-300 ease-out' style='animation: slideInRight 0.3s ease-out;'>
+            <div class='flex items-center w-full max-w-sm p-4 {$style['bg']} border {$style['border']} rounded-lg shadow-xl'>
                 <div class='inline-flex items-center justify-center flex-shrink-0 w-10 h-10 {$style['iconColor']}'>
                     <i class='bi {$style['icon']} text-2xl'></i>
                 </div>
-                <div class='ml-3 text-sm font-medium {$style['text']} flex-1'>
+                <div class='ml-3 text-sm font-medium {$style['text']} flex-1 leading-snug'>
                     {$message}
                 </div>
-                <button type='button' onclick='closeToast()' class='ml-3 -mx-1.5 -my-1.5 {$style['bg']} {$style['text']} hover:bg-opacity-80 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 inline-flex items-center justify-center h-8 w-8 transition-colors'>
+                <button type='button' onclick='dismissFlash()' class='ml-3 -mx-1.5 -my-1.5 {$style['bg']} {$style['text']} hover:bg-opacity-80 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 inline-flex items-center justify-center h-8 w-8 transition-colors'>
+                    <span class='sr-only'>Close</span>
                     <i class='bi bi-x-lg'></i>
                 </button>
             </div>
         </div>
-        
-        <script>
-            // Auto hide after 5 seconds
-            setTimeout(function() {
-                closeToast();
-            }, 5000);
-            
-            function closeToast() {
-                const toast = document.getElementById('toast-notification');
-                if (toast) {
-                    toast.classList.add('translate-x-full', 'opacity-0');
-                    setTimeout(function() {
-                        toast.remove();
-                    }, 300);
-                }
-            }
-            
-            // Slide in animation on load
-            window.addEventListener('DOMContentLoaded', function() {
-                const toast = document.getElementById('toast-notification');
-                if (toast) {
-                    toast.classList.add('-translate-x-full');
-                    setTimeout(function() {
-                        toast.classList.remove('-translate-x-full');
-                        toast.classList.add('translate-x-0');
-                    }, 100);
-                }
-            });
-        </script>
         ";
     }
 }
@@ -383,4 +381,78 @@ function dd($data) {
     var_dump($data);
     echo '</pre>';
     die();
+}
+
+// ==========================================
+// VALIDATION HELPERS (Clean Code)
+// ==========================================
+
+/**
+ * Validate and sanitize filter parameters for list pages
+ * 
+ * @param array $params Array containing 'status', 'search', 'page'
+ * @param array $validStatuses Valid status values (default: problem statuses)
+ * @return array Validated filters ['status', 'search', 'page']
+ */
+function validateListFilters($params, $validStatuses = ['all', 'active', 'reported', 'in_progress', 'resolved']) {
+    $statusFilter = $params['status'] ?? 'active';
+    $search = $params['search'] ?? '';
+    $page = (int)($params['page'] ?? 1);
+
+    // Validate status
+    if (!in_array($statusFilter, $validStatuses)) {
+        $statusFilter = 'active';
+    }
+
+    // Validate page
+    if ($page < 1) {
+        $page = 1;
+    }
+
+    return [
+        'status' => $statusFilter,
+        'search' => $search,
+        'page' => $page
+    ];
+}
+
+/**
+ * Build pagination data array for views
+ * 
+ * @param array $result Result from model (must have: page, totalPages, perPage, total)
+ * @return array Pagination data for view
+ */
+function buildPaginationData($result) {
+    return [
+        'current' => $result['page'],
+        'total' => $result['totalPages'],
+        'perPage' => $result['perPage'],
+        'totalRecords' => $result['total']
+    ];
+}
+
+/**
+ * Validate required fields in data array
+ * 
+ * @param array $data Data to validate
+ * @param array $required Required field names
+ * @return bool True if all required fields are present and not empty
+ */
+function validateRequired($data, $required) {
+    foreach ($required as $field) {
+        if (empty($data[$field])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
+ * Validate numeric ID
+ * 
+ * @param mixed $id ID to validate
+ * @return bool True if valid numeric ID
+ */
+function validateId($id) {
+    return !empty($id) && is_numeric($id) && $id > 0;
 }

@@ -137,6 +137,8 @@
     </main>
 </div>
 
+<?php include APP_PATH . '/views/admin/layouts/footer.php'; ?>
+
 <script>
     function togglePassword() {
         const passwordInput = document.getElementById('password');

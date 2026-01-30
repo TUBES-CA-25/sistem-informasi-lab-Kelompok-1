@@ -87,17 +87,52 @@ class LabActivityModel extends Model
         return $this->update($id, $data);
     }
 
+    /**
+     * Delete activity with automatic image cleanup
+     * 
+     * @param int $id Activity ID to delete
+     * @return bool True on success, false on failure
+     */
     public function deleteActivity($id)
     {
-        // Opsional: Hapus gambar fisik jika ada (Best Practice)
+        // Delete image file if exists
         $item = $this->find($id);
         if ($item && !empty($item['image_cover'])) {
-            $filePath = '../public/' . $item['image_cover'];
-            if (file_exists($filePath)) {
-                unlink($filePath);
+            // Only delete if not external URL
+            if (strpos($item['image_cover'], 'http') !== 0) {
+                $filePath = PUBLIC_PATH . $item['image_cover'];
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
             }
         }
 
         return $this->delete($id);
+    }
+
+    /**
+     * Update activity with automatic old image cleanup
+     * 
+     * @param int $id Activity ID to update
+     * @param array $data New activity data
+     * @return bool True on success, false on failure
+     */
+    public function updateActivityWithImageCleanup($id, $data)
+    {
+        // Delete old image if new one is uploaded
+        if (!empty($data['image_cover'])) {
+            $oldActivity = $this->find($id);
+            if ($oldActivity && !empty($oldActivity['image_cover']) && $oldActivity['image_cover'] !== $data['image_cover']) {
+                // Only delete if not external URL
+                if (strpos($oldActivity['image_cover'], 'http') !== 0) {
+                    $filePath = PUBLIC_PATH . $oldActivity['image_cover'];
+                    if (file_exists($filePath)) {
+                        unlink($filePath);
+                    }
+                }
+            }
+        }
+
+        return $this->update($id, $data);
     }
 }

@@ -156,6 +156,8 @@ $adminLayout = true; ?>
     </main>
 </div>
 
+<?php include APP_PATH . '/views/admin/layouts/footer.php'; ?>
+
 <div id="dateActionModal"
     class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity opacity-0 pointer-events-none">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden transform scale-95 transition-all"

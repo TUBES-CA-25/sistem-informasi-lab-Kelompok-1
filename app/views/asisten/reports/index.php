@@ -2,8 +2,6 @@
 <?php include APP_PATH . '/views/layouts/header.php'; ?>
 <?php include APP_PATH . '/views/layouts/navbar.php'; ?>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <div class="bg-slate-50 min-h-screen py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -19,9 +17,7 @@
             </a>
         </div>
 
-        <div id="flash-data" class="hidden">
-            <?php displayFlash(); ?>
-        </div>
+        <?php displayFlash(); ?>
 
         <div class="flex flex-wrap gap-2 mb-6">
             <?php $currentStatus = $filters['status'] ?? 'active'; ?>
@@ -110,9 +106,10 @@
                                             </a>
 
                                             <?php if ($problem['reported_by'] == getUserId()): ?>
-                                                <button onclick="confirmDelete(<?= $problem['id'] ?>)" 
-                                                        class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center hover:bg-rose-100 transition-colors border border-rose-200" 
-                                                        title="Hapus">
+                                                <button class="delete-problem-btn w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center hover:bg-rose-100 transition-colors border border-rose-200" 
+                                                        title="Hapus"
+                                                        data-problem-id="<?= $problem['id'] ?>"
+                                                        data-description="<?= htmlspecialchars($problem['description'], ENT_QUOTES) ?>">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             <?php endif; ?>
@@ -128,59 +125,74 @@
     </div>
 </div>
 
-<div id="deleteModal" class="hidden fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-        <h3 class="text-lg font-semibold text-slate-900 mb-2">Hapus Laporan?</h3>
-        <p class="text-slate-600 text-sm mb-6">Tindakan ini tidak dapat dibatalkan.</p>
+<!-- Delete Confirmation Modal -->
+<div id="deleteProblemModal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 transform transition-all duration-300 animate-scale">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-gradient-to-br from-rose-500 to-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-rose-500/30">
+                <i class="bi bi-trash text-white text-2xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-slate-800 mb-2">Hapus Laporan?</h3>
+            <p class="text-slate-600 font-medium" id="deleteProblemDescription">Yakin ingin menghapus laporan ini?</p>
+            <p class="text-slate-500 text-sm mt-2">Tindakan ini tidak dapat dibatalkan.</p>
+        </div>
+        
         <div class="flex gap-3">
-            <button onclick="closeDeleteModal()" class="flex-1 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg">Batal</button>
-            <form id="deleteForm" method="POST" class="flex-1">
-                <button type="submit" class="w-full px-4 py-2 bg-rose-600 text-white rounded-lg">Hapus</button>
+            <button id="cancelDeleteProblem" class="flex-1 px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition-all duration-200">
+                <i class="bi bi-x-lg mr-2"></i>Batal
+            </button>
+            <form id="deleteProblemForm" method="POST" class="flex-1">
+                <button type="submit" class="w-full px-5 py-3 bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-semibold rounded-xl shadow-lg shadow-rose-500/30 transition-all duration-200">
+                    <i class="bi bi-trash mr-2"></i>Hapus
+                </button>
             </form>
         </div>
     </div>
 </div>
 
 <script>
-function confirmDelete(id) {
-    const modal = document.getElementById('deleteModal');
-    const form = document.getElementById('deleteForm');
-    
-    // PERBAIKAN: URL sekarang mengikuti format Admin: /asisten/problems/{id}/delete
-    form.action = '<?= url('/asisten/problems/') ?>' + id + '/delete';
-    
-    modal.classList.remove('hidden');
-}
+// Event delegation for delete problem buttons
+document.body.addEventListener('click', function(e) {
+    const deleteBtn = e.target.closest('.delete-problem-btn');
+    if (deleteBtn) {
+        const problemId = deleteBtn.dataset.problemId;
+        const description = deleteBtn.dataset.description;
+        
+        console.log('Delete problem clicked:', { problemId, description });
+        
+        // Update modal content
+        const modal = document.getElementById('deleteProblemModal');
+        const form = document.getElementById('deleteProblemForm');
+        const descriptionEl = document.getElementById('deleteProblemDescription');
+        
+        // Truncate long descriptions
+        const shortDesc = description.length > 50 ? description.substring(0, 50) + '...' : description;
+        descriptionEl.textContent = shortDesc;
+        
+        // Set form action
+        form.action = '<?= url('/asisten/problems/') ?>' + problemId + '/delete';
+        
+        // Show modal
+        modal.classList.remove('hidden');
+        
+        console.log('Modal shown with form action:', form.action);
+    }
+});
 
-function closeDeleteModal() {
-    document.getElementById('deleteModal').classList.add('hidden');
-}
+// Close modal button
+document.getElementById('cancelDeleteProblem')?.addEventListener('click', function() {
+    document.getElementById('deleteProblemModal').classList.add('hidden');
+});
 
-// Tutup modal jika klik di luar area
-document.getElementById('deleteModal').addEventListener('click', function(e) {
+// Close modal when clicking backdrop
+document.getElementById('deleteProblemModal')?.addEventListener('click', function(e) {
     if (e.target === this) {
-        closeDeleteModal();
+        this.classList.add('hidden');
     }
 });
 
 // SweetAlert Logic
-document.addEventListener('DOMContentLoaded', function() {
-    const flashElement = document.getElementById('flash-data');
-    if (flashElement && flashElement.innerText.trim() !== '') {
-        const text = flashElement.innerText.trim();
-        const icon = text.toLowerCase().includes('berhasil') ? 'success' : 'error';
-        const title = icon === 'success' ? 'Berhasil!' : 'Gagal!';
-        
-        Swal.fire({ 
-            title: title, 
-            text: text, 
-            icon: icon, 
-            confirmButtonText: 'Oke',
-            confirmButtonColor: '#0ea5e9', 
-            timer: 3000 
-        });
-    }
-});
+// Flash messages now handled globally in footer.php
 </script>
 
 <?php include APP_PATH . '/views/layouts/footer.php'; ?>

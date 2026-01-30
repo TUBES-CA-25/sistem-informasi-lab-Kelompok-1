@@ -73,7 +73,39 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
 <script src="<?= asset('js/main.js') ?>"></script>
+
+<!-- Global Toast Notification Script -->
 <script>
+// Toast notification functions (global)
+function closeToast() {
+    const toast = document.getElementById('toast-notification');
+    if (toast) {
+        toast.classList.add('translate-x-full', 'opacity-0');
+        setTimeout(function() {
+            toast.remove();
+        }, 300);
+    }
+}
+
+// Auto-hide toast after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    const toast = document.getElementById('toast-notification');
+    if (toast) {
+        // Slide in animation
+        toast.classList.add('-translate-x-full');
+        setTimeout(function() {
+            toast.classList.remove('-translate-x-full');
+            toast.classList.add('translate-x-0');
+        }, 100);
+        
+        // Auto hide after 5 seconds
+        setTimeout(function() {
+            closeToast();
+        }, 5000);
+    }
+});
+
+// Smooth scroll untuk anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         if(this.getAttribute('href').length > 1) {

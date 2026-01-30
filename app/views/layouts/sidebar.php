@@ -152,3 +152,31 @@ function isSidebarActive($uri, $path)
     </div>
 
 </aside>
+
+<!-- Toast Notification Auto-Hide Script (For Admin Layout) -->
+<script>
+// Close toast notification function
+function closeToast() {
+    const toast = document.getElementById('toast-notification');
+    if (toast) {
+        toast.classList.add('translate-x-full', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+    }
+}
+
+// Auto-hide toast after 5 seconds and slide-in animation
+window.addEventListener('DOMContentLoaded', function() {
+    const toast = document.getElementById('toast-notification');
+    if (toast) {
+        // Slide in animation
+        setTimeout(() => {
+            toast.classList.remove('translate-x-full');
+        }, 100);
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            closeToast();
+        }, 5000);
+    }
+});
+</script>

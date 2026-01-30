@@ -116,4 +116,31 @@ class AssistantScheduleModel extends Model
             }
         }
     }
+
+    /**
+     * Build schedule matrix for view display
+     * 
+     * Transforms flat schedule array into matrix grouped by role and day
+     * 
+     * @param array $rawSchedules Raw schedule data from getAllWithUser()
+     * @return array Matrix indexed by [role][day]
+     */
+    public function buildScheduleMatrix($rawSchedules)
+    {
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        $matrix = [
+            'Putri' => array_fill_keys($days, []),
+            'Putra' => array_fill_keys($days, [])
+        ];
+
+        foreach ($rawSchedules as $row) {
+            $role = $row['job_role'];
+            $day = $row['day'];
+            if (isset($matrix[$role][$day])) {
+                $matrix[$role][$day][] = $row;
+            }
+        }
+
+        return $matrix;
+    }
 }

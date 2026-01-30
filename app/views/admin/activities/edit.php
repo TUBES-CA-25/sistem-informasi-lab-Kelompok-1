@@ -246,6 +246,8 @@
     </main>
 </div>
 
+<?php include APP_PATH . '/views/admin/layouts/footer.php'; ?>
+
 <script>
 function previewImage(input) {
     const preview = document.getElementById('image-preview');
