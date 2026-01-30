@@ -108,11 +108,17 @@ class AdminController extends Controller
         if ($userModel->getByEmail($data['email'])) {
             setFlash('danger', 'Email already exists');
             $this->redirect('/admin/users/create');
+            return;
         }
 
-        $userModel->createUser($data);
+        $result = $userModel->createUser($data);
 
-        setFlash('success', 'User created successfully');
+        if ($result) {
+            setFlash('success', 'User created successfully');
+        } else {
+            setFlash('danger', 'Failed to create user');
+        }
+        
         $this->redirect('/admin/users');
     }
 
@@ -156,9 +162,14 @@ class AdminController extends Controller
         }
 
         $userModel = $this->model('UserModel');
-        $userModel->updateUser($id, $data);
+        $result = $userModel->updateUser($id, $data);
 
-        setFlash('success', 'User updated successfully');
+        if ($result) {
+            setFlash('success', 'User updated successfully');
+        } else {
+            setFlash('danger', 'Failed to update user');
+        }
+        
         $this->redirect('/admin/users');
     }
 
@@ -237,9 +248,14 @@ class AdminController extends Controller
         ];
 
         $laboratoryModel = $this->model('LaboratoryModel');
-        $laboratoryModel->createLaboratory($data);
+        $result = $laboratoryModel->createLaboratory($data);
 
-        setFlash('success', 'Laboratorium berhasil ditambahkan');
+        if ($result) {
+            setFlash('success', 'Laboratorium berhasil ditambahkan');
+        } else {
+            setFlash('danger', 'Gagal menambahkan laboratorium');
+        }
+        
         $this->redirect('/admin/laboratories');
     }
 
@@ -278,9 +294,14 @@ class AdminController extends Controller
             'location' => sanitize($this->getPost('location'))
         ];
 
-        $laboratoryModel->updateLaboratory($id, $data);
+        $result = $laboratoryModel->updateLaboratory($id, $data);
 
-        setFlash('success', 'Laboratorium berhasil diperbarui');
+        if ($result) {
+            setFlash('success', 'Laboratorium berhasil diperbarui');
+        } else {
+            setFlash('danger', 'Gagal memperbarui laboratorium');
+        }
+        
         $this->redirect('/admin/laboratories');
     }
 
@@ -288,12 +309,25 @@ class AdminController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/admin/laboratories');
+            return;
+        }
+
+        // Validate ID
+        if (!validateId($id)) {
+            setFlash('danger', 'Invalid laboratory ID.');
+            $this->redirect('/admin/laboratories');
+            return;
         }
 
         $laboratoryModel = $this->model('LaboratoryModel');
-        $laboratoryModel->deleteLaboratory($id);
+        $result = $laboratoryModel->deleteLaboratory($id);
 
-        setFlash('success', 'Laboratory deleted successfully');
+        if ($result) {
+            setFlash('success', 'Laboratory deleted successfully');
+        } else {
+            setFlash('danger', 'Failed to delete laboratory.');
+        }
+        
         $this->redirect('/admin/laboratories');
     }
 
@@ -861,8 +895,14 @@ class AdminController extends Controller
                 'job_role' => sanitize($this->getPost('job_role')) // Hanya simpan 'Putra' atau 'Putri'
             ];
 
-            $this->model('AssistantScheduleModel')->createSchedule($data);
-            setFlash('success', 'Jadwal asisten berhasil ditambahkan.');
+            $result = $this->model('AssistantScheduleModel')->createSchedule($data);
+            
+            if ($result) {
+                setFlash('success', 'Jadwal asisten berhasil ditambahkan.');
+            } else {
+                setFlash('danger', 'Gagal menambahkan jadwal asisten.');
+            }
+            
             $this->redirect('/admin/assistant-schedules');
             return;
         }
@@ -918,8 +958,14 @@ class AdminController extends Controller
                 'job_role' => sanitize($this->getPost('job_role'))
             ];
 
-            $scheduleModel->updateSchedule($id, $data);
-            setFlash('success', 'Jadwal berhasil diperbarui.');
+            $result = $scheduleModel->updateSchedule($id, $data);
+            
+            if ($result) {
+                setFlash('success', 'Jadwal berhasil diperbarui.');
+            } else {
+                setFlash('danger', 'Gagal memperbarui jadwal.');
+            }
+            
             $this->redirect('/admin/assistant-schedules');
             return;
         }
@@ -939,12 +985,25 @@ class AdminController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/admin/assistant-schedules');
+            return;
+        }
+
+        // Validate ID
+        if (!validateId($id)) {
+            setFlash('danger', 'Invalid schedule ID.');
+            $this->redirect('/admin/assistant-schedules');
+            return;
         }
 
         $scheduleModel = $this->model('AssistantScheduleModel');
-        $scheduleModel->deleteSchedule($id);
+        $result = $scheduleModel->deleteSchedule($id);
 
-        setFlash('success', 'Assistant schedule deleted successfully');
+        if ($result) {
+            setFlash('success', 'Assistant schedule deleted successfully');
+        } else {
+            setFlash('danger', 'Failed to delete schedule.');
+        }
+        
         $this->redirect('/admin/assistant-schedules');
     }
 
@@ -957,9 +1016,12 @@ class AdminController extends Controller
             $key = ($role == 'Putra') ? 'job_putra' : 'job_putri';
 
             // Simpan ke SettingsModel
-            $this->model('SettingsModel')->save($key, $content);
-
-            setFlash('success', "Deskripsi tugas $role berhasil diperbarui.");
+            if ($this->model('SettingsModel')->save($key, $content)) {
+                setFlash('success', "Deskripsi tugas $role berhasil diperbarui.");
+            } else {
+                setFlash('danger', "Gagal memperbarui deskripsi tugas.");
+            }
+            
             $this->redirect('/admin/assistant-schedules');
         }
     }
@@ -1302,6 +1364,14 @@ class AdminController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/admin/activities');
+            return;
+        }
+
+        // Validate ID
+        if (!validateId($id)) {
+            setFlash('danger', 'ID kegiatan tidak valid.');
+            $this->redirect('/admin/activities');
+            return;
         }
 
         $activityModel = $this->model('LabActivityModel');
@@ -1400,13 +1470,17 @@ class AdminController extends Controller
 
         // Update problem status
         $problemModel = $this->model('LabProblemModel');
-        $problemModel->updateProblem($id, ['status' => $status]);
+        
+        if ($problemModel->updateProblem($id, ['status' => $status])) {
+            // Add to history
+            $historyModel = $this->model('ProblemHistoryModel');
+            $historyModel->addHistory($id, $status, $note);
 
-        // Add to history
-        $historyModel = $this->model('ProblemHistoryModel');
-        $historyModel->addHistory($id, $status, $note);
-
-        setFlash('success', 'Problem status updated successfully');
+            setFlash('success', 'Problem status updated successfully');
+        } else {
+            setFlash('danger', 'Failed to update problem status');
+        }
+        
         $this->redirect('/admin/problems/' . $id);
     }
 
@@ -1414,14 +1488,27 @@ class AdminController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/admin/problems');
+            return;
+        }
+
+        // Validate ID
+        if (!validateId($id)) {
+            setFlash('danger', 'Invalid problem ID.');
+            $this->redirect('/admin/problems');
+            return;
         }
 
         // Delete problem with cascading history (moved to model)
         $problemModel = $this->model('LabProblemModel');
         $historyModel = $this->model('ProblemHistoryModel');
-        $problemModel->deleteProblemWithHistory($id, $historyModel);
+        $result = $problemModel->deleteProblemWithHistory($id, $historyModel);
 
-        setFlash('success', 'Problem deleted successfully');
+        if ($result) {
+            setFlash('success', 'Problem deleted successfully');
+        } else {
+            setFlash('danger', 'Failed to delete problem.');
+        }
+        
         $this->redirect('/admin/problems');
     }
 
@@ -1485,10 +1572,13 @@ class AdminController extends Controller
             'description' => sanitize($this->getPost('description'))
         ];
 
-        $this->model('LabProblemModel')->updateProblem($id, $data);
-        $this->model('ProblemHistoryModel')->addHistory($id, 'reported', 'Detail masalah diupdate oleh Admin');
-
-        setFlash('success', 'Data masalah berhasil diperbarui.');
+        if ($this->model('LabProblemModel')->updateProblem($id, $data)) {
+            $this->model('ProblemHistoryModel')->addHistory($id, 'reported', 'Detail masalah diupdate oleh Admin');
+            setFlash('success', 'Data masalah berhasil diperbarui.');
+        } else {
+            setFlash('danger', 'Gagal memperbarui data masalah.');
+        }
+        
         $this->redirect('/admin/problems/' . $id);
     }
 
@@ -1499,13 +1589,16 @@ class AdminController extends Controller
         $assignedTo = sanitize($this->getPost('assigned_to'));
 
         // Update assigned_to
-        $this->model('LabProblemModel')->updateProblem($id, ['assigned_to' => $assignedTo]);
+        if ($this->model('LabProblemModel')->updateProblem($id, ['assigned_to' => $assignedTo])) {
+            // Ambil nama asisten untuk history
+            $assignee = $this->model('UserModel')->find($assignedTo);
+            $this->model('ProblemHistoryModel')->addHistory($id, 'reported', 'Admin menugaskan ke: ' . $assignee['name']);
 
-        // Ambil nama asisten untuk history
-        $assignee = $this->model('UserModel')->find($assignedTo);
-        $this->model('ProblemHistoryModel')->addHistory($id, 'reported', 'Admin menugaskan ke: ' . $assignee['name']);
-
-        setFlash('success', 'Tugas berhasil diberikan.');
+            setFlash('success', 'Tugas berhasil diberikan.');
+        } else {
+            setFlash('danger', 'Gagal menugaskan masalah.');
+        }
+        
         $this->redirect('/admin/problems/' . $id);
     }
 
