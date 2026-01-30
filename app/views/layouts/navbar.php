@@ -18,7 +18,7 @@
                 <div class="flex items-center gap-4">
                     <div class="hidden md:block text-right">
                         <span
-                            class="block text-sm font-bold text-slate-700"><?= e(explode(' ', $_SESSION['user_name'])[0]) ?></span>
+                            class="block text-sm font-bold text-slate-700"><?= e(explode(' ', $_SESSION['user_name'] ?? 'User')[0]) ?></span>
                         <span
                             class="block text-[10px] font-bold uppercase tracking-wider text-slate-500"><?= getUserRole() ?></span>
                     </div>
@@ -89,25 +89,25 @@
 
                 <li>
                     <a href="<?= url('/') ?>"
-                        class="block py-2 px-3 rounded md:p-0 transition-colors <?= ($_SERVER['REQUEST_URI'] == '/iclabs/public/' || $_SERVER['REQUEST_URI'] == '/iclabs/public/home') ? 'text-sky-600 font-bold' : 'text-slate-600 hover:text-sky-600' ?>">
+                        class="block py-2 px-3 rounded md:p-0 transition-colors <?= (($_SERVER['REQUEST_URI'] ?? '') == '/iclabs/public/' || ($_SERVER['REQUEST_URI'] ?? '') == '/iclabs/public/home') ? 'text-sky-600 font-bold' : 'text-slate-600 hover:text-sky-600' ?>">
                         Home
                     </a>
                 </li>
                 <li>
                     <a href="<?= url('/schedule') ?>"
-                        class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/schedule') !== false ? 'text-sky-600 font-bold' : 'text-slate-600 hover:text-sky-600' ?>">
+                        class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'] ?? '', '/schedule') !== false ? 'text-sky-600 font-bold' : 'text-slate-600 hover:text-sky-600' ?>">
                         Jadwal Lab
                     </a>
                 </li>
                 <li>
                     <a href="<?= url('/presence') ?>"
-                        class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/presence') !== false ? 'text-sky-600 font-bold' : 'text-slate-600 hover:text-sky-600' ?>">
+                        class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'] ?? '', '/presence') !== false ? 'text-sky-600 font-bold' : 'text-slate-600 hover:text-sky-600' ?>">
                         Presence
                     </a>
                 </li>
                 <li>
                     <a href="<?= url('/activities') ?>"
-                        class="block py-2 px-3 rounded md:p-0 transition-colors <?= (strpos($_SERVER['REQUEST_URI'], '/activities') !== false && strpos($_SERVER['REQUEST_URI'], '/koordinator/activities') === false && strpos($_SERVER['REQUEST_URI'], '/asisten/activities') === false && strpos($_SERVER['REQUEST_URI'], '/admin/activities') === false) ? 'text-sky-600 font-bold' : 'text-slate-600 hover:text-sky-600' ?>">
+                        class="block py-2 px-3 rounded md:p-0 transition-colors <?= (strpos($_SERVER['REQUEST_URI'] ?? '', '/activities') !== false && strpos($_SERVER['REQUEST_URI'] ?? '', '/koordinator/activities') === false && strpos($_SERVER['REQUEST_URI'] ?? '', '/asisten/activities') === false && strpos($_SERVER['REQUEST_URI'] ?? '', '/admin/activities') === false) ? 'text-sky-600 font-bold' : 'text-slate-600 hover:text-sky-600' ?>">
                         Kegiatan
                     </a>
                 </li>
@@ -119,25 +119,25 @@
                         <li class="hidden md:block w-px h-5 bg-slate-300 mx-2"></li>
                         <li>
                             <a href="<?= url('/koordinator/assistant-schedules') ?>"
-                                class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/koordinator/assistant-schedules') !== false ? 'text-amber-600 font-bold' : 'text-amber-600 hover:text-amber-700 font-medium' ?>">
+                                class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'] ?? '', '/koordinator/assistant-schedules') !== false ? 'text-amber-600 font-bold' : 'text-amber-600 hover:text-amber-700 font-medium' ?>">
                                 Piket
                             </a>
                         </li>
                         <li>
                             <a href="<?= url('/koordinator/laboratories') ?>"
-                                class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/koordinator/laboratories') !== false ? 'text-amber-600 font-bold' : 'text-amber-600 hover:text-amber-700 font-medium' ?>">
+                                class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'] ?? '', '/koordinator/laboratories') !== false ? 'text-amber-600 font-bold' : 'text-amber-600 hover:text-amber-700 font-medium' ?>">
                                 Data Lab
                             </a>
                         </li>
                         <li>
                             <a href="<?= url('/koordinator/problems') ?>"
-                                class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/koordinator/problems') !== false ? 'text-amber-600 font-bold' : 'text-amber-600 hover:text-amber-700 font-medium' ?>">
+                                class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'] ?? '', '/koordinator/problems') !== false ? 'text-amber-600 font-bold' : 'text-amber-600 hover:text-amber-700 font-medium' ?>">
                                 Permasalahan
                             </a>
                         </li>
                         <li>
                             <a href="<?= url('/koordinator/activities') ?>"
-                                class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/koordinator/activities') !== false ? 'text-amber-600 font-bold' : 'text-amber-600 hover:text-amber-700 font-medium' ?>">
+                                class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'] ?? '', '/koordinator/activities') !== false ? 'text-amber-600 font-bold' : 'text-amber-600 hover:text-amber-700 font-medium' ?>">
                                 Kegiatan
                             </a>
                         </li>
@@ -148,19 +148,19 @@
 
                         <li>
                             <a href="<?= url('/asisten/jobdesk') ?>"
-                                class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/jobdesk') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
+                                class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'] ?? '', '/jobdesk') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
                                 <i class="bi bi-briefcase mr-1"></i> Jobdesk
                             </a>
                         </li>
                         <li>
                             <a href="<?= url('/asisten/problems') ?>"
-                                class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/problems') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
+                                class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'] ?? '', '/problems') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
                                 Masalah Lab
                             </a>
                         </li>
                         <li>
                             <a href="<?= url('/asisten/assistant-schedules') ?>"
-                                class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'], '/assistant-schedules') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
+                                class="block py-2 px-3 rounded md:p-0 transition-colors <?= strpos($_SERVER['REQUEST_URI'] ?? '', '/assistant-schedules') !== false ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-600' ?>">
                                 Jadwal Piket
                             </a>
                         </li>

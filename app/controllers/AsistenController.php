@@ -96,13 +96,16 @@ class AsistenController extends Controller
             $historyModel = $this->model('ProblemHistoryModel');
 
             // Update status and timestamp
-            $problemModel->updateTaskProgress($id, $status);
+            if ($problemModel->updateTaskProgress($id, $status)) {
+                // Catat history
+                $historyLog = !empty($note) ? "Update Jobdesk: " . $note : "Status updated by assignee";
+                $historyModel->addHistory($id, $status, $historyLog);
 
-            // Catat history
-            $historyLog = !empty($note) ? "Update Jobdesk: " . $note : "Status updated by assignee";
-            $historyModel->addHistory($id, $status, $historyLog);
-
-            setFlash('success', 'Status pekerjaan berhasil diperbarui.');
+                setFlash('success', 'Status pekerjaan berhasil diperbarui.');
+            } else {
+                setFlash('danger', 'Gagal memperbarui status.');
+            }
+            
             $this->redirect('/asisten/jobdesk');
         }
     }
@@ -197,10 +200,15 @@ class AsistenController extends Controller
             $problemModel = $this->model('LabProblemModel');
             $problemId = $problemModel->createProblem($data);
 
-            // Add history awal
-            $this->model('ProblemHistoryModel')->addHistory($problemId, 'reported', 'Laporan baru dibuat oleh Asisten');
-
-            setFlash('success', 'Laporan masalah berhasil ditambahkan.');
+            if ($problemId) {
+                // Add history awal
+                $this->model('ProblemHistoryModel')->addHistory($problemId, 'reported', 'Laporan baru dibuat oleh Asisten');
+                
+                setFlash('success', 'Laporan masalah berhasil ditambahkan.');
+            } else {
+                setFlash('danger', 'Gagal menambahkan laporan masalah.');
+            }
+            
             $this->redirect('/asisten/problems');
         }
     }

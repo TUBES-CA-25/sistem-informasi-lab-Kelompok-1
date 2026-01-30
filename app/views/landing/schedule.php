@@ -273,11 +273,11 @@ $title = 'Jadwal Praktikum';
                 </a>
 
                 <span class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border-t border-b border-slate-300">
-                    Page <?= $pagination['current'] ?? 1 ?> of <?= $pagination['total_pages'] ?>
+                    Page <?= $pagination['current'] ?? 1 ?> of <?= $pagination['total_pages'] ?? 1 ?>
                 </span>
 
-                <a href="?page=<?= min($pagination['total_pages'], ($pagination['current'] ?? 1) + 1) ?>&view=<?= $view ?>&search=<?= htmlspecialchars($search ?? '') ?>"
-                    class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-r-lg hover:bg-slate-50 <?= ($pagination['current'] ?? 1) >= $pagination['total_pages'] ? 'pointer-events-none opacity-50' : '' ?>">
+                <a href="?page=<?= min($pagination['total_pages'] ?? 1, ($pagination['current'] ?? 1) + 1) ?>&view=<?= $view ?>&search=<?= htmlspecialchars($search ?? '') ?>"
+                    class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-r-lg hover:bg-slate-50 <?= ($pagination['current'] ?? 1) >= ($pagination['total_pages'] ?? 1) ? 'pointer-events-none opacity-50' : '' ?>">
                     Next
                 </a>
             </nav>

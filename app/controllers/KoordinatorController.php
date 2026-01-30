@@ -119,11 +119,16 @@ class KoordinatorController extends Controller
         $problemModel = $this->model('LabProblemModel');
         $problemId = $problemModel->createProblem($data);
 
-        // Add history
-        $historyModel = $this->model('ProblemHistoryModel');
-        $historyModel->addHistory($problemId, 'reported', 'Laporan dibuat oleh Koordinator');
-
-        setFlash('success', 'Laporan masalah berhasil ditambahkan.');
+        if ($problemId) {
+            // Add history
+            $historyModel = $this->model('ProblemHistoryModel');
+            $historyModel->addHistory($problemId, 'reported', 'Laporan dibuat oleh Koordinator');
+            
+            setFlash('success', 'Laporan masalah berhasil ditambahkan.');
+        } else {
+            setFlash('danger', 'Gagal menambahkan laporan masalah.');
+        }
+        
         $this->redirect('/koordinator/problems');
     }
 
@@ -243,13 +248,17 @@ class KoordinatorController extends Controller
         ];
 
         $problemModel = $this->model('LabProblemModel');
-        $problemModel->updateProblem($id, $data);
+        
+        if ($problemModel->updateProblem($id, $data)) {
+            // Add history
+            $historyModel = $this->model('ProblemHistoryModel');
+            $historyModel->addHistory($id, $data['status'], 'Problem updated by Koordinator');
 
-        // Add history
-        $historyModel = $this->model('ProblemHistoryModel');
-        $historyModel->addHistory($id, $data['status'], 'Problem updated by Koordinator');
-
-        setFlash('success', 'Data masalah berhasil diperbarui.');
+            setFlash('success', 'Data masalah berhasil diperbarui.');
+        } else {
+            setFlash('danger', 'Gagal memperbarui data masalah.');
+        }
+        
         $this->redirect('/koordinator/problems/' . $id);
     }
 
@@ -422,9 +431,14 @@ class KoordinatorController extends Controller
         }
 
         $scheduleModel = $this->model('AssistantScheduleModel');
-        $scheduleModel->createSchedule($data);
+        $result = $scheduleModel->createSchedule($data);
 
-        setFlash('success', 'Jadwal piket berhasil ditambahkan.');
+        if ($result) {
+            setFlash('success', 'Jadwal piket berhasil ditambahkan.');
+        } else {
+            setFlash('danger', 'Gagal menambahkan jadwal piket.');
+        }
+        
         $this->redirect('/koordinator/assistant-schedules');
     }
 
@@ -479,9 +493,13 @@ class KoordinatorController extends Controller
         ];
 
         $scheduleModel = $this->model('AssistantScheduleModel');
-        $scheduleModel->updateSchedule($id, $data);
-
-        setFlash('success', 'Jadwal piket berhasil diperbarui.');
+        
+        if ($scheduleModel->updateSchedule($id, $data)) {
+            setFlash('success', 'Jadwal piket berhasil diperbarui.');
+        } else {
+            setFlash('danger', 'Gagal memperbarui jadwal piket.');
+        }
+        
         $this->redirect('/koordinator/assistant-schedules');
     }
 
@@ -497,12 +515,25 @@ class KoordinatorController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/koordinator/assistant-schedules');
+            return;
+        }
+
+        // Validate ID
+        if (!validateId($id)) {
+            setFlash('danger', 'ID jadwal tidak valid.');
+            $this->redirect('/koordinator/assistant-schedules');
+            return;
         }
 
         $scheduleModel = $this->model('AssistantScheduleModel');
-        $scheduleModel->deleteSchedule($id);
+        $result = $scheduleModel->deleteSchedule($id);
 
-        setFlash('success', 'Jadwal piket berhasil dihapus.');
+        if ($result) {
+            setFlash('success', 'Jadwal piket berhasil dihapus.');
+        } else {
+            setFlash('danger', 'Gagal menghapus jadwal piket.');
+        }
+        
         $this->redirect('/koordinator/assistant-schedules');
     }
 
@@ -570,9 +601,14 @@ class KoordinatorController extends Controller
         }
 
         $laboratoryModel = $this->model('LaboratoryModel');
-        $laboratoryModel->createLaboratory($data);
+        $result = $laboratoryModel->createLaboratory($data);
 
-        setFlash('success', 'Laboratorium "' . $data['lab_name'] . '" berhasil ditambahkan.');
+        if ($result) {
+            setFlash('success', 'Laboratorium "' . $data['lab_name'] . '" berhasil ditambahkan.');
+        } else {
+            setFlash('danger', 'Gagal menambahkan laboratorium.');
+        }
+        
         $this->redirect('/koordinator/laboratories');
     }
 
@@ -594,8 +630,9 @@ class KoordinatorController extends Controller
         $lab = $laboratoryModel->find($id);
 
         if (!$lab) {
-            setFlash('danger', '❌ Laboratorium tidak ditemukan!');
+            setFlash('danger', 'Laboratorium tidak ditemukan!');
             $this->redirect('/koordinator/laboratories');
+            return;
         }
 
         $data = ['laboratory' => $lab];
@@ -626,9 +663,13 @@ class KoordinatorController extends Controller
         ];
 
         $laboratoryModel = $this->model('LaboratoryModel');
-        $laboratoryModel->updateLaboratory($id, $data);
-
-        setFlash('success', 'Data laboratorium "' . $data['lab_name'] . '" berhasil diperbarui.');
+        
+        if ($laboratoryModel->updateLaboratory($id, $data)) {
+            setFlash('success', 'Data laboratorium "' . $data['lab_name'] . '" berhasil diperbarui.');
+        } else {
+            setFlash('danger', 'Gagal memperbarui data laboratorium.');
+        }
+        
         $this->redirect('/koordinator/laboratories');
     }
 
@@ -639,12 +680,25 @@ class KoordinatorController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/koordinator/laboratories');
+            return;
+        }
+
+        // Validate ID
+        if (!validateId($id)) {
+            setFlash('danger', 'ID laboratorium tidak valid.');
+            $this->redirect('/koordinator/laboratories');
+            return;
         }
 
         $laboratoryModel = $this->model('LaboratoryModel');
-        $laboratoryModel->deleteLaboratory($id);
+        $result = $laboratoryModel->deleteLaboratory($id);
 
-        setFlash('success', 'Laboratorium berhasil dihapus dari sistem.');
+        if ($result) {
+            setFlash('success', 'Laboratorium berhasil dihapus dari sistem.');
+        } else {
+            setFlash('danger', 'Gagal menghapus laboratorium.');
+        }
+        
         $this->redirect('/koordinator/laboratories');
     }
 
@@ -762,9 +816,12 @@ class KoordinatorController extends Controller
             'image_cover' => $imagePath
         ];
 
-        $activityModel->updateActivityWithImageCleanup($id, $data);
-
-        setFlash('success', 'Kegiatan "' . $data['title'] . '" berhasil diperbarui.');
+        if ($activityModel->updateActivityWithImageCleanup($id, $data)) {
+            setFlash('success', 'Kegiatan "' . $data['title'] . '" berhasil diperbarui.');
+        } else {
+            setFlash('danger', 'Gagal memperbarui kegiatan.');
+        }
+        
         $this->redirect('/koordinator/activities');
     }
 
@@ -912,10 +969,27 @@ class KoordinatorController extends Controller
 
     public function deleteAssistantSchedule($id)
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->model('AssistantScheduleModel')->deleteSchedule($id);
-            setFlash('success', 'Jadwal asisten berhasil dihapus.');
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/koordinator/assistant-schedules');
+            return;
         }
+
+        // Validate ID
+        if (!validateId($id)) {
+            setFlash('danger', 'ID jadwal tidak valid.');
+            $this->redirect('/koordinator/assistant-schedules');
+            return;
+        }
+
+        $scheduleModel = $this->model('AssistantScheduleModel');
+        $result = $scheduleModel->deleteSchedule($id);
+
+        if ($result) {
+            setFlash('success', 'Jadwal asisten berhasil dihapus.');
+        } else {
+            setFlash('danger', 'Gagal menghapus jadwal asisten.');
+        }
+        
+        $this->redirect('/koordinator/assistant-schedules');
     }
 }
