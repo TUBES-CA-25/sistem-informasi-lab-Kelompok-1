@@ -283,19 +283,9 @@ class KoordinatorController extends Controller
             $this->redirect('/koordinator/problems');
         }
 
-        // Delete histories jika tabel ada
-        try {
-            $historyModel = $this->model('ProblemHistoryModel');
-            $histories = $historyModel->getHistoryByProblem($id);
-            foreach ($histories as $history) {
-                $historyModel->delete($history['id']);
-            }
-        } catch (Exception $e) {
-            // Tabel history tidak ada atau error, skip
-        }
-
-        // Delete problem
-        $result = $problemModel->deleteProblem($id);
+        // Delete problem with cascading history (moved to model)
+        $historyModel = $this->model('ProblemHistoryModel');
+        $result = $problemModel->deleteProblemWithHistory($id, $historyModel);
         
         if ($result) {
             setFlash('success', 'Data masalah berhasil dihapus.');
@@ -365,20 +355,9 @@ class KoordinatorController extends Controller
             'Putra' => $settingsModel->get('job_putra', 'Belum diatur')
         ];
 
-        // 3. Buat Matriks Data
+        // 3. Build matrix using model method
+        $matrix = $scheduleModel->buildScheduleMatrix($rawSchedules);
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-        $matrix = [
-            'Putri' => array_fill_keys($days, []),
-            'Putra' => array_fill_keys($days, [])
-        ];
-
-        foreach ($rawSchedules as $row) {
-            $role = $row['job_role'];
-            $day  = $row['day'];
-            if (isset($matrix[$role][$day])) {
-                $matrix[$role][$day][] = $row;
-            }
-        }
 
         $data = [
             'matrix' => $matrix,
@@ -768,10 +747,6 @@ class KoordinatorController extends Controller
         if (isset($_FILES['image_cover']) && $_FILES['image_cover']['error'] === UPLOAD_ERR_OK) {
             $newImagePath = uploadFile($_FILES['image_cover'], 'activities', null, 5242880, 'activity');
             if ($newImagePath) {
-                // Delete old image if exists
-                if ($imagePath && file_exists(PUBLIC_PATH . $imagePath)) {
-                    unlink(PUBLIC_PATH . $imagePath);
-                }
                 $imagePath = $newImagePath;
             }
         }
@@ -787,7 +762,7 @@ class KoordinatorController extends Controller
             'image_cover' => $imagePath
         ];
 
-        $activityModel->updateActivity($id, $data);
+        $activityModel->updateActivityWithImageCleanup($id, $data);
 
         setFlash('success', 'Kegiatan "' . $data['title'] . '" berhasil diperbarui.');
         $this->redirect('/koordinator/activities');
@@ -849,20 +824,9 @@ class KoordinatorController extends Controller
             'Putra' => $settingsModel->get('job_putra', 'Belum diatur')
         ];
 
-        // 3. Buat Matriks Data
+        // 3. Build matrix using model method
+        $matrix = $scheduleModel->buildScheduleMatrix($rawSchedules);
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-        $matrix = [
-            'Putri' => array_fill_keys($days, []),
-            'Putra' => array_fill_keys($days, [])
-        ];
-
-        foreach ($rawSchedules as $row) {
-            $role = $row['job_role'];
-            $day  = $row['day'];
-            if (isset($matrix[$role][$day])) {
-                $matrix[$role][$day][] = $row;
-            }
-        }
 
         $data = [
             'matrix' => $matrix,

@@ -233,4 +233,29 @@ class LabProblemModel extends Model
                 return ["p.status IN ('reported', 'in_progress')", []]; // Default to active
         }
     }
+
+    /**
+     * Delete problem with cascading history deletion
+     * 
+     * @param int $problemId Problem ID to delete
+     * @param object $historyModel ProblemHistoryModel instance
+     * @return bool True on success, false on failure
+     */
+    public function deleteProblemWithHistory($problemId, $historyModel = null)
+    {
+        // Delete histories if model provided
+        if ($historyModel !== null) {
+            try {
+                $histories = $historyModel->getHistoryByProblem($problemId);
+                foreach ($histories as $history) {
+                    $historyModel->delete($history['id']);
+                }
+            } catch (Exception $e) {
+                // History table doesn't exist or error, skip
+            }
+        }
+        
+        // Delete problem
+        return $this->deleteProblem($problemId);
+    }
 }

@@ -819,23 +819,9 @@ class AdminController extends Controller
             'Putra' => $settingsModel->get('job_putra', 'Belum diatur (Klik untuk edit)')
         ];
 
-        // 3. OLAH DATA MENJADI MATRIKS
-        // Struktur: $matrix['Putra']['Monday'] = [Data Asisten A, Data Asisten B]
+        // 3. Build matrix using model method
+        $matrix = $scheduleModel->buildScheduleMatrix($rawSchedules);
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-        $matrix = [
-            'Putri' => array_fill_keys($days, []),
-            'Putra' => array_fill_keys($days, [])
-        ];
-
-        foreach ($rawSchedules as $row) {
-            $role = $row['job_role']; // 'Putra' atau 'Putri'
-            $day  = $row['day'];
-
-            // Masukkan ke slot yang sesuai jika role valid
-            if (isset($matrix[$role][$day])) {
-                $matrix[$role][$day][] = $row;
-            }
-        }
 
         $data = [
             'matrix' => $matrix,
@@ -1430,16 +1416,10 @@ class AdminController extends Controller
             $this->redirect('/admin/problems');
         }
 
-        // Delete histories first
-        $historyModel = $this->model('ProblemHistoryModel');
-        $histories = $historyModel->getHistoryByProblem($id);
-        foreach ($histories as $history) {
-            $historyModel->delete($history['id']);
-        }
-
-        // Delete problem
+        // Delete problem with cascading history (moved to model)
         $problemModel = $this->model('LabProblemModel');
-        $problemModel->deleteProblem($id);
+        $historyModel = $this->model('ProblemHistoryModel');
+        $problemModel->deleteProblemWithHistory($id, $historyModel);
 
         setFlash('success', 'Problem deleted successfully');
         $this->redirect('/admin/problems');
