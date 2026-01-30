@@ -213,7 +213,7 @@ function uploadFile($file, $directory = UPLOAD_DIR_ACTIVITIES, $allowedTypes = n
         return false;
     }
     
-    // Validate file type
+    // Validate file type (MIME type)
     if (!in_array($file['type'], $allowedTypes)) {
         return false;
     }
@@ -223,14 +223,21 @@ function uploadFile($file, $directory = UPLOAD_DIR_ACTIVITIES, $allowedTypes = n
         return false;
     }
     
+    // Extract and validate file extension
+    $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+    
+    if (!in_array($extension, $allowedExtensions)) {
+        return false;
+    }
+    
     // Create upload directory if not exists
     $uploadDir = PUBLIC_PATH . '/uploads/' . $directory . '/';
     if (!file_exists($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
+        mkdir($uploadDir, 0755, true); // Secure permissions
     }
     
-    // Generate unique filename
-    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+    // Generate unique filename with sanitized extension
     $filename = uniqid($prefix . '_') . '.' . $extension;
     $filepath = $uploadDir . $filename;
     
