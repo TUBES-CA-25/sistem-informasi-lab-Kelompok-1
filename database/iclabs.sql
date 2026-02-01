@@ -169,18 +169,23 @@ CREATE TABLE `laboratories` (
   `description` text DEFAULT NULL,
   `pc_count` int(11) DEFAULT 0,
   `tv_count` int(11) DEFAULT 0,
-  `location` varchar(100) DEFAULT NULL
+  `status` enum('active','inactive','maintenance') DEFAULT 'active',
+  `location` varchar(100) DEFAULT NULL,
+  `building` varchar(100) DEFAULT NULL,
+  `floor` varchar(50) DEFAULT NULL,
+  `room_number` varchar(50) DEFAULT NULL,
+  `capacity` int(11) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `laboratories`
 --
 
-INSERT INTO `laboratories` (`id`, `lab_name`, `image`, `description`, `pc_count`, `tv_count`, `location`) VALUES
-(13, 'Multimedia', 'http://localhost/iclabs/public/uploads/laboratories/69701d042bdf2_1768955140.jpg', '...', 24, 1, '2nd Floor'),
-(14, 'DS', 'http://localhost/iclabs/public/uploads/laboratories/6970369fe20b6_1768961695.jpg', 'BAPAK', 26, 1, 'FIKOM LT2'),
-(15, 'IoT', 'http://localhost/iclabs/public/uploads/laboratories/69704fb108e98_1768968113.jpg', 'bapak', 26, 2, '2nd floor'),
-(16, 'Komputer Network', 'http://localhost/iclabs/public/uploads/laboratories/69741cd30283d_1769217235.png', '...', 14, 1, '2nd Floor Fikom');
+INSERT INTO `laboratories` (`id`, `lab_name`, `image`, `description`, `pc_count`, `tv_count`, `status`, `location`, `building`, `floor`, `room_number`, `capacity`) VALUES
+(13, 'Multimedia', 'http://localhost/iclabs/public/uploads/laboratories/69701d042bdf2_1768955140.jpg', '...', 24, 1, 'active', '2nd Floor', NULL, NULL, NULL, 0),
+(14, 'DS', 'http://localhost/iclabs/public/uploads/laboratories/6970369fe20b6_1768961695.jpg', 'BAPAK', 26, 1, 'active', 'FIKOM LT2', NULL, NULL, NULL, 0),
+(15, 'IoT', 'http://localhost/iclabs/public/uploads/laboratories/69704fb108e98_1768968113.jpg', 'bapak', 26, 2, 'active', '2nd floor', NULL, NULL, NULL, 0),
+(16, 'Komputer Network', 'http://localhost/iclabs/public/uploads/laboratories/69741cd30283d_1769217235.png', '...', 14, 1, 'active', '2nd Floor Fikom', NULL, NULL, NULL, 0);
 
 -- --------------------------------------------------------
 
