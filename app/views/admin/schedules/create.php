@@ -1,4 +1,10 @@
-<?php $title = 'Buat Jadwal Kuliah'; ?>
+<?php
+// Pastikan variabel ada
+$lecturers = $lecturers ?? [];
+$assistants = $assistants ?? [];
+$laboratories = $laboratories ?? [];
+$title = 'Buat Jadwal Kuliah';
+?>
 <?php include APP_PATH . '/views/layouts/header.php'; ?>
 
 <div class="antialiased bg-slate-50 min-h-screen">
@@ -10,8 +16,7 @@
             <div class="flex items-center justify-between mb-8">
                 <div class="flex items-center gap-4">
                     <a href="<?= url('/admin/schedules') ?>"
-                        class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-primary-600 hover:border-primary-200 shadow-sm transition-all"
-                        title="Kembali">
+                        class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-primary-600 hover:border-primary-200 shadow-sm transition-all">
                         <i class="bi bi-arrow-left text-lg"></i>
                     </a>
                     <div>
@@ -23,218 +28,190 @@
 
             <?php displayFlash(); ?>
 
-            <form action="<?= url('/admin/schedules/create') ?>" method="POST" enctype="multipart/form-data">
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <form action="<?= url('/admin/schedules/create') ?>" method="POST">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                     <div class="lg:col-span-2 space-y-6">
-
-                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                            <h2
-                                class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-6 pb-2 border-b border-slate-100 flex items-center gap-2">
-                                <i class="bi bi-clock-history text-primary-500"></i> Waktu & Generator
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                            <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <i class="bi bi-journal-bookmark text-primary-600"></i> Detail Mata Kuliah
                             </h2>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                <div>
-                                    <label class="block mb-2 text-sm font-semibold text-slate-700">Laboratorium <span
-                                            class="text-rose-500">*</span></label>
-                                    <div class="relative">
-                                        <select name="laboratory_id" required
-                                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block appearance-none">
-                                            <option value="">-- Pilih Lab --</option>
-                                            <?php foreach ($laboratories as $lab): ?>
-                                                <option value="<?= $lab['id'] ?>"><?= $lab['lab_name'] ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <div
-                                            class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-500">
-                                            <i class="bi bi-chevron-down text-xs"></i>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-800 mb-2">Tanggal Mulai (Sesi
-                                        1)</label>
-                                    <input type="date" name="start_date" id="start_date"
-                                        value="<?= !empty($prefillDate) ? $prefillDate : '' ?>" required
-                                        class="w-full px-4 py-2.5 bg-amber-50 border border-amber-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-amber-100 focus:border-amber-500 block">
-                                    <p class="text-[10px] text-slate-500 mt-1 ml-1">* Sistem akan looping dari tanggal
-                                        ini</p>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                                <div>
-                                    <label class="block mb-2 text-sm font-semibold text-slate-700">Hari</label>
-                                    <div class="relative">
-                                        <select name="day" id="day_selector" required
-                                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block appearance-none pointer-events-none bg-gray-100">
-                                            <option value="Monday">Senin</option>
-                                            <option value="Tuesday">Selasa</option>
-                                            <option value="Wednesday">Rabu</option>
-                                            <option value="Thursday">Kamis</option>
-                                            <option value="Friday">Jumat</option>
-                                            <option value="Saturday">Sabtu</option>
-                                            <option value="Sunday">Minggu</option>
-                                        </select>
-                                        <div
-                                            class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-500">
-                                            <i class="bi bi-lock-fill text-xs opacity-50"></i>
-                                        </div>
-                                    </div>
-                                    <p class="text-[10px] text-slate-400 mt-1 ml-1">* Otomatis sesuai tanggal</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="col-span-2">
+                                    <label class="block mb-2 text-sm font-bold text-slate-700">Lokasi
+                                        Laboratorium</label>
+                                    <select name="laboratory_id"
+                                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100"
+                                        required>
+                                        <option value="">-- Pilih Laboratorium --</option>
+                                        <?php foreach ($laboratories as $lab): ?>
+                                            <option value="<?= $lab['id'] ?>"><?= $lab['lab_name'] ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
                                 </div>
                                 <div>
-                                    <label class="block mb-2 text-sm font-semibold text-slate-700">Jam Mulai</label>
-                                    <input type="time" name="start_time" required
-                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block">
+                                    <label class="block mb-2 text-sm font-bold text-slate-700">Mata Kuliah</label>
+                                    <input type="text" name="course"
+                                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100"
+                                        placeholder="Contoh: Pemrograman Web" required>
                                 </div>
                                 <div>
-                                    <label class="block mb-2 text-sm font-semibold text-slate-700">Jam Selesai</label>
-                                    <input type="time" name="end_time" required
-                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block">
+                                    <label class="block mb-2 text-sm font-bold text-slate-700">Kode Kelas</label>
+                                    <input type="text" name="class_code"
+                                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100"
+                                        placeholder="Contoh: TI-3A" required>
                                 </div>
-                            </div>
-
-                            <div class="p-4 bg-amber-50 rounded-xl border border-amber-100 flex items-center gap-4">
-                                <div
-                                    class="shrink-0 w-10 h-10 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center">
-                                    <i class="bi bi-repeat text-xl"></i>
+                                <div>
+                                    <label class="block mb-2 text-sm font-bold text-slate-700">Program Studi</label>
+                                    <select name="program_study"
+                                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100">
+                                        <option value="Teknik Informatika">Teknik Informatika</option>
+                                        <option value="Sistem Informasi">Sistem Informasi</option>
+                                    </select>
                                 </div>
-                                <div class="flex-1">
-                                    <label
-                                        class="block text-xs font-bold text-amber-800 uppercase tracking-wider mb-1">Total
-                                        Pertemuan</label>
-                                    <div class="flex items-center gap-2">
-                                        <input type="number" name="total_meetings" value="14" min="1" max="20" required
-                                            class="w-20 px-3 py-1.5 bg-white border border-amber-200 rounded-lg text-center font-bold text-slate-800 focus:ring-amber-500 focus:border-amber-500">
-                                        <span class="text-sm text-amber-700 font-medium">Sesi Minggu</span>
-                                    </div>
+                                <div>
+                                    <label class="block mb-2 text-sm font-bold text-slate-700">Semester</label>
+                                    <input type="number" name="semester"
+                                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100"
+                                        min="1" max="8" value="1" required>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                            <h2
-                                class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-6 pb-2 border-b border-slate-100 flex items-center gap-2">
-                                <i class="bi bi-book text-violet-500"></i> Informasi Akademik
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                            <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                                <i class="bi bi-people text-primary-600"></i> Dosen & Asisten
                             </h2>
 
-                            <div class="mb-6">
-                                <label class="block mb-2 text-sm font-semibold text-slate-700">Mata Kuliah <span
-                                        class="text-rose-500">*</span></label>
-                                <input type="text" name="course" required placeholder="Contoh: Algoritma Pemrograman"
-                                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block">
+                            <div class="mb-6 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                <label class="block mb-3 text-sm font-bold text-slate-700">Dosen Pengampu</label>
+                                <div class="flex items-start gap-4">
+                                    <div class="shrink-0">
+                                        <img id="preview_lecturer"
+                                            src="https://ui-avatars.com/api/?name=Dosen&background=e2e8f0&color=64748b"
+                                            class="w-14 h-14 rounded-full object-cover border-2 border-white shadow-md">
+                                    </div>
+                                    <div class="flex-1">
+                                        <select name="lecturer_id" id="lecturer_id" onchange="updatePhoto('lecturer')"
+                                            class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100 cursor-pointer">
+                                            <option value="" data-image="" data-name="Dosen">-- Pilih Dosen --</option>
+                                            <?php if (!empty($lecturers)): ?>
+                                                <?php foreach ($lecturers as $dosen): ?>
+                                                    <option value="<?= $dosen['id'] ?>"
+                                                        data-image="<?= !empty($dosen['image']) ? $dosen['image'] : '' ?>"
+                                                        data-name="<?= $dosen['name'] ?>">
+                                                        <?= $dosen['name'] ?> (<?= ucfirst($dosen['role_name'] ?? 'User') ?>)
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            <?php else: ?>
+                                                <option disabled>Data Dosen Kosong</option>
+                                            <?php endif; ?>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                                <div>
-                                    <label class="block mb-2 text-sm font-semibold text-slate-700">Program Studi</label>
-                                    <input type="text" name="program_study" placeholder="Teknik Informatika"
-                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                    <label class="block mb-3 text-sm font-bold text-slate-700">Asisten 1 (Utama)</label>
+                                    <div class="flex items-start gap-3">
+                                        <div class="shrink-0">
+                                            <img id="preview_asst1"
+                                                src="https://ui-avatars.com/api/?name=A1&background=e2e8f0&color=64748b"
+                                                class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-md">
+                                        </div>
+                                        <div class="flex-1">
+                                            <select name="assistant_1_id" id="assistant_1_id"
+                                                onchange="updatePhoto('assistant_1')"
+                                                class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm">
+                                                <option value="" data-image="" data-name="A1">-- Pilih --</option>
+                                                <?php foreach ($assistants as $ast): ?>
+                                                    <option value="<?= $ast['id'] ?>"
+                                                        data-image="<?= !empty($ast['image']) ? $ast['image'] : '' ?>"
+                                                        data-name="<?= $ast['name'] ?>">
+                                                        <?= $ast['name'] ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block mb-2 text-sm font-semibold text-slate-700">Frekuensi (Kode
-                                        Kelas)</label>
-                                    <input type="text" name="class_code" required placeholder="TI_MICRO-6 (A5)"
-                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block">
-                                </div>
-                                <div>
-                                    <label class="block mb-2 text-sm font-semibold text-slate-700">Semester</label>
-                                    <input type="number" name="semester" placeholder="1-8"
-                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block">
-                                </div>
-                            </div>
 
-                            <div>
-                                <label class="block mb-2 text-sm font-semibold text-slate-700">Deskripsi
-                                    Tambahan</label>
-                                <textarea name="description" rows="2"
-                                    class="w-full p-4 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block resize-none"
-                                    placeholder="Catatan..."></textarea>
+                                <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                    <label class="block mb-3 text-sm font-bold text-slate-700">Asisten 2
+                                        (Opsional)</label>
+                                    <div class="flex items-start gap-3">
+                                        <div class="shrink-0">
+                                            <img id="preview_asst2"
+                                                src="https://ui-avatars.com/api/?name=A2&background=e2e8f0&color=64748b"
+                                                class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-md">
+                                        </div>
+                                        <div class="flex-1">
+                                            <select name="assistant_2_id" id="assistant_2_id"
+                                                onchange="updatePhoto('assistant_2')"
+                                                class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm">
+                                                <option value="" data-image="" data-name="A2">-- Kosong --</option>
+                                                <?php foreach ($assistants as $ast): ?>
+                                                    <option value="<?= $ast['id'] ?>"
+                                                        data-image="<?= !empty($ast['image']) ? $ast['image'] : '' ?>"
+                                                        data-name="<?= $ast['name'] ?>">
+                                                        <?= $ast['name'] ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-
                     </div>
 
-                    <div class="lg:col-span-1 space-y-6">
-
-                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sticky top-6">
-                            <h2
-                                class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-6 pb-2 border-b border-slate-100 flex items-center gap-2">
-                                <i class="bi bi-people-fill text-emerald-500"></i> Tim Pengajar
+                    <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                            <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <i class="bi bi-clock text-primary-600"></i> Waktu & Sesi
                             </h2>
-
-                            <div
-                                class="mb-6 p-4 bg-primary-50/50 rounded-xl border border-primary-100 group hover:border-primary-300 transition-colors">
-                                <label class="block mb-2 text-xs font-bold text-primary-700 uppercase">Dosen Pengampu
-                                    *</label>
-                                <input type="text" name="lecturer" required placeholder="Nama Lengkap & Gelar"
-                                    class="w-full px-3 py-2 bg-white border border-slate-200 text-slate-900 text-sm rounded-lg mb-3 focus:ring-2 focus:ring-primary-100 block">
-
-                                <label class="flex items-center gap-3 cursor-pointer">
-                                    <div
-                                        class="w-10 h-10 rounded-full bg-white border border-dashed border-primary-300 flex items-center justify-center text-primary-400 group-hover:text-primary-600 group-hover:border-primary-500 transition-all">
-                                        <i class="bi bi-camera"></i>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block mb-2 text-sm font-bold text-slate-700">Tanggal Mulai</label>
+                                    <input type="date" id="start_date" name="start_date"
+                                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100"
+                                        value="<?= isset($start_date) ? $start_date : date('Y-m-d') ?>" required>
+                                </div>
+                                <div>
+                                    <label class="block mb-2 text-sm font-bold text-slate-700">Hari</label>
+                                    <input type="text" id="day_selector" name="day"
+                                        class="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-slate-500 cursor-not-allowed"
+                                        readonly>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block mb-2 text-sm font-bold text-slate-700">Jam Mulai</label>
+                                        <input type="time" name="start_time"
+                                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100"
+                                            required>
                                     </div>
-                                    <div class="flex-1">
-                                        <span class="text-xs font-medium text-slate-600 block">Upload Foto Dosen</span>
-                                        <input type="file" name="lecturer_photo_file" accept="image/*"
-                                            class="text-[10px] text-slate-400 file:hidden">
+                                    <div>
+                                        <label class="block mb-2 text-sm font-bold text-slate-700">Jam Selesai</label>
+                                        <input type="time" name="end_time"
+                                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100"
+                                            required>
                                     </div>
-                                </label>
+                                </div>
+                                <div>
+                                    <label class="block mb-2 text-sm font-bold text-slate-700">Jumlah Pertemuan</label>
+                                    <input type="number" name="total_meetings"
+                                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100"
+                                        value="14" min="1" max="20" required>
+                                </div>
                             </div>
+                        </div>
 
-                            <div
-                                class="mb-6 p-4 bg-emerald-50/50 rounded-xl border border-emerald-100 group hover:border-emerald-300 transition-colors">
-                                <label class="block mb-2 text-xs font-bold text-emerald-700 uppercase">Asisten 1
-                                    (Utama)</label>
-                                <input type="text" name="assistant" placeholder="Nama Asisten 1"
-                                    class="w-full px-3 py-2 bg-white border border-slate-200 text-slate-900 text-sm rounded-lg mb-3 focus:ring-2 focus:ring-emerald-100 block">
-
-                                <label class="flex items-center gap-3 cursor-pointer">
-                                    <div
-                                        class="w-10 h-10 rounded-full bg-white border border-dashed border-emerald-300 flex items-center justify-center text-emerald-400 group-hover:text-emerald-600 group-hover:border-emerald-500 transition-all">
-                                        <i class="bi bi-camera"></i>
-                                    </div>
-                                    <div class="flex-1">
-                                        <span class="text-xs font-medium text-slate-600 block">Upload Foto Asisten
-                                            1</span>
-                                        <input type="file" name="assistant_photo_file" accept="image/*"
-                                            class="text-[10px] text-slate-400 file:hidden">
-                                    </div>
-                                </label>
-                            </div>
-
-                            <div
-                                class="mb-8 p-4 bg-violet-50/50 rounded-xl border border-violet-100 group hover:border-violet-300 transition-colors">
-                                <label class="block mb-2 text-xs font-bold text-violet-700 uppercase">Asisten 2
-                                    (Opsional)</label>
-                                <input type="text" name="assistant_2" placeholder="Nama Asisten 2"
-                                    class="w-full px-3 py-2 bg-white border border-slate-200 text-slate-900 text-sm rounded-lg mb-3 focus:ring-2 focus:ring-violet-100 block">
-
-                                <label class="flex items-center gap-3 cursor-pointer">
-                                    <div
-                                        class="w-10 h-10 rounded-full bg-white border border-dashed border-violet-300 flex items-center justify-center text-violet-400 group-hover:text-violet-600 group-hover:border-violet-500 transition-all">
-                                        <i class="bi bi-camera"></i>
-                                    </div>
-                                    <div class="flex-1">
-                                        <span class="text-xs font-medium text-slate-600 block">Upload Foto Asisten
-                                            2</span>
-                                        <input type="file" name="assistant2_photo_file" accept="image/*"
-                                            class="text-[10px] text-slate-400 file:hidden">
-                                    </div>
-                                </label>
-                            </div>
-
+                        <div class="pt-4">
                             <button type="submit"
                                 class="w-full py-3.5 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-xl shadow-lg shadow-primary-500/30 transition-all flex items-center justify-center gap-2 transform active:scale-95">
-                                <i class="bi bi-magic"></i>
-                                Generate Jadwal
+                                <i class="bi bi-magic"></i> Generate Jadwal
                             </button>
-
                         </div>
                     </div>
 
@@ -247,26 +224,47 @@
 <?php include APP_PATH . '/views/admin/layouts/footer.php'; ?>
 
 <script>
+    function updatePhoto(roleKey) {
+        let selectId, imgId;
+        if (roleKey === 'lecturer') {
+            selectId = 'lecturer_id';
+            imgId = 'preview_lecturer';
+        } else if (roleKey === 'assistant_1') {
+            selectId = 'assistant_1_id';
+            imgId = 'preview_asst1';
+        } else if (roleKey === 'assistant_2') {
+            selectId = 'assistant_2_id';
+            imgId = 'preview_asst2';
+        }
+
+        const select = document.getElementById(selectId);
+        const img = document.getElementById(imgId);
+
+        if (select.selectedIndex === -1) return;
+
+        const selectedOption = select.options[select.selectedIndex];
+        const photoUrl = selectedOption.getAttribute('data-image');
+        const name = selectedOption.getAttribute('data-name') || 'User';
+
+        if (photoUrl && photoUrl.trim() !== '') {
+            img.src = photoUrl;
+        } else {
+            const encodedName = encodeURIComponent(name);
+            img.src = `https://ui-avatars.com/api/?name=${encodedName}&background=e2e8f0&color=64748b`;
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const startDateInput = document.getElementById('start_date');
         const daySelector = document.getElementById('day_selector');
-
-        // Mapping Hari JS (0-6) ke Value Option (English)
         const daysMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
         function updateDay() {
-            const dateVal = startDateInput.value;
-            if (dateVal) {
-                const date = new Date(dateVal);
-                const dayIndex = date.getDay(); // 0 = Sunday
-                const dayName = daysMap[dayIndex];
-
-                // Set value dropdown
-                daySelector.value = dayName;
+            if (startDateInput.value) {
+                const date = new Date(startDateInput.value);
+                daySelector.value = daysMap[date.getDay()];
             }
         }
-
-        // Jalankan saat load (jika ada prefill) dan saat berubah
         updateDay();
         startDateInput.addEventListener('change', updateDay);
     });

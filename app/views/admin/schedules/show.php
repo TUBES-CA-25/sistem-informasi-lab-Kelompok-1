@@ -146,20 +146,16 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
 
+                            <?php
+                            $lecImg = !empty($schedule['lecturer_photo'])
+                                ? $schedule['lecturer_photo']
+                                : 'https://ui-avatars.com/api/?name=' . urlencode($schedule['lecturer_name']) . '&background=e2e8f0&color=64748b&size=128';
+                            ?>
                             <div
                                 class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-primary-200 transition-all text-center group">
                                 <div
                                     class="w-20 h-20 mx-auto mb-4 rounded-full p-1 border-2 border-primary-100 group-hover:border-primary-300 transition-colors">
-                                    <div class="w-full h-full rounded-full overflow-hidden bg-slate-100">
-                                        <?php if (!empty($schedule['lecturer_photo'])): ?>
-                                        <img src="<?= e($schedule['lecturer_photo']) ?>"
-                                            class="w-full h-full object-cover">
-                                        <?php else: ?>
-                                        <div
-                                            class="w-full h-full flex items-center justify-center text-slate-300 text-2xl font-bold bg-slate-50">
-                                            DS</div>
-                                        <?php endif; ?>
-                                    </div>
+                                    <img src="<?= $lecImg ?>" class="w-full h-full rounded-full object-cover">
                                 </div>
                                 <h4 class="font-bold text-slate-900 text-sm mb-1"><?= e($schedule['lecturer_name']) ?>
                                 </h4>
@@ -168,20 +164,16 @@
                                     Pengampu</span>
                             </div>
 
+                            <?php
+                            $asst1Img = !empty($schedule['assistant_1_photo'])
+                                ? $schedule['assistant_1_photo']
+                                : 'https://ui-avatars.com/api/?name=' . urlencode($schedule['assistant_1_name']) . '&background=e2e8f0&color=64748b&size=128';
+                            ?>
                             <div
                                 class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all text-center group">
                                 <div
                                     class="w-20 h-20 mx-auto mb-4 rounded-full p-1 border-2 border-emerald-100 group-hover:border-emerald-300 transition-colors">
-                                    <div class="w-full h-full rounded-full overflow-hidden bg-slate-100">
-                                        <?php if (!empty($schedule['assistant_1_photo'])): ?>
-                                        <img src="<?= e($schedule['assistant_1_photo']) ?>"
-                                            class="w-full h-full object-cover">
-                                        <?php else: ?>
-                                        <div
-                                            class="w-full h-full flex items-center justify-center text-slate-300 text-2xl font-bold bg-slate-50">
-                                            A1</div>
-                                        <?php endif; ?>
-                                    </div>
+                                    <img src="<?= $asst1Img ?>" class="w-full h-full rounded-full object-cover">
                                 </div>
                                 <h4 class="font-bold text-slate-900 text-sm mb-1">
                                     <?= e($schedule['assistant_1_name']) ?></h4>
@@ -190,21 +182,16 @@
                                     Utama</span>
                             </div>
 
-                            <?php if (!empty($schedule['assistant_2_name'])): ?>
+                            <?php if (!empty($schedule['assistant_2_name'])):
+                                $asst2Img = !empty($schedule['assistant_2_photo'])
+                                    ? $schedule['assistant_2_photo']
+                                    : 'https://ui-avatars.com/api/?name=' . urlencode($schedule['assistant_2_name']) . '&background=e2e8f0&color=64748b&size=128';
+                            ?>
                             <div
                                 class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-violet-200 transition-all text-center group">
                                 <div
                                     class="w-20 h-20 mx-auto mb-4 rounded-full p-1 border-2 border-violet-100 group-hover:border-violet-300 transition-colors">
-                                    <div class="w-full h-full rounded-full overflow-hidden bg-slate-100">
-                                        <?php if (!empty($schedule['assistant_2_photo'])): ?>
-                                        <img src="<?= e($schedule['assistant_2_photo']) ?>"
-                                            class="w-full h-full object-cover">
-                                        <?php else: ?>
-                                        <div
-                                            class="w-full h-full flex items-center justify-center text-slate-300 text-2xl font-bold bg-slate-50">
-                                            A2</div>
-                                        <?php endif; ?>
-                                    </div>
+                                    <img src="<?= $asst2Img ?>" class="w-full h-full rounded-full object-cover">
                                 </div>
                                 <h4 class="font-bold text-slate-900 text-sm mb-1">
                                     <?= e($schedule['assistant_2_name']) ?></h4>

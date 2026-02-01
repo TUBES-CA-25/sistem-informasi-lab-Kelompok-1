@@ -19,16 +19,14 @@ class AuthController extends Controller
             }
         }
 
-        // 2. LOGIKA BARU: Ambil Data Foto Lab untuk Slideshow Login
+        // 2. Ambil Data Foto Lab untuk Slideshow Login
         $labModel = $this->model('LaboratoryModel');
         $labs = $labModel->getAllLaboratories();
 
-        // Filter: Hanya ambil lab yang memiliki foto (kolom 'image' tidak kosong)
         $labImages = array_filter($labs, function ($lab) {
             return !empty($lab['image']);
         });
 
-        // 3. Kirim data ke View
         $data = [
             'labImages' => $labImages
         ];
@@ -45,8 +43,10 @@ class AuthController extends Controller
         $email = sanitize($this->getPost('email'));
         $password = $this->getPost('password');
 
-        // ... (Validasi input & verifikasi user sama seperti sebelumnya) ...
-        // ... (Kode validasi disingkat agar fokus ke logic redirect) ...
+        if (empty($email) || empty($password)) {
+            setFlash('danger', 'Email dan password wajib diisi.');
+            $this->redirect('/login');
+        }
 
         $userModel = $this->model('UserModel');
         $user = $userModel->verifyLogin($email, $password);
@@ -57,22 +57,32 @@ class AuthController extends Controller
         }
 
         $userWithRole = $userModel->getUserWithRole($user['id']);
+        $role = $userWithRole['role_name'];
+
+        // --- UPDATE BARU: BLOKIR LOGIN DOSEN ---
+        // Dosen hanya data administratif ("Role as Label")
+        if ($role === 'dosen') {
+            setFlash('danger', 'Akun Dosen hanya untuk pendataan administratif, tidak dapat digunakan untuk login.');
+            $this->redirect('/login');
+            return;
+        }
+        // ---------------------------------------
 
         // Set Session
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_name'] = $user['name'];
         $_SESSION['user_email'] = $user['email'];
-        $_SESSION['role'] = $userWithRole['role_name'];
+        $_SESSION['role'] = $role;
         $_SESSION['role_id'] = $user['role_id'];
 
-        // LOGIKA REDIRECT
-        $role = $userWithRole['role_name'];
-
+        // Logika Redirect
         if ($role === 'admin') {
-            // Admin punya dashboard sendiri
             $this->redirect('/admin/dashboard');
+        } elseif ($role === 'koordinator') {
+            $this->redirect('/koordinator/activities');
+        } elseif ($role === 'asisten') {
+            $this->redirect('/asisten/jobdesk');
         } else {
-            // Koordinator & Asisten kembali ke halaman depan
             $this->redirect('/');
         }
     }

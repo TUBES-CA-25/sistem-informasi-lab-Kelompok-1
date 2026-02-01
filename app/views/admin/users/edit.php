@@ -1,151 +1,173 @@
-<?php $title = 'Edit User'; $adminLayout = true; ?>
+<?php
+$title = 'Edit User';
+$adminLayout = true;
+?>
 <?php include APP_PATH . '/views/layouts/header.php'; ?>
 
-<div class="admin-layout antialiased bg-slate-50 min-h-screen">
+<div class="antialiased bg-slate-50 min-h-screen">
     <?php include APP_PATH . '/views/layouts/sidebar.php'; ?>
-    
+
     <main class="p-4 sm:ml-64 pt-8 transition-all duration-300">
-        <div class="max-w-2xl mx-auto">
-            
+        <div class="max-w-4xl mx-auto">
+
             <div class="flex items-center gap-4 mb-8">
-                <a href="<?= url('/admin/users') ?>" 
-                   class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-primary-600 hover:border-primary-200 shadow-sm transition-all"
-                   title="Back to List">
+                <a href="<?= url('/admin/users') ?>"
+                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-primary-600 hover:border-primary-200 shadow-sm transition-all"
+                    title="Kembali">
                     <i class="bi bi-arrow-left text-lg"></i>
                 </a>
                 <div>
                     <h1 class="text-2xl font-bold tracking-tight text-slate-900">Edit User</h1>
                     <div class="flex items-center gap-2 text-sm text-slate-500 mt-1">
-                        <span>Users Management</span>
+                        <span>Management</span>
                         <i class="bi bi-chevron-right text-xs"></i>
-                        <span class="text-primary-600 font-medium">Edit #<?= $user['id'] ?></span>
+                        <span class="text-primary-600 font-medium"><?= e($user['name']) ?></span>
                     </div>
                 </div>
             </div>
-            
+
             <?php displayFlash(); ?>
-            
-            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-                
-                <form method="POST" action="<?= url('/admin/users/' . $user['id'] . '/edit') ?>">
-                    
-                    <div class="flex justify-center mb-8">
-                        <div class="w-24 h-24 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 border-4 border-white shadow-sm flex items-center justify-center text-slate-500 font-bold text-3xl">
-                            <?= strtoupper(substr($user['name'], 0, 1)) ?>
+
+            <form action="<?= url('/admin/users/' . $user['id'] . '/edit') ?>" method="POST"
+                enctype="multipart/form-data">
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 h-fit">
+                        <div class="flex flex-col items-center mb-6">
+
+                            <div class="relative group cursor-pointer w-32 h-32">
+                                <div
+                                    class="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg bg-slate-100 relative">
+
+                                    <?php
+                                    // LOGIKA: Cek apakah user punya foto?
+                                    $hasPhoto = !empty($user['image']);
+                                    // Jika ada foto, pakai URL-nya. Jika tidak, pakai placeholder
+                                    $photoSrc = $hasPhoto ? $user['image'] : '';
+                                    ?>
+
+                                    <img id="preview-img" src="<?= $photoSrc ?>"
+                                        class="w-full h-full object-cover <?= $hasPhoto ? '' : 'hidden' ?>"
+                                        alt="Foto Profil">
+
+                                    <div id="placeholder-icon"
+                                        class="absolute inset-0 flex items-center justify-center text-slate-300 <?= $hasPhoto ? 'hidden' : '' ?>">
+                                        <i class="bi bi-person-fill text-6xl"></i>
+                                    </div>
+
+                                </div>
+
+                                <div class="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                                    onclick="document.getElementById('image').click()">
+                                    <i class="bi bi-camera-fill text-white text-2xl"></i>
+                                </div>
+
+                                <input type="file" name="image" id="image" class="hidden" accept="image/*"
+                                    onchange="previewImage(this)">
+                            </div>
+
+                            <p class="text-xs text-slate-500 mt-3 text-center">Klik foto untuk mengganti.<br>Format:
+                                JPG, PNG (Max 2MB)</p>
+                        </div>
+
+                        <div class="border-t border-slate-100 pt-4 text-center">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Status Akun</span>
+                            <div class="mt-1">
+                                <?php if ($user['status'] == 'active'): ?>
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    Active
+                                </span>
+                                <?php else: ?>
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    Inactive
+                                </span>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="space-y-6">
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label for="name" class="block mb-2 text-sm font-semibold text-slate-700">Full Name <span class="text-rose-500">*</span></label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none text-slate-400">
-                                        <i class="bi bi-person text-lg"></i>
-                                    </div>
-                                    <input type="text" name="name" id="name" value="<?= e($user['name']) ?>"
-                                           class="w-full ps-11 p-3 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block transition-all" 
-                                           placeholder="John Doe" required>
-                                </div>
-                            </div>
-                            <div>
-                                <label for="email" class="block mb-2 text-sm font-semibold text-slate-700">Email Address <span class="text-rose-500">*</span></label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none text-slate-400">
-                                        <i class="bi bi-envelope text-lg"></i>
-                                    </div>
-                                    <input type="email" name="email" id="email" value="<?= e($user['email']) ?>"
-                                           class="w-full ps-11 p-3 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block transition-all" 
-                                           placeholder="john@example.com" required>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="md:col-span-2 space-y-6">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                            <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                                <i class="bi bi-person-vcard text-primary-600"></i> Informasi Pengguna
+                            </h2>
 
-                        <div class="p-4 bg-amber-50 rounded-xl border border-amber-100">
-                            <label for="password" class="block mb-2 text-sm font-semibold text-slate-700">Change Password</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none text-amber-500/70">
-                                    <i class="bi bi-key text-lg"></i>
+                            <div class="grid grid-cols-1 gap-6">
+                                <div>
+                                    <label class="block mb-2 text-sm font-bold text-slate-700">Nama Lengkap</label>
+                                    <input type="text" name="name" value="<?= e($user['name']) ?>"
+                                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 transition-all"
+                                        placeholder="Contoh: Ahmad Fauzi" required>
                                 </div>
-                                <input type="password" name="password" id="password" minlength="6"
-                                       class="w-full ps-11 pe-12 p-3 bg-white border border-amber-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-amber-200 focus:border-amber-500 block transition-all placeholder:text-slate-400" 
-                                       placeholder="Leave blank to keep current password">
-                                <button type="button" onclick="togglePassword()" class="absolute inset-y-0 end-0 flex items-center pe-4 text-slate-400 hover:text-slate-600 transition-colors">
-                                    <i class="bi bi-eye-slash" id="toggleIcon"></i>
+
+                                <div>
+                                    <label class="block mb-2 text-sm font-bold text-slate-700">Alamat Email</label>
+                                    <input type="email" name="email" value="<?= e($user['email']) ?>"
+                                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 transition-all"
+                                        placeholder="nama@email.com" required>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block mb-2 text-sm font-bold text-slate-700">Role (Peran)</label>
+                                        <select name="role_id"
+                                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 cursor-pointer">
+                                            <?php foreach ($roles as $role): ?>
+                                            <option value="<?= $role['id'] ?>"
+                                                <?= $user['role_id'] == $role['id'] ? 'selected' : '' ?>>
+                                                <?= ucfirst($role['role_name']) ?>
+                                            </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block mb-2 text-sm font-bold text-slate-700">Status</label>
+                                        <select name="status"
+                                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 cursor-pointer">
+                                            <option value="active" <?= $user['status'] == 'active' ? 'selected' : '' ?>>
+                                                Active</option>
+                                            <option value="inactive"
+                                                <?= $user['status'] == 'inactive' ? 'selected' : '' ?>>Inactive</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="pt-4 border-t border-slate-100">
+                                    <label class="block mb-2 text-sm font-bold text-slate-700">
+                                        Password Baru <span class="text-slate-400 font-normal text-xs">(Opsional)</span>
+                                    </label>
+                                    <div class="relative">
+                                        <input type="password" name="password" id="password"
+                                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 transition-all"
+                                            placeholder="Kosongkan jika tidak ingin mengubah password">
+                                        <button type="button" onclick="togglePassword()"
+                                            class="absolute inset-y-0 right-0 px-4 text-slate-400 hover:text-slate-600">
+                                            <i class="bi bi-eye" id="toggleIcon"></i>
+                                        </button>
+                                    </div>
+                                    <p class="text-xs text-slate-500 mt-2">Minimal 6 karakter. Gunakan kombinasi huruf
+                                        dan angka.</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-8 flex gap-3">
+                                <button type="submit"
+                                    class="px-6 py-3.5 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-xl shadow-lg shadow-primary-500/30 transition-all transform active:scale-95">
+                                    Simpan Perubahan
                                 </button>
+                                <a href="<?= url('/admin/users') ?>"
+                                    class="px-6 py-3.5 bg-white border border-slate-300 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-all">
+                                    Batal
+                                </a>
                             </div>
-                            <p class="mt-2 text-xs text-amber-600/80 flex items-center gap-1">
-                                <i class="bi bi-exclamation-circle-fill"></i> Only fill this if you want to reset the user's password.
-                            </p>
+
                         </div>
-
-                        <div>
-                            <label for="role_id" class="block mb-2 text-sm font-semibold text-slate-700">User Role <span class="text-rose-500">*</span></label>
-                            <div class="relative">
-                                <select name="role_id" id="role_id" 
-                                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-500 block appearance-none cursor-pointer" required>
-                                    <option value="">-- Select System Role --</option>
-                                    <?php foreach ($roles as $role): ?>
-                                        <option value="<?= $role['id'] ?>" <?= $role['id'] == $user['role_id'] ? 'selected' : '' ?>>
-                                            <?= e($role['role_name']) ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-500">
-                                    <i class="bi bi-chevron-down text-xs"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block mb-2 text-sm font-semibold text-slate-700">Account Status</label>
-                            <div class="grid grid-cols-2 gap-4">
-                                <label class="group relative flex items-center p-4 bg-white border rounded-xl cursor-pointer hover:bg-slate-50 transition-all border-slate-200 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50/30 has-[:checked]:ring-1 has-[:checked]:ring-emerald-500">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-4 h-4 rounded-full border border-slate-300 flex items-center justify-center bg-white group-has-[:checked]:border-emerald-500">
-                                            <div class="w-2 h-2 rounded-full bg-emerald-500 hidden group-has-[:checked]:block"></div>
-                                        </div>
-                                        <span class="text-sm font-medium text-slate-700">Active</span>
-                                    </div>
-                                    <input type="radio" name="status" value="active" class="hidden" 
-                                        <?= strtolower($user['status']) == 'active' ? 'checked' : '' ?>>
-                                </label>
-
-                                <label class="group relative flex items-center p-4 bg-white border rounded-xl cursor-pointer hover:bg-slate-50 transition-all border-slate-200 has-[:checked]:border-slate-500 has-[:checked]:bg-slate-50 has-[:checked]:ring-1 has-[:checked]:ring-slate-500">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-4 h-4 rounded-full border border-slate-300 flex items-center justify-center bg-white group-has-[:checked]:border-slate-500">
-                                            <div class="w-2 h-2 rounded-full bg-slate-500 hidden group-has-[:checked]:block"></div>
-                                        </div>
-                                        <span class="text-sm font-medium text-slate-700">Inactive</span>
-                                    </div>
-                                    <input type="radio" name="status" value="inactive" class="hidden"
-                                        <?= strtolower($user['status']) == 'inactive' ? 'checked' : '' ?>>
-                                </label>
-                            </div>
-                        </div>
-
                     </div>
-
-                    <div class="flex flex-col sm:flex-row items-center gap-4 mt-8 pt-6 border-t border-slate-100">
-                        <button type="submit" class="w-full sm:flex-1 text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-semibold rounded-xl text-sm px-5 py-3 transition-all shadow-lg shadow-primary-500/30 flex justify-center items-center gap-2 group">
-                            <i class="bi bi-check-lg group-hover:scale-110 transition-transform"></i>
-                            Save Changes
-                        </button>
-                        
-                        <a href="<?= url('/admin/users') ?>" class="w-full sm:flex-1 text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 hover:text-slate-900 focus:ring-4 focus:ring-slate-100 font-medium rounded-xl text-sm px-5 py-3 text-center transition-all">
-                            Cancel
-                        </a>
-                    </div>
-
-                </form>
-            </div>
-            
-            <div class="mt-6 text-center">
-                <p class="text-xs text-slate-400">
-                    User created at: <span class="font-mono"><?= formatDate($user['created_at']) ?></span>
-                </p>
-            </div>
+                </div>
+            </form>
 
         </div>
     </main>
@@ -154,18 +176,36 @@
 <?php include APP_PATH . '/views/admin/layouts/footer.php'; ?>
 
 <script>
-    function togglePassword() {
-        const passwordInput = document.getElementById('password');
-        const icon = document.getElementById('toggleIcon');
-        
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            icon.classList.remove('bi-eye-slash');
-            icon.classList.add('bi-eye');
-        } else {
-            passwordInput.type = 'password';
-            icon.classList.remove('bi-eye');
-            icon.classList.add('bi-eye-slash');
+// Logic: Preview Gambar saat file dipilih
+function previewImage(input) {
+    const preview = document.getElementById('preview-img');
+    const placeholder = document.getElementById('placeholder-icon');
+
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            // Tampilkan elemen img, sembunyikan placeholder
+            preview.classList.remove('hidden');
+            placeholder.classList.add('hidden');
         }
+
+        reader.readAsDataURL(input.files[0]);
     }
+}
+
+// Logic: Lihat Password
+function togglePassword() {
+    const input = document.getElementById('password');
+    const icon = document.getElementById('toggleIcon');
+
+    if (input.type === "password") {
+        input.type = "text";
+        icon.classList.replace('bi-eye', 'bi-eye-slash');
+    } else {
+        input.type = "password";
+        icon.classList.replace('bi-eye-slash', 'bi-eye');
+    }
+}
 </script>
