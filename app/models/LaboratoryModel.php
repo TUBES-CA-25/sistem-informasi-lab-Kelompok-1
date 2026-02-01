@@ -90,4 +90,28 @@ class LaboratoryModel extends Model
         $result = $this->queryOne("SELECT COUNT(*) as total FROM laboratories");
         return $result['total'];
     }
+
+    // Cari ID Lab berdasarkan Nama (Case Insensitive & Mirip)
+    public function findIdByName($name)
+    {
+        $this->table = 'laboratories';
+        // Mencari yang namanya mirip, misal "Lab IoT" cocok dengan "IoT"
+        $sql = "SELECT id FROM laboratories WHERE lab_name LIKE ? LIMIT 1";
+        $result = $this->queryOne($sql, ['%' . $name . '%']);
+        return $result ? $result['id'] : null;
+    }
+
+    // Ambil semua user (untuk hitung total di dashboard)
+    public function getAllUsers()
+    {
+        $sql = "SELECT * FROM users";
+        return $this->query($sql);
+    }
+
+    // Ambil semua data laboratorium untuk statistik dashboard
+    public function getAllLabs()
+    {
+        $sql = "SELECT * FROM laboratories";
+        return $this->query($sql);
+    }
 }
