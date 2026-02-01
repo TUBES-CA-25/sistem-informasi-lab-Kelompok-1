@@ -136,4 +136,73 @@ class UserModel extends Model
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    // Cari User ID berdasarkan Nama Lengkap (untuk mapping import jadwal)
+    public function findByName($name)
+    {
+        // Bersihkan nama dari spasi berlebih
+        $cleanName = trim($name);
+        $sql = "SELECT * FROM users WHERE name LIKE ? LIMIT 1";
+        $result = $this->queryOne($sql, [$cleanName]);
+        return $result; // Kembalikan full row agar kita bisa ambil fotonya
+    }
+
+
+
+
+
+
+
+    // Hitung User per Role (Untuk Grafik Donat)
+    public function getUserRoleStats()
+    {
+        $sql = "SELECT r.role_name, COUNT(u.id) as total
+                FROM users u
+                JOIN roles r ON u.role_id = r.id
+                GROUP BY r.id";
+        return $this->query($sql);
+    }
+
+    // Ambil semua user (untuk hitung total di dashboard)
+    public function getAllUsers()
+    {
+        $sql = "SELECT * FROM users";
+        return $this->query($sql);
+    }
+
+
+
+    // Ambil user dengan Pagination & Pencarian
+    // Ambil user dengan Pagination & Pencarian
+    public function getUsersPaginated($keyword = null, $limit = 10, $offset = 0)
+    {
+        $sql = "SELECT u.*, r.role_name 
+                FROM users u 
+                JOIN roles r ON u.role_id = r.id";
+
+        $params = [];
+
+        if ($keyword) {
+            $sql .= " WHERE u.name LIKE :keyword OR u.email LIKE :keyword";
+            $params['keyword'] = "%$keyword%";
+        }
+
+        $sql .= " ORDER BY u.created_at DESC LIMIT $limit OFFSET $offset";
+
+        return $this->query($sql, $params);
+    }
+
+    public function countTotalUsers($keyword = null)
+    {
+        $sql = "SELECT COUNT(*) as total FROM users u";
+        $params = [];
+
+        if ($keyword) {
+            $sql .= " WHERE u.name LIKE :keyword OR u.email LIKE :keyword";
+            $params['keyword'] = "%$keyword%";
+        }
+
+        $result = $this->queryOne($sql, $params);
+        return $result['total'];
+    }
 }

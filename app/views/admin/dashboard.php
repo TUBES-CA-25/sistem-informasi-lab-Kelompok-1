@@ -1,167 +1,290 @@
-<?php $title = 'Admin Dashboard'; $adminLayout = true; ?>
+<?php $title = 'Smart Dashboard';
+$adminLayout = true; ?>
 <?php include APP_PATH . '/views/layouts/header.php'; ?>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<div class="admin-layout antialiased bg-slate-50/50 min-h-screen relative text-slate-800">
-    
+<div class="antialiased bg-slate-50 min-h-screen">
     <?php include APP_PATH . '/views/layouts/sidebar.php'; ?>
-    
+
     <main class="p-4 sm:ml-64 pt-8 transition-all duration-300">
-        <div class="max-w-7xl mx-auto space-y-6">
-            
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto space-y-8">
+
+            <div class="flex flex-col md:flex-row justify-between items-end gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold tracking-tight text-slate-900">Dashboard</h1>
-                    <p class="text-slate-500 text-sm mt-1">Selamat datang kembali, pantau performa laboratorium hari ini.</p>
+                    <h1 class="text-3xl font-black text-slate-900 tracking-tight">Dashboard Overview</h1>
+                    <p class="text-slate-500 mt-1">Pantau aktivitas laboratorium ICLABS secara real-time.</p>
                 </div>
-                
-                <div class="flex items-center gap-3 pl-4 md:border-l md:border-slate-200">
-                    <div class="text-right hidden sm:block">
-                        <p class="text-sm font-semibold text-slate-700"><?= e($userName) ?></p>
-                        <p class="text-xs text-slate-500">Administrator</p>
+                <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-sm border border-slate-200">
+                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span class="text-xs font-bold text-slate-600 uppercase tracking-wide">
+                        <?= date('l, d F Y') ?>
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                <div
+                    class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all group">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Pengguna</p>
+                            <h3 class="text-3xl font-black text-slate-800 mt-2"><?= $stats['users'] ?></h3>
+                        </div>
+                        <div
+                            class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
                     </div>
-                    <div class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold border-2 border-white shadow-sm ring-2 ring-primary-50">
-                        <?= strtoupper(substr($userName, 0, 2)) ?>
+                    <div class="mt-4 flex items-center gap-2 text-xs font-medium text-slate-500">
+                        <span class="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded flex items-center gap-1">
+                            <i class="bi bi-arrow-up-short"></i> Active
+                        </span>
+                        <span>Terdaftar di sistem</span>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all group">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Laboratorium</p>
+                            <h3 class="text-3xl font-black text-slate-800 mt-2"><?= $stats['labs'] ?></h3>
+                        </div>
+                        <div
+                            class="w-12 h-12 bg-violet-50 text-violet-600 rounded-xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                            <i class="bi bi-pc-display"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-xs font-medium text-slate-500">
+                        Ruangan Siap Digunakan
+                    </div>
+                </div>
+
+                <div
+                    class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all group">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Kelas Semester Ini</p>
+                            <h3 class="text-3xl font-black text-slate-800 mt-2"><?= $stats['courses'] ?></h3>
+                        </div>
+                        <div
+                            class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-xs font-medium text-slate-500">
+                        Mata Kuliah Terjadwal
+                    </div>
+                </div>
+
+                <div
+                    class="bg-gradient-to-br from-indigo-600 to-blue-700 p-6 rounded-2xl shadow-lg shadow-blue-500/20 text-white relative overflow-hidden group">
+                    <div
+                        class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white opacity-10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700">
+                    </div>
+
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-bold text-blue-200 uppercase tracking-wider">Sesi Hari Ini</p>
+                                <h3 class="text-3xl font-black mt-2"><?= $stats['today_sessions'] ?></h3>
+                            </div>
+                            <div
+                                class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center text-xl">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-xs font-medium text-blue-100 flex items-center gap-2">
+                            <?php if ($stats['today_sessions'] > 0): ?>
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Sedang Berlangsung
+                            <?php else: ?>
+                            <span class="opacity-70">Tidak ada jadwal hari ini</span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 class="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <i class="bi bi-bar-chart-fill text-primary-600"></i> Kesibukan Laboratorium
+                    </h3>
+                    <div class="h-64">
+                        <canvas id="labChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 class="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <i class="bi bi-pie-chart-fill text-violet-600"></i> Pengguna Sistem
+                    </h3>
+                    <div class="h-64 flex items-center justify-center">
+                        <canvas id="userChart"></canvas>
                     </div>
                 </div>
             </div>
 
-            <div class="admin-content space-y-6">
-                <?php displayFlash(); ?>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                    
-                    <div class="group bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden">
-                        <div class="absolute right-0 top-0 w-24 h-24 bg-primary-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-                        <div class="relative z-10">
-                            <div class="flex justify-between items-start mb-4">
-                                <div class="p-2 bg-primary-100 text-primary-600 rounded-lg">
-                                    <i class="bi bi-people-fill text-xl"></i>
-                                </div>
-                                <span class="text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded-full">+2.5%</span>
-                            </div>
-                            <div class="stat-value text-3xl font-bold text-slate-800"><?= $statistics['total_users'] ?? 0 ?></div>
-                            <div class="stat-label text-slate-500 text-sm font-medium mt-1">Total Users</div>
-                        </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-lg">Jadwal Praktikum Hari Ini</h3>
+                        <p class="text-xs text-slate-500 mt-1">Daftar sesi yang dijadwalkan untuk <?= date('d F Y') ?>
+                        </p>
                     </div>
-
-                    <div class="group bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden">
-                        <div class="absolute right-0 top-0 w-24 h-24 bg-violet-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-                        <div class="relative z-10">
-                            <div class="flex justify-between items-start mb-4">
-                                <div class="p-2 bg-violet-100 text-violet-600 rounded-lg">
-                                    <i class="bi bi-pc-display text-xl"></i>
-                                </div>
-                            </div>
-                            <div class="stat-value text-3xl font-bold text-slate-800"><?= $statistics['total_laboratories'] ?? 0 ?></div>
-                            <div class="stat-label text-slate-500 text-sm font-medium mt-1">Laboratories</div>
-                        </div>
-                    </div>
-
-                    <div class="group bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden">
-                        <div class="absolute right-0 top-0 w-24 h-24 bg-amber-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-                        <div class="relative z-10">
-                            <div class="flex justify-between items-start mb-4">
-                                <div class="p-2 bg-amber-100 text-amber-600 rounded-lg">
-                                    <i class="bi bi-hourglass-split text-xl"></i>
-                                </div>
-                                <?php if(($statistics['pending_problems'] ?? 0) > 0): ?>
-                                    <span class="animate-pulse w-2 h-2 rounded-full bg-amber-500"></span>
-                                <?php endif; ?>
-                            </div>
-                            <div class="stat-value text-3xl font-bold text-slate-800"><?= $statistics['pending_problems'] ?? 0 ?></div>
-                            <div class="stat-label text-slate-500 text-sm font-medium mt-1">Pending Issues</div>
-                        </div>
-                    </div>
-
-                    <div class="group bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden">
-                        <div class="absolute right-0 top-0 w-24 h-24 bg-rose-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-                        <div class="relative z-10">
-                            <div class="flex justify-between items-start mb-4">
-                                <div class="p-2 bg-rose-100 text-rose-600 rounded-lg">
-                                    <i class="bi bi-exclamation-triangle-fill text-xl"></i>
-                                </div>
-                            </div>
-                            <div class="stat-value text-3xl font-bold text-slate-800"><?= $statistics['total_problems'] ?? 0 ?></div>
-                            <div class="stat-label text-slate-500 text-sm font-medium mt-1">Total Reports</div>
-                        </div>
-                    </div>
+                    <a href="<?= url('/schedule') ?>"
+                        class="text-sm font-bold text-primary-600 hover:text-primary-700 flex items-center gap-1">
+                        Lihat Full Jadwal <i class="bi bi-arrow-right"></i>
+                    </a>
                 </div>
-                
-                <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-                    <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-white">
-                        <div class="flex items-center gap-2">
-                            <div class="w-1 h-6 bg-primary-500 rounded-full"></div>
-                            <h2 class="text-lg font-bold text-slate-800">Laporan Terbaru</h2>
-                        </div>
-                        <a href="<?= url('/admin/problems') ?>" class="text-sm text-primary-600 hover:text-primary-700 font-medium hover:underline flex items-center gap-1">
-                            Lihat Semua <i class="bi bi-arrow-right"></i>
-                        </a>
-                    </div>
 
-                    <div class="overflow-x-auto">
-                        <?php if (!empty($recentProblems)): ?>
-                            <table class="w-full text-sm text-left text-slate-600">
-                                <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-100">
-                                    <tr>
-                                        <th scope="col" class="px-6 py-3 font-semibold">Laboratory</th>
-                                        <th scope="col" class="px-6 py-3 font-semibold">PC No.</th>
-                                        <th scope="col" class="px-6 py-3 font-semibold">Type</th>
-                                        <th scope="col" class="px-6 py-3 font-semibold">Status</th>
-                                        <th scope="col" class="px-6 py-3 font-semibold">Reporter</th>
-                                        <th scope="col" class="px-6 py-3 font-semibold">Date</th>
-                                        <th scope="col" class="px-6 py-3 font-semibold text-right">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100">
-                                    <?php foreach (array_slice($recentProblems, 0, 10) as $problem): ?>
-                                        <tr class="hover:bg-slate-50/80 transition-colors duration-150">
-                                            <td class="px-6 py-4 font-medium text-slate-900"><?= e($problem['lab_name']) ?></td>
-                                            <td class="px-6 py-4">
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded border border-slate-200 bg-slate-50 text-slate-600 text-xs font-medium font-mono">
-                                                    <?= e($problem['pc_number']) ?>
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4 text-slate-700"><?= getProblemTypeLabel($problem['problem_type']) ?></td>
-                                            <td class="px-6 py-4">
-                                                <?= getStatusBadge($problem['status']) ?>
-                                            </td>
-                                            <td class="px-6 py-4">
-                                                <div class="flex items-center gap-2">
-                                                    <div class="w-6 h-6 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-xs text-slate-600 font-bold">
-                                                        <?= substr($problem['reporter_name'], 0, 1) ?>
-                                                    </div>
-                                                    <span class="truncate max-w-[100px]"><?= e($problem['reporter_name']) ?></span>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 text-slate-500 text-xs whitespace-nowrap">
-                                                <i class="bi bi-clock me-1"></i>
-                                                <?= formatDateTime($problem['reported_at']) ?>
-                                            </td>
-                                            <td class="px-6 py-4 text-right">
-                                                <a href="<?= url('/admin/problems/' . $problem['id']) ?>" 
-                                                   class="inline-flex items-center justify-center w-8 h-8 rounded-full text-slate-400 hover:text-primary-600 hover:bg-primary-50 transition-all" title="View Details">
-                                                    <i class="bi bi-eye"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        <?php else: ?>
-                            <div class="flex flex-col items-center justify-center py-16 text-center">
-                                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-4">
-                                    <i class="bi bi-clipboard-check text-3xl"></i>
-                                </div>
-                                <p class="text-base font-medium text-slate-600">Tidak ada laporan masalah</p>
-                                <p class="text-sm text-slate-400 mt-1">Semua laboratorium berjalan dengan baik.</p>
-                            </div>
-                        <?php endif; ?>
-                    </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-slate-50 text-slate-500 font-bold uppercase text-xs">
+                            <tr>
+                                <th class="px-6 py-4">Waktu</th>
+                                <th class="px-6 py-4">Laboratorium</th>
+                                <th class="px-6 py-4">Mata Kuliah</th>
+                                <th class="px-6 py-4">Dosen</th>
+                                <th class="px-6 py-4 text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <?php if (!empty($todaySchedule)): ?>
+                            <?php foreach ($todaySchedule as $sch):
+                                    // Status sederhana berdasarkan jam
+                                    $now = date('H:i:s');
+                                    $statusClass = 'bg-slate-100 text-slate-600';
+                                    $statusText = 'Scheduled';
+
+                                    if ($now >= $sch['start_time'] && $now <= $sch['end_time']) {
+                                        $statusClass = 'bg-emerald-100 text-emerald-700 animate-pulse';
+                                        $statusText = 'Live Now';
+                                    } elseif ($now > $sch['end_time']) {
+                                        $statusClass = 'bg-slate-100 text-slate-400';
+                                        $statusText = 'Finished';
+                                    }
+                                ?>
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="px-6 py-4 font-mono font-medium text-slate-700">
+                                    <?= substr($sch['start_time'], 0, 5) ?> - <?= substr($sch['end_time'], 0, 5) ?>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-bold text-slate-800"><?= e($sch['lab_name']) ?></span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="font-medium text-slate-900"><?= e($sch['course_name']) ?></div>
+                                    <div class="text-xs text-slate-500"><?= e($sch['class_code']) ?></div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <div
+                                            class="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600">
+                                            <?= substr($sch['lecturer_name'] ?? '?', 0, 1) ?>
+                                        </div>
+                                        <span class="text-slate-600"><?= e($sch['lecturer_name'] ?? '-') ?></span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <span
+                                        class="inline-block px-3 py-1 rounded-full text-xs font-bold <?= $statusClass ?>">
+                                        <?= $statusText ?>
+                                    </span>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                            <?php else: ?>
+                            <tr>
+                                <td colspan="5" class="px-6 py-12 text-center text-slate-400">
+                                    <i class="bi bi-calendar-x text-3xl mb-2 block"></i>
+                                    Tidak ada jadwal praktikum hari ini.
+                                </td>
+                            </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
-                
             </div>
+
         </div>
     </main>
 </div>
 
 <?php include APP_PATH . '/views/admin/layouts/footer.php'; ?>
+
+<script>
+// Data dari PHP
+const labLabels = <?= json_encode(array_column($charts['labs'], 'lab_name')) ?>;
+const labData = <?= json_encode(array_column($charts['labs'], 'total_courses')) ?>;
+
+const userLabels = <?= json_encode(array_column($charts['users'], 'role_name')) ?>;
+const userData = <?= json_encode(array_column($charts['users'], 'total')) ?>;
+
+// 1. Bar Chart (Lab Utilization)
+const ctxLab = document.getElementById('labChart').getContext('2d');
+new Chart(ctxLab, {
+    type: 'bar',
+    data: {
+        labels: labLabels,
+        datasets: [{
+            label: 'Jumlah Kelas',
+            data: labData,
+            backgroundColor: '#3b82f6',
+            borderRadius: 6,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    borderDash: [2, 2]
+                }
+            },
+            x: {
+                grid: {
+                    display: false
+                }
+            }
+        }
+    }
+});
+
+// 2. Doughnut Chart (User Roles)
+const ctxUser = document.getElementById('userChart').getContext('2d');
+new Chart(ctxUser, {
+    type: 'doughnut',
+    data: {
+        labels: userLabels.map(l => l.charAt(0).toUpperCase() + l.slice(1)), // Capitalize
+        datasets: [{
+            data: userData,
+            backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444'],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    padding: 20
+                }
+            }
+        },
+        cutout: '70%'
+    }
+});
+</script>

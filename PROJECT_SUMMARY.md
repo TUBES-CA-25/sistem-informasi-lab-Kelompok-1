@@ -8,12 +8,15 @@
 ## 🎯 Project Overview
 
 ### Nama Project
+
 **ICLABS** - Laboratory Information System
 
 ### Deskripsi Singkat
+
 Sistem informasi berbasis web untuk manajemen laboratorium komputer yang mencakup monitoring jadwal praktikum, pengelolaan kegiatan lab, tracking permasalahan hardware/software, dan manajemen asisten laboratorium.
 
 ### Tujuan Project
+
 1. **Digitalisasi** proses manajemen laboratorium
 2. **Transparansi** informasi jadwal & kegiatan lab
 3. **Efisiensi** pelaporan masalah & koordinasi asisten
@@ -24,6 +27,7 @@ Sistem informasi berbasis web untuk manajemen laboratorium komputer yang mencaku
 ## 🛠️ Technology Stack
 
 ### Backend Architecture
+
 ```
 Language:       PHP 8.0+ (Native, No Framework)
 Database:       MySQL 5.7+ / MariaDB 10.4+
@@ -32,6 +36,7 @@ Server:         Apache 2.4 (XAMPP)
 ```
 
 ### Frontend Stack
+
 ```
 CSS Framework:  Tailwind CSS 3.x (CDN)
 Icons:          Bootstrap Icons
@@ -40,6 +45,7 @@ Responsive:     Mobile-first design
 ```
 
 ### Security Features
+
 ```
 ✅ SQL Injection Protection:    PDO Prepared Statements
 ✅ XSS Prevention:              e() output escaping
@@ -53,19 +59,20 @@ Responsive:     Mobile-first design
 
 ## 👥 User Roles & Permissions
 
-| Role | Level | Key Responsibilities |
-|------|-------|---------------------|
-| **Admin** | 5 | Full system control, user management, all CRUD operations |
-| **Koordinator** | 4 | Lab management, problem tracking, activity publishing |
-| **Asisten** | 3 | Jobdesk execution, problem reporting, schedule view |
-| **Dosen** | 2 | View schedule, lab info (future implementation) |
-| **Mahasiswa** | 1 | Public access, schedule view (future implementation) |
+| Role            | Level | Key Responsibilities                                      |
+| --------------- | ----- | --------------------------------------------------------- |
+| **Admin**       | 5     | Full system control, user management, all CRUD operations |
+| **Koordinator** | 4     | Lab management, problem tracking, activity publishing     |
+| **Asisten**     | 3     | Jobdesk execution, problem reporting, schedule view       |
+| **Dosen**       | 2     | View schedule, lab info (future implementation)           |
+| **Mahasiswa**   | 1     | Public access, schedule view (future implementation)      |
 
 ---
 
 ## 📦 Core Modules
 
 ### 1. Public Module (Landing Pages)
+
 **File**: `app/controllers/LandingController.php`
 
 - **Landing Page**: Lab statistics, real-time schedules
@@ -74,46 +81,50 @@ Responsive:     Mobile-first design
 - **Kegiatan**: Activity gallery & news
 
 **Features**:
+
 - Dynamic schedule aggregation
 - Day grouping with Indonesian translation
 - Real-time status indicators
 - WhatsApp integration
 
 ### 2. Admin Module
+
 **File**: `app/controllers/AdminController.php`
 
-| Sub-Module | CRUD | Features |
-|------------|------|----------|
-| **Users** | ✅ | Create, Edit, Delete, Role assignment |
-| **Laboratories** | ✅ | Lab data with photos, capacity management |
-| **Schedules** | ✅ | Course plans, session management, reschedule |
-| **Assistant Schedules** | ✅ | Piket scheduling, jobdesk description |
-| **Head Laboran** | ✅ | Staff management with photos |
-| **Activities** | ✅ | Publish news, upload cover images |
-| **Problems** | ✅ | View all problems, assign to asisten, status update |
+| Sub-Module              | CRUD | Features                                            |
+| ----------------------- | ---- | --------------------------------------------------- |
+| **Users**               | ✅   | Create, Edit, Delete, Role assignment               |
+| **Laboratories**        | ✅   | Lab data with photos, capacity management           |
+| **Schedules**           | ✅   | Course plans, session management, reschedule        |
+| **Assistant Schedules** | ✅   | Piket scheduling, jobdesk description               |
+| **Head Laboran**        | ✅   | Staff management with photos                        |
+| **Activities**          | ✅   | Publish news, upload cover images                   |
+| **Problems**            | ✅   | View all problems, assign to asisten, status update |
 
 **Total Methods**: 50+ controller actions
 
 ### 3. Koordinator Module
+
 **File**: `app/controllers/KoordinatorController.php`
 
-| Sub-Module | CRUD | Features |
-|------------|------|----------|
-| **Problems** | ✅ | Create, Edit, Delete, Assign to asisten |
-| **Schedules** | ✅ | View, Create piket schedules |
-| **Laboratories** | ✅ | Manage lab data |
-| **Activities** | ✅ | Publish kegiatan with images |
+| Sub-Module       | CRUD | Features                                |
+| ---------------- | ---- | --------------------------------------- |
+| **Problems**     | ✅   | Create, Edit, Delete, Assign to asisten |
+| **Schedules**    | ✅   | View, Create piket schedules            |
+| **Laboratories** | ✅   | Manage lab data                         |
+| **Activities**   | ✅   | Publish kegiatan with images            |
 
 **Total Methods**: 30+ controller actions
 
 ### 4. Asisten Module
+
 **File**: `app/controllers/AsistenController.php`
 
-| Sub-Module | CRUD | Features |
-|------------|------|----------|
-| **Jobdesk** | View, Update | Task list with status tracking |
-| **Problems** | ✅ | Report, Edit, Delete own reports |
-| **Schedules** | View | Personal piket schedule |
+| Sub-Module    | CRUD         | Features                         |
+| ------------- | ------------ | -------------------------------- |
+| **Jobdesk**   | View, Update | Task list with status tracking   |
+| **Problems**  | ✅           | Report, Edit, Delete own reports |
+| **Schedules** | View         | Personal piket schedule          |
 
 **Total Methods**: 20+ controller actions
 
@@ -124,6 +135,7 @@ Responsive:     Mobile-first design
 ### Total Tables: 14
 
 #### Core Tables
+
 1. **users** (User accounts & authentication)
    - Columns: id, name, email, password, role_id, status, created_at
    - Relations: → roles, assistant_schedules, lab_problems
@@ -165,11 +177,13 @@ Responsive:     Mobile-first design
     - ON DELETE: CASCADE
 
 #### Support Tables
+
 11. **app_settings** (Application settings)
 12. **lab_photos** (Lab image gallery)
 13. **lab_schedules_old** (Legacy schedules)
 
 ### Foreign Key Strategy
+
 ```sql
 ✅ CASCADE:   Delete related data automatically
 ✅ SET NULL:  Keep record, nullify reference (assigned_to)
@@ -183,6 +197,7 @@ Responsive:     Mobile-first design
 ## 🎨 Design Pattern & Code Quality
 
 ### MVC Architecture
+
 ```
 Model:      Business logic + Database interaction (PDO)
 View:       Presentation layer (PHP + Tailwind CSS)
@@ -190,108 +205,176 @@ Controller: Request handling + Authorization
 ```
 
 ### Code Organization
+
 ```
-ICLABS/
-├── app/
-│   ├── config/
-│   │   ├── constants.php
-│   │   ├── database.php
-│   │   └── routes.php
-│   ├── controllers/
-│   │   ├── AdminController.php
-│   │   ├── ApiController.php
-│   │   ├── AsistenController.php
-│   │   ├── AuthController.php
-│   │   ├── KoordinatorController.php
-│   │   └── LandingController.php
-│   ├── core/
-│   │   ├── Controller.php
-│   │   ├── Model.php
-│   │   └── Router.php
-│   ├── helpers/
-│   │   └── functions.php
-│   ├── models/
-│   │   ├── AssistantScheduleModel.php
-│   │   ├── HeadLaboranModel.php
-│   │   ├── LabActivityModel.php
-│   │   ├── LaboratoryModel.php
-│   │   ├── LabProblemModel.php
-│   │   ├── LabScheduleModel.php
-│   │   ├── ProblemHistoryModel.php
-│   │   ├── RoleModel.php
-│   │   ├── SettingsModel.php
-│   │   └── UserModel.php
-│   └── views/
-│       ├── admin/
-│       │   ├── activities/ (create, edit, index)
-│       │   ├── assistant-schedules/ (create, edit, list)
-│       │   ├── calendar/ (index)
-│       │   ├── head-laboran/ (create, edit, index, show)
-│       │   ├── laboratories/ (create, edit, list)
-│       │   ├── problems/ (create, detail, edit, list)
-│       │   ├── schedules/ (create, edit, index, session_detail, session_edit, sessions, show)
-│       │   └── users/ (create, edit, list, dashboard?)
-│       ├── asisten/
-│       │   ├── jobdesk/
-│       │   │   ├── edit.php
-│       │   │   └── index.php
-│       │   ├── reports/
-│       │   │   ├── create.php
-│       │   │   ├── detail.php
-│       │   │   ├── edit.php
-│       │   │   └── index.php
-│       │   └── schedules/
-│       │       └── index.php
-│       ├── auth/
-│       │   └── login.php
-│       ├── koordinator/  <-- BAGIAN INI JUGA SUDAH ADA
-│       │   ├── activities/ (create, edit, index)
-│       │   ├── assistant-schedules/ (create, edit, index)
-│       │   ├── laboratories/ (create, edit, index)
-│       │   ├── problems/ (create, detail, edit, index)
-│       │   └── schedules/ (create, edit, index)
-│       ├── landing/
-│       │   ├── activities.php
-│       │   ├── activity-detail.php
-│       │   ├── index.php
-│       │   ├── presence.php
-│       │   ├── schedule-detail.php
-│       │   └── schedule.php
-│       └── layouts/
-│           ├── footer.php
-│           ├── header.php
-│           ├── navbar.php
-│           └── sidebar.php
-├── database/
-│   └── migrations/
-│   └── iclabs.sql (tempat upload database setelah di import)
-├── public/
-│   ├── assets/
-│   └── uploads/
-│   └── .htaccess
-│   └── index.php
-├── .htaccess
-└── index.php
+├── 📁 app
+│   ├── 📁 config
+│   │   ├── 🐘 constants.php
+│   │   ├── 🐘 database.php
+│   │   └── 🐘 routes.php
+│   ├── 📁 controllers
+│   │   ├── 🐘 AdminController.php
+│   │   ├── 🐘 ApiController.php
+│   │   ├── 🐘 AsistenController.php
+│   │   ├── 🐘 AuthController.php
+│   │   ├── 🐘 KoordinatorController.php
+│   │   └── 🐘 LandingController.php
+│   ├── 📁 core
+│   │   ├── 🐘 Controller.php
+│   │   ├── 🐘 Model.php
+│   │   └── 🐘 Router.php
+│   ├── 📁 helpers
+│   │   └── 🐘 functions.php
+│   ├── 📁 models
+│   │   ├── 🐘 AssistantScheduleModel.php
+│   │   ├── 🐘 HeadLaboranModel.php
+│   │   ├── 🐘 LabActivityModel.php
+│   │   ├── 🐘 LabProblemModel.php
+│   │   ├── 🐘 LabScheduleModel.php
+│   │   ├── 🐘 LaboratoryModel.php
+│   │   ├── 🐘 ProblemHistoryModel.php
+│   │   ├── 🐘 RoleModel.php
+│   │   ├── 🐘 SettingsModel.php
+│   │   └── 🐘 UserModel.php
+│   └── 📁 views
+│       ├── 📁 admin
+│       │   ├── 📁 activities
+│       │   │   ├── 🐘 create.php
+│       │   │   ├── 🐘 edit.php
+│       │   │   └── 🐘 index.php
+│       │   ├── 📁 assistant-schedules
+│       │   │   ├── 🐘 create.php
+│       │   │   ├── 🐘 edit.php
+│       │   │   └── 🐘 list.php
+│       │   ├── 📁 calendar
+│       │   │   └── 🐘 index.php
+│       │   ├── 📁 head-laboran
+│       │   │   ├── 🐘 create.php
+│       │   │   ├── 🐘 edit.php
+│       │   │   ├── 🐘 index.php
+│       │   │   └── 🐘 show.php
+│       │   ├── 📁 laboratories
+│       │   │   ├── 🐘 create.php
+│       │   │   ├── 🐘 edit.php
+│       │   │   └── 🐘 list.php
+│       │   ├── 📁 layouts
+│       │   │   └── 🐘 footer.php
+│       │   ├── 📁 problems
+│       │   │   ├── 🐘 create.php
+│       │   │   ├── 🐘 detail.php
+│       │   │   ├── 🐘 edit.php
+│       │   │   └── 🐘 list.php
+│       │   ├── 📁 schedules
+│       │   │   ├── 🐘 create.php
+│       │   │   ├── 🐘 edit.php
+│       │   │   ├── 🐘 import.php
+│       │   │   ├── 🐘 index.php
+│       │   │   ├── 🐘 session_detail.php
+│       │   │   ├── 🐘 session_edit.php
+│       │   │   ├── 🐘 sessions.php
+│       │   │   └── 🐘 show.php
+│       │   ├── 📁 users
+│       │   │   ├── 🐘 create.php
+│       │   │   ├── 🐘 edit.php
+│       │   │   ├── 🐘 import.php
+│       │   │   └── 🐘 list.php
+│       │   └── 🐘 dashboard.php
+│       ├── 📁 asisten
+│       │   ├── 📁 jobdesk
+│       │   │   ├── 🐘 edit.php
+│       │   │   └── 🐘 index.php
+│       │   ├── 📁 reports
+│       │   │   ├── 🐘 create.php
+│       │   │   ├── 🐘 detail.php
+│       │   │   ├── 🐘 edit.php
+│       │   │   └── 🐘 index.php
+│       │   └── 📁 schedules
+│       │       └── 🐘 index.php
+│       ├── 📁 auth
+│       │   └── 🐘 login.php
+│       ├── 📁 koordinator
+│       │   ├── 📁 activities
+│       │   │   ├── 🐘 create.php
+│       │   │   ├── 🐘 edit.php
+│       │   │   └── 🐘 index.php
+│       │   ├── 📁 assistant-schedules
+│       │   │   ├── 🐘 create.php
+│       │   │   ├── 🐘 edit.php
+│       │   │   └── 🐘 index.php
+│       │   ├── 📁 laboratories
+│       │   │   ├── 🐘 create.php
+│       │   │   ├── 🐘 edit.php
+│       │   │   └── 🐘 index.php
+│       │   ├── 📁 problems
+│       │   │   ├── 🐘 create.php
+│       │   │   ├── 🐘 detail.php
+│       │   │   ├── 🐘 edit.php
+│       │   │   └── 🐘 index.php
+│       │   └── 📁 schedules
+│       │       ├── 🐘 create.php
+│       │       ├── 🐘 edit.php
+│       │       └── 🐘 index.php
+│       ├── 📁 landing
+│       │   ├── 🐘 activities.php
+│       │   ├── 🐘 activity-detail.php
+│       │   ├── 🐘 index.php
+│       │   ├── 🐘 presence.php
+│       │   ├── 🐘 schedule-detail.php
+│       │   └── 🐘 schedule.php
+│       └── 📁 layouts
+│           ├── 🐘 footer.php
+│           ├── 🐘 header.php
+│           ├── 🐘 navbar.php
+│           └── 🐘 sidebar.php
+├── 📁 database
+│   ├── 📁 migrations
+│   │   ├── 📄 001_remove_reporter_name.sql
+│   │   ├── 📄 002_seed_asisten_users.sql
+│   │   └── 📄 users_data.sql
+│   └── 📄 iclabs.sql
+├── 📁 public
+│   ├── 📁 assets
+│   │   ├── 📁 css
+│   │   │   ├── 🎨 admin.css
+│   │   │   └── 🎨 style.css
+│   │   ├── 📁 images
+│   │   │   └── 🖼️ logo-iclabs.png
+│   │   └── 📁 js
+│   │       └── 📄 main.js
+│   ├── ⚙️ .htaccess
+│   └── 🐘 index.php
+├── ⚙️ .gitignore
+├── ⚙️ .htaccess
+├── 📝 INSTALL.md
+├── 📝 PROJECT_SUMMARY.md
+├── 📝 README.md
+├── ⚙️ composer.json
+└── 📄 vhost-config.txt
 
 ```
 
 ### Helper Functions (42+ functions)
+
 **Security**:
+
 - `sanitize()`: Input cleaning
 - `e()`: Output escaping
 - `validateId()`: ID validation
 - `validateRequired()`: Required field check
 
 **Upload**:
+
 - `uploadFile()`: Secure file upload (MIME + extension)
 - `deleteFile()`: Safe file deletion
 
 **Flash Messages**:
+
 - `setFlash()`: Store notification
 - `getFlash()`: Retrieve & clear
 - `displayFlash()`: Render toast (auto-dismiss 5s)
 
 **Utilities**:
+
 - `formatDate()`, `formatTime()`, `indonesianDay()`
 - `url()`: Generate URLs
 - `isLoggedIn()`, `getUserId()`, `hasRole()`
@@ -301,6 +384,7 @@ ICLABS/
 ## 📊 Project Statistics
 
 ### Code Metrics
+
 ```
 Total Lines of Code:     ~15,000 LOC
 PHP Files:              ~65 files
@@ -311,6 +395,7 @@ Helper Functions:       42 functions
 ```
 
 ### Feature Coverage
+
 ```
 CRUD Operations:        42 operations
 DELETE Actions:         14 (all with validation)
@@ -320,6 +405,7 @@ File Uploads:           8 operations (secure)
 ```
 
 ### Bug Fixes & Improvements (During Development)
+
 ```
 ✅ Silent Failures Fixed:       42+ operations
 ✅ Undefined Index Protected:   15+ locations
@@ -332,6 +418,7 @@ File Uploads:           8 operations (secure)
 ## 🔒 Security Audit Summary
 
 ### ✅ Implemented
+
 1. **SQL Injection**: PDO prepared statements in all 14 models
 2. **XSS Protection**: `e()` helper available, used in critical outputs
 3. **Authorization**: `requireRole()` enforced in all controllers
@@ -345,11 +432,13 @@ File Uploads:           8 operations (secure)
 7. **Permissions**: Secure directory creation (0755)
 
 ### ⚠️ Partial Implementation
+
 1. **CSRF Protection**: Token generation ready, not all forms protected
 2. **Password Hashing**: Using `password_hash()`, no password strength enforcement
 3. **Session Security**: Basic session, no regeneration on privilege change
 
 ### 📝 Recommendations
+
 1. Implement CSRF tokens on all state-changing forms
 2. Add password strength meter
 3. Implement rate limiting on login
@@ -361,6 +450,7 @@ File Uploads:           8 operations (secure)
 ## 🚀 Deployment Checklist
 
 ### Pre-Production
+
 - [ ] Change default passwords
 - [ ] Remove test accounts
 - [ ] Enable error logging (not display)
@@ -371,6 +461,7 @@ File Uploads:           8 operations (secure)
 - [ ] Check foreign key constraints
 
 ### Production Configuration
+
 ```php
 // app/config/database.php
 DB_HOST = 'production-host'
@@ -388,6 +479,7 @@ ini_set('error_log', '/path/to/error.log');
 ## 📈 Future Roadmap
 
 ### Phase 2 (Enhancements)
+
 - [ ] CSRF protection on all forms
 - [ ] Export data (Excel/PDF)
 - [ ] Email notifications
@@ -395,6 +487,7 @@ ini_set('error_log', '/path/to/error.log');
 - [ ] Image optimization & lazy loading
 
 ### Phase 3 (Advanced)
+
 - [ ] Mobile app (PWA)
 - [ ] Barcode scanner for PC tracking
 - [ ] Inventory management
@@ -424,4 +517,3 @@ ini_set('error_log', '/path/to/error.log');
 **Last Updated**: January 30, 2026  
 **Version**: 1.0.0  
 **Status**: Production Ready ✅
-

@@ -1,5 +1,11 @@
 <?php
 
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+
+
 /**
  * ICLABS - Admin Controller
  * Handles all admin operations (FULL CRUD)
@@ -19,33 +25,41 @@ class AdminController extends Controller
 
     public function dashboard()
     {
+        // Load Models
         $userModel = $this->model('UserModel');
-        $laboratoryModel = $this->model('LaboratoryModel');
+        $labModel = $this->model('LaboratoryModel');
         $scheduleModel = $this->model('LabScheduleModel');
-        $problemModel = $this->model('LabProblemModel');
-        $activityModel = $this->model('LabActivityModel');
+        // $problemModel = $this->model('ProblemModel'); // Jika ada fitur ticket
 
-        $roleModel = $this->model('RoleModel');
-        $roles = $roleModel->getAllRoles();
+        // 1. Ambil Data Kartu Utama
+        $totalUsers = count($userModel->getAllUsers());
+        $totalLabs = count($labModel->getAllLabs());
 
-        $statistics = [
-            'total_users' => $userModel->count(),
-            'total_laboratories' => $laboratoryModel->countLaboratories(),
-            'total_schedules' => $scheduleModel->countSchedules(),
-            'total_problems' => $problemModel->count(),
-            'pending_problems' => $problemModel->countByStatus('reported'),
-            'upcoming_activities' => $activityModel->countUpcoming(),
-        ];
+        // Hitung total jadwal aktif (Course Plans)
+        $allPlans = $scheduleModel->getAllPlans(); // Pastikan method ini ada (kita buat utk export tadi)
+        $totalCourses = count($allPlans);
 
-        // Count users by role
-        foreach ($roles as $role) {
-            $statistics['users_' . $role['role_name']] = $userModel->countByRole($role['id']);
-        }
+        // 2. Data Grafik & Tabel
+        $todaySchedule = $scheduleModel->getTodaySchedule();
+        $labStats = $scheduleModel->getLabUtilizationStats();
+        $dailyStats = $scheduleModel->getDailyLoadStats();
+        $userStats = $userModel->getUserRoleStats();
 
+        // 3. Kirim ke View
         $data = [
-            'statistics' => $statistics,
-            'recentProblems' => $problemModel->getAllWithDetails(),
-            'userName' => getUserName()
+            'stats' => [
+                'users' => $totalUsers,
+                'labs' => $totalLabs,
+                'courses' => $totalCourses,
+                'today_sessions' => count($todaySchedule)
+            ],
+            'todaySchedule' => $todaySchedule,
+            'charts' => [
+                'labs' => $labStats,
+                'daily' => $dailyStats,
+                'users' => $userStats
+            ],
+            'userName' => $_SESSION['user_name'] ?? 'Admin' // Ambil nama dari session login
         ];
 
         $this->view('admin/dashboard', $data);
@@ -55,33 +69,35 @@ class AdminController extends Controller
     // USER MANAGEMENT
     // ==========================================
 
+    // GANTI method listUsers() yang lama dengan yang ini:
     public function listUsers()
     {
         $userModel = $this->model('UserModel');
 
-        // 1. Ambil parameter filter dari URL (misal: ?role=dosen)
-        $roleFilter = isset($_GET['role']) ? $_GET['role'] : null;
+        // 1. Konfigurasi Pagination
+        $limit = 10; // Tampilkan 10 user per halaman
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $page = $page < 1 ? 1 : $page; // Minimal halaman 1
+        $offset = ($page - 1) * $limit;
 
-        if ($roleFilter) {
-            // Gunakan fungsi baru yang kita buat di UserModel tadi
-            $users = $userModel->getUsersByRoleName($roleFilter);
-        } else {
-            // Jika tidak ada filter, ambil semua
-            $users = $userModel->getAllWithRoles();
-        }
+        // 2. Ambil Keyword Pencarian (jika ada)
+        $keyword = isset($_GET['q']) ? trim($_GET['q']) : null;
 
-        // 2. Hitung statistik kecil untuk tombol filter
-        $allCount = count($userModel->getAllWithRoles());
+        // 3. Ambil Data dari Model
+        // (Method ini sudah ada di UserModel.php Anda, jadi aman)
+        $users = $userModel->getUsersPaginated($keyword, $limit, $offset);
+        $totalUsers = $userModel->countTotalUsers($keyword);
 
-        // Ambil data roles untuk tab filter dinamis (opsional, tapi bagus untuk UI)
-        $roleModel = $this->model('RoleModel');
-        $roles = $roleModel->getAllRoles();
+        // 4. Hitung Total Halaman
+        $totalPages = ceil($totalUsers / $limit);
 
+        // 5. Kirim Data ke View (Pastikan nama variabel SESUAI dengan list.php)
         $data = [
             'users' => $users,
-            'currentRole' => $roleFilter,
-            'roles' => $roles, // Kirim list role agar bisa jadi tombol filter
-            'total_users' => $allCount
+            'currentPage' => $page,
+            'totalPages' => $totalPages, // Ini yang dicari list.php ($totalPages)
+            'keyword' => $keyword,       // Ini yang dicari list.php ($keyword)
+            'totalUsers' => $totalUsers  // Ini yang dicari list.php ($totalUsers)
         ];
 
         $this->view('admin/users/list', $data);
@@ -282,6 +298,39 @@ class AdminController extends Controller
             setFlash('danger', 'Gagal memperbarui user.');
             $this->redirect('/admin/users/' . $id . '/edit');
         }
+    }
+
+    public function users()
+    {
+        $userModel = $this->model('UserModel');
+
+        // 1. Konfigurasi Pagination
+        $limit = 10; // Tampilkan 10 user per halaman
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $page = $page < 1 ? 1 : $page; // Minimal halaman 1
+        $offset = ($page - 1) * $limit;
+
+        // 2. Ambil Keyword Pencarian (jika ada)
+        $keyword = isset($_GET['q']) ? trim($_GET['q']) : null;
+
+        // 3. Ambil Data dari Model
+        // (Pastikan UserModel sudah punya method getUsersPaginated & countTotalUsers)
+        $users = $userModel->getUsersPaginated($keyword, $limit, $offset);
+        $totalUsers = $userModel->countTotalUsers($keyword);
+
+        // 4. Hitung Total Halaman
+        $totalPages = ceil($totalUsers / $limit);
+
+        // 5. Kirim Data ke View (INI YANG PENTING AGAR ERROR HILANG)
+        $data = [
+            'users' => $users,
+            'currentPage' => $page,
+            'totalPages' => $totalPages, // Mengisi $totalPages di view
+            'keyword' => $keyword,       // Mengisi $keyword di view
+            'totalUsers' => $totalUsers  // Mengisi $totalUsers di view
+        ];
+
+        $this->view('admin/users/list', $data);
     }
 
 
@@ -1774,6 +1823,465 @@ class AdminController extends Controller
 
         header('Content-Type: application/json');
         echo json_encode($calendarEvents);
+        exit;
+    }
+
+    // ==========================================
+    // MASS USER IMPORT & EXPORT
+    // ==========================================
+
+    public function importUserForm()
+    {
+        $this->view('admin/users/import');
+    }
+
+    public function importUser()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/users/import');
+        }
+
+        // 1. Validasi File
+        if (!isset($_FILES['file']['name']) || empty($_FILES['file']['name'])) {
+            setFlash('danger', 'Silakan pilih file Excel terlebih dahulu.');
+            $this->redirect('/admin/users/import');
+            return;
+        }
+
+        $extension = pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION);
+        if (!in_array(strtolower($extension), ['xls', 'xlsx', 'csv'])) {
+            setFlash('danger', 'Format file harus Excel (.xlsx, .xls) atau CSV.');
+            $this->redirect('/admin/users/import');
+            return;
+        }
+
+        $userModel = $this->model('UserModel');
+        $roleModel = $this->model('RoleModel');
+
+        try {
+            // 2. Baca File Excel
+            $spreadsheet = IOFactory::load($_FILES['file']['tmp_name']);
+            $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+
+            // Variabel counter
+            $success = 0;
+            $failed = 0;
+            $errors = [];
+
+            // 3. Looping Baris (Mulai dari baris 2 karena baris 1 adalah Header)
+            foreach ($sheetData as $key => $row) {
+                if ($key == 1) continue; // Skip Header
+
+                // Pastikan baris tidak kosong (cek email)
+                $email = trim($row['B'] ?? ''); // Kolom B: Email
+                if (empty($email)) continue;
+
+                // Cek Duplikasi Email
+                if ($userModel->getByEmail($email)) {
+                    $failed++;
+                    $errors[] = "Baris $key: Email $email sudah terdaftar.";
+                    continue;
+                }
+
+                // Mapping Role (Contoh: "Asisten" -> ID 3)
+                $roleName = strtolower(trim($row['C'] ?? '')); // Kolom C: Role
+                $roleId = 3; // Default Asisten jika tidak ketemu
+
+                // Cari ID role berdasarkan nama
+                $roleData = $roleModel->getByName($roleName);
+                if ($roleData) {
+                    $roleId = $roleData['id'];
+                }
+
+                // Persiapkan Data
+                $userData = [
+                    'name'     => trim($row['A'] ?? 'No Name'), // Kolom A: Nama
+                    'email'    => $email,
+                    'role_id'  => $roleId,
+                    'status'   => strtolower(trim($row['D'] ?? 'active')), // Kolom D: Status
+                    'password' => trim($row['E'] ?? 'password123'), // Kolom E: Password
+                    'image'    => null // Default null
+                ];
+
+                // Insert User (Password akan di-hash di Model)
+                if ($userModel->createUser($userData)) {
+                    $success++;
+                } else {
+                    $failed++;
+                }
+            }
+
+            // 4. Feedback
+            if ($success > 0) {
+                setFlash('success', "Berhasil import $success user. Gagal: $failed.");
+            } else {
+                setFlash('danger', "Gagal import user. Pastikan format Excel benar.");
+            }
+
+            if (!empty($errors)) {
+                // Opsional: Tampilkan error detail di session/flash terpisah jika perlu
+            }
+        } catch (Exception $e) {
+            setFlash('danger', 'Terjadi kesalahan saat membaca file: ' . $e->getMessage());
+        }
+
+        $this->redirect('/admin/users');
+    }
+
+    public function exportUser()
+    {
+        // 1. Ambil Data dari Database
+        $userModel = $this->model('UserModel');
+        // Kita pakai getAllWithRoles agar dapat nama role (bukan cuma ID)
+        $users = $userModel->getAllWithRoles();
+
+        if (empty($users)) {
+            setFlash('danger', 'Tidak ada data user untuk diexport.');
+            $this->redirect('/admin/users');
+        }
+
+        // 2. Buat Spreadsheet Baru
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Data User ICLABS');
+
+        // 3. Set Header Kolom (Baris 1)
+        $headers = ['No', 'Nama Lengkap', 'Email Address', 'Role', 'Status Akun', 'Tanggal Registrasi'];
+        $columnIndex = 'A';
+
+        foreach ($headers as $header) {
+            $sheet->setCellValue($columnIndex . '1', $header);
+
+            // Styling Header (Bold + Warna Background Ringan)
+            $style = $sheet->getStyle($columnIndex . '1');
+            $style->getFont()->setBold(true);
+            $style->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                ->getStartColor()->setARGB('FFEEEEEE'); // Abu-abu muda
+
+            $columnIndex++;
+        }
+
+        // 4. Isi Data (Mulai Baris 2)
+        $row = 2;
+        $no = 1;
+
+        foreach ($users as $user) {
+            // Kolom A: No
+            $sheet->setCellValue('A' . $row, $no++);
+
+            // Kolom B: Nama
+            $sheet->setCellValue('B' . $row, $user['name']);
+
+            // Kolom C: Email
+            $sheet->setCellValue('C' . $row, $user['email']);
+
+            // Kolom D: Role (Huruf Kapital Awal)
+            $sheet->setCellValue('D' . $row, ucfirst($user['role_name'] ?? '-'));
+
+            // Kolom E: Status
+            $sheet->setCellValue('E' . $row, ucfirst($user['status']));
+
+            // Kolom F: Tanggal (Format Cantik)
+            $date = date('d-m-Y H:i', strtotime($user['created_at']));
+            $sheet->setCellValue('F' . $row, $date);
+
+            $row++;
+        }
+
+        // 5. Auto Size Kolom (Agar lebar kolom pas dengan isi teks)
+        foreach (range('A', 'F') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // 6. Output ke Browser (Download)
+        $filename = 'Data_User_ICLABS_' . date('Y-m-d_His') . '.xlsx';
+
+        // Bersihkan buffer output agar file tidak corrupt
+        if (ob_get_length()) ob_end_clean();
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+
+
+
+
+
+
+
+
+
+    // ==========================================
+    // SCHEDULE IMPORT (LOGIC COMPLEX)
+    // ==========================================
+
+    public function importScheduleForm()
+    {
+        $this->view('admin/schedules/import');
+    }
+
+    public function importSchedule()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/schedules/import');
+        }
+
+        if (!isset($_FILES['file']['name']) || empty($_FILES['file']['name'])) {
+            setFlash('danger', 'Silakan pilih file Excel terlebih dahulu.');
+            $this->redirect('/admin/schedules/import');
+            return;
+        }
+
+        $scheduleModel = $this->model('LabScheduleModel');
+        $labModel = $this->model('LaboratoryModel');
+        $userModel = $this->model('UserModel');
+
+        try {
+            $spreadsheet = IOFactory::load($_FILES['file']['tmp_name']);
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray(null, true, true, true);
+
+            // Variabel Laporan
+            $report = [
+                'success' => 0,
+                'errors' => [] // Menyimpan detail error: ['row' => 1, 'msg' => '...']
+            ];
+
+            foreach ($rows as $key => $row) {
+                if ($key == 1) continue; // Skip Header
+
+                // A. Ambil Data Dasar
+                $labName = trim($row['A'] ?? '');
+                $dateStr = trim($row['B'] ?? '');
+                $startTime = trim($row['C'] ?? '');
+                $endTime = trim($row['D'] ?? '');
+                $courseName = trim($row['F'] ?? 'Tanpa Nama'); // Untuk laporan error
+
+                // Skip baris kosong
+                if (empty($labName) && empty($dateStr)) continue;
+
+                // B. Validasi Kritis
+                $labId = $labModel->findIdByName($labName);
+                if (!$labId) {
+                    $report['errors'][] = [
+                        'row' => $key,
+                        'course' => $courseName,
+                        'reason' => "Laboratorium '$labName' tidak ditemukan di database."
+                    ];
+                    continue; // Lanjut ke baris berikutnya
+                }
+
+                // C. Cek Format Tanggal & Waktu
+                try {
+                    if (is_numeric($dateStr)) {
+                        $startDate = Date::excelToDateTimeObject($dateStr);
+                    } else {
+                        $startDate = new DateTime($dateStr);
+                    }
+                    $startDateStr = $startDate->format('Y-m-d');
+                    $dayName = $startDate->format('l');
+                } catch (Exception $e) {
+                    $report['errors'][] = [
+                        'row' => $key,
+                        'course' => $courseName,
+                        'reason' => "Format tanggal salah ($dateStr). Gunakan YYYY-MM-DD."
+                    ];
+                    continue;
+                }
+
+                // D. Validasi Bentrok MASTER (Cek sesi pertama)
+                if ($scheduleModel->isSlotOccupied($labId, $startDateStr, $startTime, $endTime)) {
+                    $report['errors'][] = [
+                        'row' => $key,
+                        'course' => $courseName,
+                        'reason' => "<b>Jadwal Bentrok!</b> Lab $labName sudah terisi pada $startDateStr ($startTime - $endTime)."
+                    ];
+                    continue; // Skip baris ini, jangan insert
+                }
+
+                // E. Persiapkan Data User (Snapshot)
+                $dosenName = trim($row['K'] ?? '');
+                $dosenUser = $userModel->findByName($dosenName);
+
+                $asst1Name = trim($row['L'] ?? '');
+                $asst1User = $userModel->findByName($asst1Name);
+
+                $asst2Name = trim($row['M'] ?? '');
+                $asst2User = $userModel->findByName($asst2Name);
+
+                // F. Insert Master Plan
+                $planData = [
+                    'laboratory_id'    => $labId,
+                    'course_name'      => $courseName,
+                    'program_study'    => trim($row['G'] ?? '-'),
+                    'class_code'       => trim($row['H'] ?? '-'),
+                    'semester'         => (int) ($row['I'] ?? 1),
+                    'description'      => trim($row['J'] ?? ''),
+                    'lecturer_id'      => $dosenUser['id'] ?? null,
+                    'assistant_1_id'   => $asst1User['id'] ?? null,
+                    'assistant_2_id'   => $asst2User['id'] ?? null,
+                    'lecturer_name'    => $dosenUser['name'] ?? $dosenName,
+                    'lecturer_photo'   => $dosenUser['image'] ?? null,
+                    'assistant_1_name' => $asst1User['name'] ?? $asst1Name,
+                    'assistant_1_photo' => $asst1User['image'] ?? null,
+                    'assistant_2_name' => $asst2User['name'] ?? $asst2Name,
+                    'assistant_2_photo' => $asst2User['image'] ?? null,
+                    'day'              => $dayName,
+                    'start_time'       => $startTime,
+                    'end_time'         => $endTime,
+                    'total_meetings'   => (int) ($row['E'] ?? 14)
+                ];
+
+                $planId = $scheduleModel->createCoursePlan($planData);
+
+                if ($planId) {
+                    // G. Generate Sesi
+                    $currentDate = new DateTime($startDateStr);
+                    $sessionFailures = 0;
+
+                    for ($i = 1; $i <= $planData['total_meetings']; $i++) {
+                        $sessionDate = $currentDate->format('Y-m-d');
+
+                        // Cek bentrok per sesi (untuk sesi ke-2 dst)
+                        if (!$scheduleModel->isSlotOccupied($labId, $sessionDate, $startTime, $endTime)) {
+                            $scheduleModel->createSession([
+                                'course_plan_id' => $planId,
+                                'meeting_number' => $i,
+                                'session_date'   => $sessionDate,
+                                'start_time'     => $startTime,
+                                'end_time'       => $endTime,
+                                'status'         => 'scheduled'
+                            ]);
+                        } else {
+                            $sessionFailures++;
+                        }
+                        $currentDate->modify('+7 days');
+                    }
+
+                    $report['success']++;
+
+                    // Jika ada sesi yang gagal (bentrok parsial), catat sebagai warning
+                    if ($sessionFailures > 0) {
+                        $report['errors'][] = [
+                            'row' => $key,
+                            'course' => $courseName,
+                            'reason' => "Jadwal berhasil dibuat, tapi <b>$sessionFailures sesi</b> gagal digenerate karena bentrok di minggu-minggu berikutnya."
+                        ];
+                    }
+                }
+            }
+
+            // SIMPAN REPORT KE SESSION
+            $_SESSION['import_report'] = $report;
+            setFlash('info', 'Proses import selesai. Silakan cek laporan di bawah.');
+        } catch (Exception $e) {
+            setFlash('danger', 'Error System: ' . $e->getMessage());
+        }
+
+        $this->redirect('/admin/schedules/import');
+    }
+
+
+
+
+
+
+
+
+    // ==========================================
+    // EXPORT SCHEDULE TO EXCEL
+    // ==========================================
+    public function exportSchedule()
+    {
+        $scheduleModel = $this->model('LabScheduleModel');
+
+        // Ambil semua data Master Plan
+        // (Pastikan method getAllPlans di Model melakukan JOIN ke users & laboratories)
+        $schedules = $scheduleModel->getAllPlans();
+
+        if (empty($schedules)) {
+            setFlash('danger', 'Belum ada data jadwal untuk diexport.');
+            $this->redirect('/admin/schedules');
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Jadwal Praktikum');
+
+        // 1. Header Styles
+        $headerStyle = [
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => '0F172A']], // Slate-900
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+        ];
+
+        // 2. Set Header Columns
+        $headers = [
+            'A' => 'No',
+            'B' => 'Hari',
+            'C' => 'Waktu',
+            'D' => 'Laboratorium',
+            'E' => 'Mata Kuliah',
+            'F' => 'Kelas / Sem',
+            'G' => 'Dosen Pengampu',
+            'H' => 'Asisten 1',
+            'I' => 'Asisten 2'
+        ];
+
+        foreach ($headers as $col => $text) {
+            $sheet->setCellValue($col . '1', $text);
+            $sheet->getStyle($col . '1')->applyFromArray($headerStyle);
+        }
+
+        // 3. Isi Data
+        $row = 2;
+        $no = 1;
+
+        foreach ($schedules as $sch) {
+            $timeRange = formatTime($sch['start_time']) . ' - ' . formatTime($sch['end_time']);
+
+            $sheet->setCellValue('A' . $row, $no++);
+            $sheet->setCellValue('B' . $row, getDayName($sch['day'])); // Pastikan helper getDayName ada
+            $sheet->setCellValue('C' . $row, $timeRange);
+            $sheet->setCellValue('D' . $row, $sch['lab_name']);
+            $sheet->setCellValue('E' . $row, $sch['course_name']);
+            $sheet->setCellValue('F' . $row, $sch['class_code'] . ' (Sem ' . $sch['semester'] . ')');
+
+            // Nama Dosen (Ambil dari snapshot jika ada, atau relasi user)
+            $lecturer = $sch['lecturer_name'] ?? $sch['lecturer_real_name'] ?? '-';
+            $sheet->setCellValue('G' . $row, $lecturer);
+
+            // Nama Asisten
+            $asst1 = $sch['assistant_1_name'] ?? '-';
+            $asst2 = $sch['assistant_2_name'] ?? '-';
+            $sheet->setCellValue('H' . $row, $asst1);
+            $sheet->setCellValue('I' . $row, $asst2);
+
+            $row++;
+        }
+
+        // 4. Formatting Akhir
+        foreach (range('A', 'I') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Download
+        $filename = 'Jadwal_Praktikum_ICLABS_' . date('Y-m-d') . '.xlsx';
+
+        if (ob_get_length()) ob_end_clean();
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
         exit;
     }
 }

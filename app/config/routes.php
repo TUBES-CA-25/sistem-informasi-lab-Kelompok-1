@@ -133,6 +133,10 @@ $router->post('/admin/users/create', 'AdminController@createUser');
 $router->get('/admin/users/:id/edit', 'AdminController@editUserForm');
 $router->post('/admin/users/:id/edit', 'AdminController@editUser');
 $router->post('/admin/users/:id/delete', 'AdminController@deleteUser');
+// ... Routes Admin User Management yang sudah ada ...
+$router->get('/admin/users/import', 'AdminController@importUserForm');
+$router->post('/admin/users/import', 'AdminController@importUser');
+$router->get('/admin/users/export', 'AdminController@exportUser');
 
 // Laboratory Management
 $router->get('/admin/laboratories', 'AdminController@listLaboratories');
@@ -153,6 +157,9 @@ $router->post('/admin/sessions/:id/delete', 'AdminController@deleteSession');
 $router->get('/admin/schedules/:id/edit', 'AdminController@editScheduleForm');
 $router->post('/admin/schedules/:id/edit', 'AdminController@editSchedule');
 $router->post('/admin/schedules/:id/delete', 'AdminController@deleteSchedule');
+$router->get('/admin/schedules/import', 'AdminController@importScheduleForm');
+$router->post('/admin/schedules/import', 'AdminController@importSchedule');
+$router->get('/admin/schedules/export', 'AdminController@exportSchedule');
 $router->get('/admin/sessions/:id/edit', 'AdminController@editSessionForm');
 $router->post('/admin/sessions/:id/edit', 'AdminController@updateSession');
 

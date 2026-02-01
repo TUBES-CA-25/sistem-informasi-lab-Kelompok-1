@@ -24,6 +24,7 @@ require_once APP_PATH . '/core/Model.php';
 require_once APP_PATH . '/config/constants.php';
 require_once APP_PATH . '/config/database.php';
 require_once APP_PATH . '/helpers/functions.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 // Initialize Router
 $router = new Router();

@@ -16,11 +16,25 @@
                     </p>
                 </div>
 
-                <a href="<?= url('/admin/schedules/create') ?>"
-                    class="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl shadow-lg shadow-primary-500/30 transition-all focus:ring-4 focus:ring-primary-100">
-                    <i class="bi bi-plus-lg text-lg"></i>
-                    <span>Buat Jadwal Baru</span>
-                </a>
+                <div class="flex gap-2">
+                    <a href="<?= url('/admin/schedules/import') ?>"
+                        class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-sm transition-all">
+                        <i class="bi bi-file-earmark-spreadsheet"></i>
+                        <span class="hidden sm:inline">Import</span>
+                    </a>
+
+                    <a href="<?= url('/admin/schedules/export') ?>"
+                        class="inline-flex items-center gap-2 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 text-sm font-medium px-4 py-2.5 rounded-xl shadow-sm transition-all">
+                        <i class="bi bi-download"></i>
+                        <span class="hidden sm:inline">Export</span>
+                    </a>
+
+                    <a href="<?= url('/admin/schedules/create') ?>"
+                        class="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl shadow-lg shadow-primary-500/30 transition-all">
+                        <i class="bi bi-plus-lg"></i>
+                        <span>Buat Jadwal</span>
+                    </a>
+                </div>
             </div>
 
             <?php displayFlash(); ?>

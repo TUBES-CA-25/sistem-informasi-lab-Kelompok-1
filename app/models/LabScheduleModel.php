@@ -380,4 +380,70 @@ class LabScheduleModel extends Model
         return $result['count'] > 0;
     }
 
+    // ==========================================
+    // TAMBAHAN UNTUK EXPORT JADWAL
+    // ==========================================
+
+    public function getAllPlans()
+    {
+        $sql = "SELECT cp.*, 
+                       l.lab_name, 
+                       u.name as lecturer_real_name
+                FROM course_plans cp
+                JOIN laboratories l ON cp.laboratory_id = l.id
+                LEFT JOIN users u ON cp.lecturer_id = u.id
+                ORDER BY FIELD(cp.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'), 
+                         cp.start_time ASC";
+
+        return $this->query($sql);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    // --- STATISTIK DASHBOARD ---
+
+    // 1. Ambil Jadwal Hari Ini (Real-time)
+    public function getTodaySchedule()
+    {
+        $today = date('Y-m-d');
+        $sql = "SELECT s.*, cp.course_name, cp.class_code, cp.lecturer_name, l.lab_name 
+                FROM schedule_sessions s
+                JOIN course_plans cp ON s.course_plan_id = cp.id
+                JOIN laboratories l ON cp.laboratory_id = l.id
+                WHERE s.session_date = :today
+                ORDER BY s.start_time ASC";
+        return $this->query($sql, ['today' => $today]);
+    }
+
+    // 2. Statistik Kesibukan Lab (Untuk Grafik Bar)
+    public function getLabUtilizationStats()
+    {
+        $sql = "SELECT l.lab_name, COUNT(cp.id) as total_courses
+                FROM laboratories l
+                LEFT JOIN course_plans cp ON l.id = cp.laboratory_id
+                GROUP BY l.id
+                ORDER BY total_courses DESC
+                LIMIT 5";
+        return $this->query($sql);
+    }
+
+    // 3. Statistik Beban Harian (Untuk Grafik Line/Area)
+    public function getDailyLoadStats()
+    {
+        // Menghitung jumlah kelas per hari
+        $sql = "SELECT day, COUNT(id) as total 
+                FROM course_plans 
+                GROUP BY day 
+                ORDER BY FIELD(day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')";
+        return $this->query($sql);
+    }
 }
