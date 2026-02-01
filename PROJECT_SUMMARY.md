@@ -191,13 +191,88 @@ Controller: Request handling + Authorization
 
 ### Code Organization
 ```
-app/
-├── config/         # Database & constants
-├── controllers/    # Business logic orchestration
-├── core/          # Base Controller, Router
-├── helpers/       # Utility functions (sanitize, validate, upload)
-├── models/        # Database models (PDO)
-└── views/         # Templates (Tailwind CSS)
+ICLABS/
+├── app/
+│   ├── config/
+│   │   ├── constants.php
+│   │   ├── database.php
+│   │   └── routes.php
+│   ├── controllers/
+│   │   ├── AdminController.php
+│   │   ├── ApiController.php
+│   │   ├── AsistenController.php
+│   │   ├── AuthController.php
+│   │   ├── KoordinatorController.php
+│   │   └── LandingController.php
+│   ├── core/
+│   │   ├── Controller.php
+│   │   ├── Model.php
+│   │   └── Router.php
+│   ├── helpers/
+│   │   └── functions.php
+│   ├── models/
+│   │   ├── AssistantScheduleModel.php
+│   │   ├── HeadLaboranModel.php
+│   │   ├── LabActivityModel.php
+│   │   ├── LaboratoryModel.php
+│   │   ├── LabProblemModel.php
+│   │   ├── LabScheduleModel.php
+│   │   ├── ProblemHistoryModel.php
+│   │   ├── RoleModel.php
+│   │   ├── SettingsModel.php
+│   │   └── UserModel.php
+│   └── views/
+│       ├── admin/
+│       │   ├── activities/ (create, edit, index)
+│       │   ├── assistant-schedules/ (create, edit, list)
+│       │   ├── calendar/ (index)
+│       │   ├── head-laboran/ (create, edit, index, show)
+│       │   ├── laboratories/ (create, edit, list)
+│       │   ├── problems/ (create, detail, edit, list)
+│       │   ├── schedules/ (create, edit, index, session_detail, session_edit, sessions, show)
+│       │   └── users/ (create, edit, list, dashboard?)
+│       ├── asisten/
+│       │   ├── jobdesk/
+│       │   │   ├── edit.php
+│       │   │   └── index.php
+│       │   ├── reports/
+│       │   │   ├── create.php
+│       │   │   ├── detail.php
+│       │   │   ├── edit.php
+│       │   │   └── index.php
+│       │   └── schedules/
+│       │       └── index.php
+│       ├── auth/
+│       │   └── login.php
+│       ├── koordinator/  <-- BAGIAN INI JUGA SUDAH ADA
+│       │   ├── activities/ (create, edit, index)
+│       │   ├── assistant-schedules/ (create, edit, index)
+│       │   ├── laboratories/ (create, edit, index)
+│       │   ├── problems/ (create, detail, edit, index)
+│       │   └── schedules/ (create, edit, index)
+│       ├── landing/
+│       │   ├── activities.php
+│       │   ├── activity-detail.php
+│       │   ├── index.php
+│       │   ├── presence.php
+│       │   ├── schedule-detail.php
+│       │   └── schedule.php
+│       └── layouts/
+│           ├── footer.php
+│           ├── header.php
+│           ├── navbar.php
+│           └── sidebar.php
+├── database/
+│   └── migrations/
+│   └── iclabs.sql (tempat upload database setelah di import)
+├── public/
+│   ├── assets/
+│   └── uploads/
+│   └── .htaccess
+│   └── index.php
+├── .htaccess
+└── index.php
+
 ```
 
 ### Helper Functions (42+ functions)
