@@ -1,182 +1,159 @@
 <?php
 $uri = $_SERVER['REQUEST_URI'] ?? '';
+
+// Helper function sederhana untuk cek menu aktif
 function isSidebarActive($uri, $path)
 {
     return strpos($uri, $path) !== false
-        ? 'bg-sky-600 text-white shadow-lg shadow-sky-500/20 font-medium border-l-4 border-white'
+        ? 'bg-sky-600 text-white shadow-md shadow-sky-500/20 font-semibold'
         : 'text-slate-400 hover:bg-slate-800 hover:text-white transition-colors duration-200';
 }
 ?>
 
 <aside id="logo-sidebar"
-    class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0 bg-slate-900 border-r border-slate-800 flex flex-col shadow-2xl"
+    class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0 bg-slate-900 border-r border-slate-800 flex flex-col shadow-xl"
     aria-label="Sidebar">
 
-    <div class="h-16 flex items-center px-6 border-b border-slate-800 bg-slate-900 shrink-0">
+    <div class="h-20 flex items-center px-6 border-b border-slate-800 bg-slate-900 shrink-0">
         <a href="<?= url('/admin/dashboard') ?>" class="flex items-center gap-3 group">
-            <div
-                class="w-8 h-8 rounded bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg shadow-sky-500/30">
-                IC
+            <img src="<?= url('/assets/images/logo-iclabs.png') ?>" alt="Logo ICLABS"
+                class="h-10 w-auto object-contain">
+
+            <div class="flex flex-col">
+                <span class="text-lg font-bold text-white tracking-wide leading-none">ICLABS</span>
+                <span class="text-[10px] font-medium text-slate-500 uppercase tracking-widest mt-1">Admin Panel</span>
             </div>
-            <span class="self-center text-xl font-bold whitespace-nowrap text-white tracking-wide">ADMIN</span>
         </a>
     </div>
 
-    <div class="flex-1 px-3 py-4 overflow-y-auto sidebar-scroll">
+    <div class="flex-1 px-3 py-6 overflow-y-auto custom-scrollbar">
+        <ul class="space-y-1">
 
-        <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'admin'): ?>
-            <ul class="space-y-1">
+            <li>
+                <a href="<?= url('/admin/dashboard') ?>"
+                    class="flex items-center p-3 rounded-lg <?= isSidebarActive($uri, '/admin/dashboard') ?>">
+                    <i class="bi bi-grid-fill text-lg w-6 text-center"></i>
+                    <span class="ms-3 text-sm">Dashboard</span>
+                </a>
+            </li>
 
-                <li class="mb-6">
-                    <a href="<?= url('/') ?>"
-                        class="flex items-center p-2.5 rounded-xl text-emerald-400 bg-emerald-900/10 border border-emerald-900/30 hover:bg-emerald-900/30 transition-all group">
-                        <i class="bi bi-house-door text-xl opacity-80 group-hover:scale-110 transition-transform"></i>
-                        <span class="ms-3 text-sm font-semibold">Ke Halaman Depan</span>
-                    </a>
-                </li>
+            <li>
+                <a href="<?= url('/admin/users') ?>"
+                    class="flex items-center p-3 rounded-lg <?= isSidebarActive($uri, '/admin/users') ?>">
+                    <i class="bi bi-people-fill text-lg w-6 text-center"></i>
+                    <span class="ms-3 text-sm">Pengguna (Users)</span>
+                </a>
+            </li>
 
-                <li>
-                    <a href="<?= url('/admin/dashboard') ?>"
-                        class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/admin/dashboard') ?>">
-                        <i class="bi bi-speedometer2 text-xl opacity-80"></i>
-                        <span class="ms-3 text-sm">Dashboard</span>
-                    </a>
-                </li>
+            <li>
+                <a href="<?= url('/admin/laboratories') ?>"
+                    class="flex items-center p-3 rounded-lg <?= isSidebarActive($uri, '/admin/laboratories') ?>">
+                    <i class="bi bi-pc-display-horizontal text-lg w-6 text-center"></i>
+                    <span class="ms-3 text-sm">Laboratorium</span>
+                </a>
+            </li>
 
-                <li class="px-3 mt-6 mb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Akademik</li>
+            <li>
+                <a href="<?= url('/admin/head-laboran') ?>"
+                    class="flex items-center p-3 rounded-lg <?= isSidebarActive($uri, '/admin/head-laboran') ?>">
+                    <i class="bi bi-person-badge-fill text-lg w-6 text-center"></i>
+                    <span class="ms-3 text-sm">Kepala Lab</span>
+                </a>
+            </li>
 
-                <li>
-                    <a href="<?= url('/admin/calendar') ?>"
-                        class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/admin/calendar') ?>">
-                        <i class="bi bi-calendar3 text-xl opacity-80"></i>
-                        <span class="ms-3 text-sm">Kalender Akademik</span>
-                    </a>
-                </li>
+            <li>
+                <a href="<?= url('/admin/calendar') ?>"
+                    class="flex items-center p-3 rounded-lg <?= isSidebarActive($uri, '/admin/calendar') ?>">
+                    <i class="bi bi-calendar3 text-lg w-6 text-center"></i>
+                    <span class="ms-3 text-sm">Kalender Akademik</span>
+                </a>
+            </li>
 
-                <li>
-                    <a href="<?= url('/admin/schedules') ?>"
-                        class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/admin/schedules') ?>">
-                        <i class="bi bi-table text-xl opacity-80"></i>
-                        <span class="ms-3 text-sm">Data Jadwal</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="<?= url('/admin/assistant-schedules') ?>"
-                        class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/admin/assistant-schedules') ?>">
-                        <i class="bi bi-clock-history text-xl opacity-80"></i>
-                        <span class="ms-3 text-sm">Jadwal Piket</span>
-                    </a>
-                </li>
+            <li>
+                <a href="<?= url('/admin/schedules') ?>"
+                    class="flex items-center p-3 rounded-lg <?= isSidebarActive($uri, '/admin/schedules') ?>">
+                    <i class="bi bi-calendar-week-fill text-lg w-6 text-center"></i>
+                    <span class="ms-3 text-sm">Jadwal Kuliah</span>
+                </a>
+            </li>
 
-                <li class="px-3 mt-6 mb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Manajemen Lab</li>
-                <li>
-                    <a href="<?= url('/admin/head-laboran') ?>"
-                        class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/admin/head-laboran') ?>">
-                        <i class="bi bi-person-badge text-xl opacity-80"></i>
-                        <span class="ms-3 text-sm">Presence / KaLab</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="<?= url('/admin/laboratories') ?>"
-                        class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/admin/laboratories') ?>">
-                        <i class="bi bi-pc-display text-xl opacity-80"></i>
-                        <span class="ms-3 text-sm">Data Laboratorium</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="<?= url('/admin/activities') ?>"
-                        class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/admin/activities') ?>">
-                        <i class="bi bi-newspaper text-xl opacity-80"></i>
-                        <span class="ms-3 text-sm">Kegiatan / Blog</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="<?= url('/admin/problems') ?>"
-                        class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/admin/problems') ?>">
-                        <i class="bi bi-exclamation-triangle text-xl opacity-80"></i>
-                        <span class="ms-3 text-sm">Laporan Masalah</span>
-                    </a>
-                </li>
+            <li>
+                <a href="<?= url('/admin/assistant-schedules') ?>"
+                    class="flex items-center p-3 rounded-lg <?= isSidebarActive($uri, '/admin/assistant-schedules') ?>">
+                    <i class="bi bi-clock-history text-lg w-6 text-center"></i>
+                    <span class="ms-3 text-sm">Jadwal Piket</span>
+                </a>
+            </li>
 
-                <li class="px-3 mt-6 mb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">System</li>
-                <li>
-                    <a href="<?= url('/admin/users') ?>"
-                        class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/admin/users') ?>">
-                        <i class="bi bi-people text-xl opacity-80"></i>
-                        <span class="ms-3 text-sm">User Management</span>
-                    </a>
-                </li>
-            </ul>
+            <li>
+                <a href="<?= url('/admin/problems') ?>"
+                    class="flex items-center p-3 rounded-lg <?= isSidebarActive($uri, '/admin/problems') ?>">
+                    <i class="bi bi-exclamation-triangle-fill text-lg w-6 text-center"></i>
+                    <span class="ms-3 text-sm">Laporan Masalah</span>
+                </a>
+            </li>
 
-        <?php elseif (isset($_SESSION['role']) && $_SESSION['role'] == 'koordinator'): ?>
-            <ul class="space-y-1">
-                <li class="px-3 mt-2 mb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Main Menu</li>
-                <li><a href="<?= url('/koordinator/dashboard') ?>"
-                        class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/koordinator/dashboard') ?>"><i
-                            class="bi bi-grid-1x2-fill text-lg opacity-80"></i><span
-                            class="ms-3 text-sm">Dashboard</span></a></li>
-                <li class="px-3 mt-6 mb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Laporan Masalah
-                </li>
-                <li><a href="<?= url('/koordinator/problems') ?>"
-                        class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/koordinator/problems') ?>"><i
-                            class="bi bi-exclamation-triangle-fill text-lg opacity-80"></i><span
-                            class="ms-3 text-sm">Laporan Masalah</span></a></li>
-            </ul>
+            <li>
+                <a href="<?= url('/admin/activities') ?>"
+                    class="flex items-center p-3 rounded-lg <?= isSidebarActive($uri, '/admin/activities') ?>">
+                    <i class="bi bi-newspaper text-lg w-6 text-center"></i>
+                    <span class="ms-3 text-sm">Berita / Kegiatan</span>
+                </a>
+            </li>
 
-        <?php elseif (isset($_SESSION['role']) && $_SESSION['role'] == 'asisten'): ?>
-            <ul class="space-y-1">
-                <li class="px-3 mt-2 mb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Main Menu</li>
-                <li><a href="<?= url('/asisten/dashboard') ?>"
-                        class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/asisten/dashboard') ?>"><i
-                            class="bi bi-grid-1x2-fill text-lg opacity-80"></i><span
-                            class="ms-3 text-sm">Dashboard</span></a></li>
-                <li class="px-3 mt-6 mb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Laporan Masalah
-                </li>
-                <li><a href="<?= url('/asisten/report-problem') ?>"
-                        class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/asisten/report-problem') ?>"><i
-                            class="bi bi-plus-circle-fill text-lg opacity-80"></i><span class="ms-3 text-sm">Lapor
-                            Kerusakan</span></a></li>
-                <li><a href="<?= url('/asisten/my-reports') ?>"
-                        class="flex items-center p-2.5 rounded-xl group <?= isSidebarActive($uri, '/asisten/my-reports') ?>"><i
-                            class="bi bi-list-ul text-lg opacity-80"></i><span class="ms-3 text-sm">Laporan Saya</span></a>
-                </li>
-            </ul>
-        <?php endif; ?>
+        </ul>
     </div>
 
-    <div class="border-t border-slate-800 p-4 bg-slate-900 shrink-0">
+    <div class="border-t border-slate-800 p-4 bg-slate-900 shrink-0 space-y-2">
+
+        <a href="<?= url('/') ?>"
+            class="flex items-center justify-center w-full p-2.5 text-xs font-bold text-slate-300 bg-slate-800/80 border border-slate-700 rounded-lg hover:bg-sky-600 hover:text-white hover:border-sky-600 transition-all duration-300 group">
+            <i class="bi bi-house-door-fill me-2 text-sm"></i>
+            HALAMAN DEPAN
+        </a>
+
         <a href="<?= url('/logout') ?>"
-            class="flex items-center justify-center w-full p-2.5 text-xs font-bold text-rose-300 bg-rose-950/30 border border-rose-900/50 rounded-lg hover:bg-rose-900/50 hover:text-white transition-colors">
-            <i class="bi bi-box-arrow-right me-2 text-sm"></i> LOGOUT
+            class="flex items-center justify-center w-full p-2.5 text-xs font-bold text-rose-300 bg-rose-950/20 border border-rose-900/30 rounded-lg hover:bg-rose-600 hover:text-white hover:border-rose-600 transition-all duration-300 group">
+            <i class="bi bi-box-arrow-right me-2 text-sm group-hover:translate-x-1 transition-transform"></i>
+            LOGOUT
         </a>
     </div>
 
 </aside>
 
-<!-- Toast Notification Auto-Hide Script (For Admin Layout) -->
-<script>
-// Close toast notification function
-function closeToast() {
-    const toast = document.getElementById('toast-notification');
-    if (toast) {
-        toast.classList.add('translate-x-full', 'opacity-0');
-        setTimeout(() => toast.remove(), 300);
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
     }
-}
 
-// Auto-hide toast after 5 seconds and slide-in animation
-window.addEventListener('DOMContentLoaded', function() {
-    const toast = document.getElementById('toast-notification');
-    if (toast) {
-        // Slide in animation
-        setTimeout(() => {
-            toast.classList.remove('translate-x-full');
-        }, 100);
-        
-        // Auto-hide after 5 seconds
-        setTimeout(() => {
-            closeToast();
-        }, 5000);
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
     }
-});
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: #334155;
+        border-radius: 20px;
+    }
+</style>
+
+<script>
+    window.addEventListener('DOMContentLoaded', function() {
+        const toast = document.getElementById('toast-notification');
+        if (toast) {
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full', 'opacity-0');
+            }, 100);
+            setTimeout(() => {
+                closeToast();
+            }, 5000);
+        }
+    });
+
+    function closeToast() {
+        const toast = document.getElementById('toast-notification');
+        if (toast) {
+            toast.classList.add('translate-x-full', 'opacity-0');
+            setTimeout(() => toast.remove(), 300);
+        }
+    }
 </script>
