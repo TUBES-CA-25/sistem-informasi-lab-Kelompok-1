@@ -53,9 +53,9 @@ class KoordinatorController extends Controller
 
         // Get filtered data
         $result = $problemModel->getFilteredProblems(
-            $filters['status'], 
-            $filters['search'], 
-            $filters['page'], 
+            $filters['status'],
+            $filters['search'],
+            $filters['page'],
             10
         );
 
@@ -123,12 +123,12 @@ class KoordinatorController extends Controller
             // Add history
             $historyModel = $this->model('ProblemHistoryModel');
             $historyModel->addHistory($problemId, 'reported', 'Laporan dibuat oleh Koordinator');
-            
+
             setFlash('success', 'Laporan masalah berhasil ditambahkan.');
         } else {
             setFlash('danger', 'Gagal menambahkan laporan masalah.');
         }
-        
+
         $this->redirect('/koordinator/problems');
     }
 
@@ -248,7 +248,7 @@ class KoordinatorController extends Controller
         ];
 
         $problemModel = $this->model('LabProblemModel');
-        
+
         if ($problemModel->updateProblem($id, $data)) {
             // Add history
             $historyModel = $this->model('ProblemHistoryModel');
@@ -258,7 +258,7 @@ class KoordinatorController extends Controller
         } else {
             setFlash('danger', 'Gagal memperbarui data masalah.');
         }
-        
+
         $this->redirect('/koordinator/problems/' . $id);
     }
 
@@ -284,7 +284,7 @@ class KoordinatorController extends Controller
         }
 
         $problemModel = $this->model('LabProblemModel');
-        
+
         // Cek apakah problem exists
         $problem = $problemModel->find($id);
         if (!$problem) {
@@ -295,13 +295,13 @@ class KoordinatorController extends Controller
         // Delete problem with cascading history (moved to model)
         $historyModel = $this->model('ProblemHistoryModel');
         $result = $problemModel->deleteProblemWithHistory($id, $historyModel);
-        
+
         if ($result) {
             setFlash('success', 'Data masalah berhasil dihapus.');
         } else {
             setFlash('danger', 'Gagal menghapus data masalah.');
         }
-        
+
         $this->redirect('/koordinator/problems');
     }
 
@@ -396,7 +396,7 @@ class KoordinatorController extends Controller
         $data = [
             'assistants' => $userModel->getUsersByRoleName('asisten')
         ];
-        
+
         $this->view('koordinator/assistant-schedules/create', $data);
     }
 
@@ -438,7 +438,7 @@ class KoordinatorController extends Controller
         } else {
             setFlash('danger', 'Gagal menambahkan jadwal piket.');
         }
-        
+
         $this->redirect('/koordinator/assistant-schedules');
     }
 
@@ -466,7 +466,7 @@ class KoordinatorController extends Controller
             'schedule' => $schedule,
             'assistants' => $userModel->getUsersByRoleName('asisten')
         ];
-        
+
         $this->view('koordinator/assistant-schedules/edit', $data);
     }
 
@@ -493,13 +493,13 @@ class KoordinatorController extends Controller
         ];
 
         $scheduleModel = $this->model('AssistantScheduleModel');
-        
+
         if ($scheduleModel->updateSchedule($id, $data)) {
             setFlash('success', 'Jadwal piket berhasil diperbarui.');
         } else {
             setFlash('danger', 'Gagal memperbarui jadwal piket.');
         }
-        
+
         $this->redirect('/koordinator/assistant-schedules');
     }
 
@@ -533,7 +533,7 @@ class KoordinatorController extends Controller
         } else {
             setFlash('danger', 'Gagal menghapus jadwal piket.');
         }
-        
+
         $this->redirect('/koordinator/assistant-schedules');
     }
 
@@ -561,146 +561,241 @@ class KoordinatorController extends Controller
      * 
      * @return void
      */
+    /**
+     * Menampilkan Form Tambah Laboratorium (GET)
+     */
     public function createLaboratoryForm()
     {
         $this->view('koordinator/laboratories/create');
     }
 
     /**
-     * Store new laboratory
-     */
-    /**
-     * Process and store new laboratory
-     * 
-     * Validates lab name requirement
-     * Creates laboratory record with specs
-     * 
-     * @return void Redirects to laboratories list
-     */
-    public function createLaboratory()
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->redirect('/koordinator/laboratories');
-        }
-
-        $data = [
-            'lab_name' => sanitize($this->getPost('lab_name')),
-            'description' => sanitize($this->getPost('description')),
-            'location' => sanitize($this->getPost('location')),
-            'building' => sanitize($this->getPost('building')),
-            'floor' => sanitize($this->getPost('floor')),
-            'room_number' => sanitize($this->getPost('room_number')),
-            'pc_count' => (int)sanitize($this->getPost('pc_count')),
-            'capacity' => (int)sanitize($this->getPost('capacity')),
-            'status' => sanitize($this->getPost('status'))
-        ];
-
-        if (!validateRequired($data, ['lab_name'])) {
-            setFlash('danger', 'Nama laboratorium wajib diisi.');
-            $this->redirect('/koordinator/laboratories/create');
-        }
-
-        $laboratoryModel = $this->model('LaboratoryModel');
-        $result = $laboratoryModel->createLaboratory($data);
-
-        if ($result) {
-            setFlash('success', 'Laboratorium "' . $data['lab_name'] . '" berhasil ditambahkan.');
-        } else {
-            setFlash('danger', 'Gagal menambahkan laboratorium.');
-        }
-        
-        $this->redirect('/koordinator/laboratories');
-    }
-
-    /**
-     * Show edit laboratory form
-     */
-    /**
-     * Display form for editing existing laboratory
-     * 
-     * Loads laboratory data
-     * 
-     * @param int $id Laboratory ID
-     * @return void
+     * Menampilkan Form Edit Laboratorium (GET)
      */
     public function editLaboratoryForm($id)
     {
-        $laboratoryModel = $this->model('LaboratoryModel');
-
-        $lab = $laboratoryModel->find($id);
+        $labModel = $this->model('LaboratoryModel');
+        $lab = $labModel->find($id);
 
         if (!$lab) {
-            setFlash('danger', 'Laboratorium tidak ditemukan!');
+            setFlash('danger', 'Laboratorium tidak ditemukan.');
             $this->redirect('/koordinator/laboratories');
             return;
         }
 
-        $data = ['laboratory' => $lab];
+        $this->view('koordinator/laboratories/edit', ['laboratory' => $lab]);
+    }
 
-        $this->view('koordinator/laboratories/edit', $data);
+// ==========================================================
+    // MODULE: LABORATORIES (MANAJEMEN LAB + FOTO)
+    // ==========================================================
+
+    /**
+     * Menampilkan daftar laboratorium
+     */
+    public function laboratories()
+    {
+        $labModel = $this->model('LaboratoryModel');
+        $keyword = isset($_GET['q']) ? trim($_GET['q']) : null;
+
+        if ($keyword) {
+            // Filter manual berdasarkan nama atau lokasi
+            $allLabs = $labModel->getAllLaboratories();
+            $data['laboratories'] = array_filter($allLabs, function ($lab) use ($keyword) {
+                return stripos($lab['lab_name'], $keyword) !== false ||
+                    stripos($lab['location'], $keyword) !== false;
+            });
+        } else {
+            $data['laboratories'] = $labModel->getAllLaboratories();
+        }
+
+        $this->view('koordinator/laboratories/index', $data);
     }
 
     /**
-     * Update laboratory
+     * Menambah laboratorium baru (dengan Upload Gambar)
+     */
+    public function createLaboratory()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $labModel = $this->model('LaboratoryModel');
+
+            // 1. Ambil Data Teks (Sesuai kolom database iclabs.sql)
+            $data = [
+                'lab_name'    => $_POST['lab_name'],
+                'description' => $_POST['description'],
+                'location'    => $_POST['location'],
+                'pc_count'    => $_POST['pc_count'],
+                'tv_count'    => $_POST['tv_count'],
+                'image'       => null // Default null jika tidak ada foto
+            ];
+
+            // 2. Handle Upload Gambar
+            if (!empty($_FILES['image']['name'])) {
+                $upload = $this->handleUpload($_FILES['image']);
+                if ($upload['success']) {
+                    $data['image'] = $upload['path'];
+                } else {
+                    setFlash('danger', 'Gagal upload foto: ' . $upload['message']);
+                    $this->view('koordinator/laboratories/create');
+                    return;
+                }
+            }
+
+            // 3. Simpan ke Database
+            if ($labModel->createLaboratory($data)) {
+                setFlash('success', 'Laboratorium berhasil ditambahkan.');
+                $this->redirect('/koordinator/laboratories');
+                return;
+            } else {
+                setFlash('danger', 'Gagal menyimpan data ke database.');
+            }
+        }
+
+        $this->view('koordinator/laboratories/create');
+    }
+
+    /**
+     * Mengedit laboratorium (dengan Update Gambar)
      */
     public function updateLaboratory($id)
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        $labModel = $this->model('LaboratoryModel');
+        $lab = $labModel->find($id); // Pastikan Model punya method find()
+
+        if (!$lab) {
+            setFlash('danger', 'Laboratorium tidak ditemukan.');
             $this->redirect('/koordinator/laboratories');
+            return;
         }
 
-        $data = [
-            'lab_name' => sanitize($this->getPost('lab_name')),
-            'description' => sanitize($this->getPost('description')),
-            'location' => sanitize($this->getPost('location')),
-            'building' => sanitize($this->getPost('building')),
-            'floor' => sanitize($this->getPost('floor')),
-            'room_number' => sanitize($this->getPost('room_number')),
-            'capacity' => (int)sanitize($this->getPost('capacity')),
-            'pc_count' => (int)sanitize($this->getPost('pc_count')),
-            'tv_count' => (int)sanitize($this->getPost('tv_count')),
-            'status' => sanitize($this->getPost('status'))
-        ];
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            // 1. Ambil Data Teks
+            $data = [
+                'lab_name'    => $_POST['lab_name'],
+                'description' => $_POST['description'],
+                'location'    => $_POST['location'],
+                'pc_count'    => $_POST['pc_count'],
+                'tv_count'    => $_POST['tv_count']
+                // Jangan set 'image' di sini agar foto lama tidak tertimpa null
+            ];
 
-        $laboratoryModel = $this->model('LaboratoryModel');
-        
-        if ($laboratoryModel->updateLaboratory($id, $data)) {
-            setFlash('success', 'Data laboratorium "' . $data['lab_name'] . '" berhasil diperbarui.');
-        } else {
-            setFlash('danger', 'Gagal memperbarui data laboratorium.');
+            // 2. Handle Upload Gambar Baru (Jika user upload file baru)
+            if (!empty($_FILES['image']['name'])) {
+                $upload = $this->handleUpload($_FILES['image']);
+                if ($upload['success']) {
+                    $data['image'] = $upload['path']; // Update path gambar baru
+                } else {
+                    setFlash('danger', 'Gagal upload foto: ' . $upload['message']);
+                    $this->view('koordinator/laboratories/edit', ['laboratory' => $lab]);
+                    return;
+                }
+            }
+
+            // 3. Update Database
+            if ($labModel->updateLaboratory($id, $data)) {
+                setFlash('success', 'Data laboratorium berhasil diperbarui.');
+                $this->redirect('/koordinator/laboratories');
+                return;
+            } else {
+                setFlash('danger', 'Gagal memperbarui data.');
+            }
         }
-        
-        $this->redirect('/koordinator/laboratories');
+
+        $this->view('koordinator/laboratories/edit', ['laboratory' => $lab]);
     }
 
     /**
-     * Delete laboratory
+     * Menghapus laboratorium
      */
     public function deleteLaboratory($id)
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $labModel = $this->model('LaboratoryModel');
+
+            if ($labModel->deleteLaboratory($id)) {
+                setFlash('success', 'Laboratorium berhasil dihapus.');
+            } else {
+                setFlash('danger', 'Gagal menghapus laboratorium.');
+            }
             $this->redirect('/koordinator/laboratories');
-            return;
         }
-
-        // Validate ID
-        if (!validateId($id)) {
-            setFlash('danger', 'ID laboratorium tidak valid.');
-            $this->redirect('/koordinator/laboratories');
-            return;
-        }
-
-        $laboratoryModel = $this->model('LaboratoryModel');
-        $result = $laboratoryModel->deleteLaboratory($id);
-
-        if ($result) {
-            setFlash('success', 'Laboratorium berhasil dihapus dari sistem.');
-        } else {
-            setFlash('danger', 'Gagal menghapus laboratorium.');
-        }
-        
-        $this->redirect('/koordinator/laboratories');
     }
+
+    /**
+     * HELPER: Fungsi Upload Gambar
+     * (Wajib ada agar create/update tidak error "Call to undefined method")
+     */
+    private function handleUpload($file)
+    {
+        // Tentukan folder tujuan (pastikan folder ini ada/writable)
+        $targetDir = PUBLIC_PATH . '/uploads/laboratories/';
+
+        // Buat folder otomatis jika belum ada
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0777, true);
+        }
+
+        // Validasi Ekstensi File
+        $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $fileExt = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+        if (!in_array($fileExt, $allowedTypes)) {
+            return ['success' => false, 'message' => 'Format file harus JPG, PNG, atau GIF.'];
+        }
+
+        // Generate Nama File Unik (agar tidak bentrok)
+        $fileName = uniqid() . '_' . time() . '.' . $fileExt;
+        $targetFile = $targetDir . $fileName;
+
+        // Pindahkan file dari temp ke folder tujuan
+        if (move_uploaded_file($file['tmp_name'], $targetFile)) {
+            // Sukses: Kembalikan URL lengkap
+            $webUrl = defined('BASE_URL') ? BASE_URL : 'http://localhost/iclabs/public';
+            return [
+                'success' => true,
+                'path' => $webUrl . '/uploads/laboratories/' . $fileName
+            ];
+        }
+
+        return ['success' => false, 'message' => 'Gagal memindahkan file upload.'];
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * List all lab activities with CRUD
@@ -821,7 +916,7 @@ class KoordinatorController extends Controller
         } else {
             setFlash('danger', 'Gagal memperbarui kegiatan.');
         }
-        
+
         $this->redirect('/koordinator/activities');
     }
 
@@ -846,7 +941,7 @@ class KoordinatorController extends Controller
 
         // Delete via model (akan hapus file juga jika ada)
         $result = $activityModel->deleteActivity($id);
-        
+
         if ($result) {
             setFlash('success', 'Kegiatan "' . $activity['title'] . '" berhasil dihapus.');
         } else {
@@ -989,7 +1084,7 @@ class KoordinatorController extends Controller
         } else {
             setFlash('danger', 'Gagal menghapus jadwal asisten.');
         }
-        
+
         $this->redirect('/koordinator/assistant-schedules');
     }
 }

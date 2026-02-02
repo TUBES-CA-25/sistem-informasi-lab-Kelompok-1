@@ -174,6 +174,7 @@ class UserModel extends Model
 
     // Ambil user dengan Pagination & Pencarian
     // Ambil user dengan Pagination & Pencarian
+    // Ambil user dengan Pagination & Pencarian
     public function getUsersPaginated($keyword = null, $limit = 10, $offset = 0)
     {
         $sql = "SELECT u.*, r.role_name 
@@ -182,24 +183,30 @@ class UserModel extends Model
 
         $params = [];
 
-        if ($keyword) {
-            $sql .= " WHERE u.name LIKE :keyword OR u.email LIKE :keyword";
-            $params['keyword'] = "%$keyword%";
+        if (!empty($keyword)) {
+            // PERBAIKAN: Gunakan :k1 dan :k2 agar placeholder tidak ganda
+            $sql .= " WHERE (u.name LIKE :k1 OR u.email LIKE :k2)";
+            $params['k1'] = "%$keyword%";
+            $params['k2'] = "%$keyword%";
         }
 
+        // Limit & Offset dimasukkan langsung karena integer aman
         $sql .= " ORDER BY u.created_at DESC LIMIT $limit OFFSET $offset";
 
         return $this->query($sql, $params);
     }
 
+    // Hitung total user (untuk rumus halaman)
     public function countTotalUsers($keyword = null)
     {
         $sql = "SELECT COUNT(*) as total FROM users u";
         $params = [];
 
-        if ($keyword) {
-            $sql .= " WHERE u.name LIKE :keyword OR u.email LIKE :keyword";
-            $params['keyword'] = "%$keyword%";
+        if (!empty($keyword)) {
+            // PERBAIKAN: Gunakan :k1 dan :k2 di sini juga
+            $sql .= " WHERE (u.name LIKE :k1 OR u.email LIKE :k2)";
+            $params['k1'] = "%$keyword%";
+            $params['k2'] = "%$keyword%";
         }
 
         $result = $this->queryOne($sql, $params);
