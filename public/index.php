@@ -21,6 +21,7 @@ define('BASE_URL', 'http://localhost/iclabs/public');
 require_once APP_PATH . '/core/Router.php';
 require_once APP_PATH . '/core/Controller.php';
 require_once APP_PATH . '/core/Model.php';
+require_once APP_PATH . '/controllers/ErrorController.php'; // Error handling
 require_once APP_PATH . '/config/constants.php';
 require_once APP_PATH . '/config/database.php';
 require_once APP_PATH . '/helpers/functions.php';

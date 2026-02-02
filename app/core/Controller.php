@@ -72,8 +72,8 @@ class Controller {
         }
         
         if (!hasRole($allowedRoles)) {
-            setFlash('danger', 'Akses ditolak. Anda tidak memiliki izin untuk mengakses halaman ini.');
-            $this->redirect('/dashboard');
+            // Use error page instead of redirect
+            $this->error(403, 'Anda tidak memiliki izin untuk mengakses halaman ini.');
         }
     }
     
@@ -127,5 +127,62 @@ class Controller {
         }
         
         return $errors;
+    }
+    
+    /**
+     * Show error page
+     * 
+     * @param int $code HTTP error code
+     * @param string|null $message Custom error message
+     */
+    protected function error($code = 404, $message = null) {
+        // ErrorController already loaded in index.php
+        if (class_exists('ErrorController')) {
+            $errorController = new ErrorController();
+            $errorController->render($code, $message);
+        } else {
+            // Fallback
+            http_response_code($code);
+            echo "<h1>Error $code</h1>";
+            if ($message) {
+                echo "<p>" . htmlspecialchars($message) . "</p>";
+            }
+            exit;
+        }
+    }
+    
+    /**
+     * Shortcut for 404 error
+     */
+    protected function notFound($message = null) {
+        $this->error(404, $message);
+    }
+    
+    /**
+     * Shortcut for 403 error
+     */
+    protected function forbidden($message = null) {
+        $this->error(403, $message);
+    }
+    
+    /**
+     * Shortcut for 401 error
+     */
+    protected function unauthorized($message = null) {
+        $this->error(401, $message);
+    }
+    
+    /**
+     * Shortcut for 400 error
+     */
+    protected function badRequest($message = null) {
+        $this->error(400, $message);
+    }
+    
+    /**
+     * Shortcut for 500 error
+     */
+    protected function serverError($message = null) {
+        $this->error(500, $message);
     }
 }
