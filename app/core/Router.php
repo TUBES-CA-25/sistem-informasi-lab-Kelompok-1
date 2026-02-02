@@ -96,31 +96,57 @@ class Router {
         $controllerFile = APP_PATH . '/controllers/' . $controllerName . '.php';
         
         if (!file_exists($controllerFile)) {
-            die("Controller not found: $controllerName");
+            $this->handleError(500, "Controller file not found");
+            return;
         }
         
         require_once $controllerFile;
         
         if (!class_exists($controllerName)) {
-            die("Controller class not found: $controllerName");
+            $this->handleError(500, "Controller class not found");
+            return;
         }
         
         $controller = new $controllerName();
         
         if (!method_exists($controller, $method)) {
-            die("Method not found: $method in $controllerName");
+            $this->handleError(500, "Controller method not found");
+            return;
         }
         
-        // Call method with params
-        call_user_func_array([$controller, $method], $this->params);
+        try {
+            // Call method with params
+            call_user_func_array([$controller, $method], $this->params);
+        } catch (Exception $e) {
+            // Log error (in production, log to file)
+            error_log($e->getMessage());
+            $this->handleError(500);
+        }
+    }
+    
+    /**
+     * Handle errors by loading ErrorController
+     */
+    private function handleError($code = 500, $message = null) {
+        // ErrorController already loaded in index.php
+        if (class_exists('ErrorController')) {
+            $errorController = new ErrorController();
+            $errorController->render($code, $message);
+        } else {
+            // Fallback if ErrorController doesn't exist
+            http_response_code($code);
+            echo "<h1>Error $code</h1>";
+            if ($message) {
+                echo "<p>" . htmlspecialchars($message) . "</p>";
+            }
+            exit;
+        }
     }
     
     /**
      * 404 Not Found
      */
     private function notFound() {
-        http_response_code(404);
-        echo "<h1>404 - Page Not Found</h1>";
-        exit;
+        $this->handleError(404);
     }
 }
